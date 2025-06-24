@@ -131,8 +131,10 @@ class StrukController extends Controller
     // (Opsional) Menampilkan 1 struk saja
     public function show(Struk $struk)
     {
-        return $struk;
+        $struk->items = json_decode($struk->items);
+        return view('struks.show', compact('struk'));
     }
+
 
     public function exportExcel()
     {

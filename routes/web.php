@@ -12,3 +12,4 @@ Route::delete('/struks/{struk}', [StrukController::class, 'destroy'])->name('str
 
 Route::get('/struks/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');
 Route::get('/struks/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
+Route::get('/struks/{struk}', [StrukController::class, 'show'])->name('struks.show');
