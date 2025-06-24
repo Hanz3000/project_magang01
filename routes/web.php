@@ -13,4 +13,8 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard
 
 Route::get('/struks/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');
 Route::get('/struks/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
+<<<<<<< HEAD
 Route::get('/struks/{struk}', [StrukController::class, 'show'])->name('struks.show');
+=======
+Route::get('/struks/{struk}', [StrukController::class, 'show'])->name('struks.show');
+>>>>>>> a19649668aa87c9671b2d99401aca7bbf1836054
