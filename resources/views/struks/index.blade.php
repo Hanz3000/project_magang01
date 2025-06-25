@@ -103,10 +103,24 @@
                                 @endif
                             </tr>
                             @endforeach
+
+                            @if (request('edit') == $struk->id)
+                            <tr class="bg-slate-50">
+                                <td></td>
+                                <td colspan="3" class="text-sm text-slate-500">Tambah Barang Baru:</td>
+                                <td><input name="nama[]" placeholder="Nama Barang" class="w-full border rounded px-2 py-1"></td>
+                                <td><input name="jumlah[]" type="number" placeholder="0" class="w-16 border rounded px-2 py-1 text-center"></td>
+                                <td><input name="harga[]" type="number" placeholder="0" class="w-24 border rounded px-2 py-1 text-right"></td>
+                                <td class="text-right font-semibold"></td>
+                                <td></td>
+                            </tr>
+                            @endif
+
                             @if (request('edit') == $struk->id)
                         </form>
                         @endif
                         @endforeach
+
                     </tbody>
                 </table>
             </div>

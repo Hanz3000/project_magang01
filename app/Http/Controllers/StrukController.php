@@ -240,11 +240,9 @@ class StrukController extends Controller
     public function updateItems(Request $request, $id)
     {
         $struk = Struk::findOrFail($id);
-        $items = json_decode($struk->items, true); // Ambil data lama
+        $existingItems = json_decode($struk->items, true) ?? [];
 
         $validated = $request->validate([
-            'item_index' => 'required|array',
-            'item_index.*' => 'required|integer',
             'nama' => 'required|array',
             'nama.*' => 'required|string',
             'jumlah' => 'required|array',
@@ -253,26 +251,46 @@ class StrukController extends Controller
             'harga.*' => 'required|numeric|min:0',
         ]);
 
-        foreach ($validated['item_index'] as $i => $index) {
-            if (isset($items[$index])) {
-                $items[$index]['nama'] = $validated['nama'][$i];
-                $items[$index]['jumlah'] = $validated['jumlah'][$i];
-                $items[$index]['harga'] = $validated['harga'][$i];
+        $newItems = [];
+
+        foreach ($validated['nama'] as $i => $nama) {
+            $jumlah = $validated['jumlah'][$i];
+            $harga = $validated['harga'][$i];
+
+            if (isset($request->item_index[$i])) {
+                // Perbarui item lama
+                $index = $request->item_index[$i];
+                $existingItems[$index] = [
+                    'nama' => $nama,
+                    'jumlah' => $jumlah,
+                    'harga' => $harga,
+                ];
+            } else {
+                // Tambahkan item baru
+                if ($nama !== null && $jumlah > 0 && $harga >= 0) {
+                    $newItems[] = [
+                        'nama' => $nama,
+                        'jumlah' => $jumlah,
+                        'harga' => $harga,
+                    ];
+                }
             }
         }
 
-        // Hitung ulang total harga
-        $total = 0;
-        foreach ($items as $item) {
-            $total += $item['jumlah'] * $item['harga'];
-        }
+        // Gabungkan data
+        $finalItems = array_values(array_merge($existingItems, $newItems));
 
-        $struk->items = json_encode($items);
+        $total = collect($finalItems)->sum(function ($item) {
+            return $item['jumlah'] * $item['harga'];
+        });
+
+        $struk->items = json_encode($finalItems);
         $struk->total_harga = $total;
         $struk->save();
 
-        return redirect()->route('struks.index')->with('success', 'Semua item berhasil diperbarui!');
+        return redirect()->route('struks.index')->with('success', 'Item berhasil disimpan!');
     }
+
 
 
     public function addItem(Request $request, $id)
