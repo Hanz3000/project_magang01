@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventaris Barang</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -27,40 +28,76 @@
             </div>
 
             <!-- Menu -->
-            <nav class="py-4">
-                <ul class="space-y-2">
-                    <li>
-                        <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2">
-                            <div class="p-1.5 bg-blue-100 text-blue-600 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                                </svg>
-                            </div>
-                            <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('struks.index') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2">
-                            <div class="p-1.5 bg-green-100 text-green-600 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                            </div>
-                            <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Daftar Struk</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('struks.create') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2">
-                            <div class="p-1.5 bg-amber-100 text-amber-600 rounded-lg">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                            </div>
-                            <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Tambah Struk</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+          <nav class="py-4">
+    <ul class="space-y-2">
+        <!-- Dashboard -->
+        <li>
+            <a href="{{ url('/dashboard') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2">
+                <div class="p-1.5 bg-blue-100 text-blue-600 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </div>
+                <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Dashboard</span>
+            </a>
+        </li>
+
+        <!-- Daftar Struk -->
+        <li>
+            <a href="{{ route('struks.index') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2">
+                <div class="p-1.5 bg-green-100 text-green-600 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                </div>
+                <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Daftar Struk</span>
+            </a>
+        </li>
+
+        <!-- Tambah Struk -->
+        <li>
+            <a href="{{ route('struks.create') }}" class="flex items-center gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2">
+                <div class="p-1.5 bg-amber-100 text-amber-600 rounded-lg">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                    </svg>
+                </div>
+                <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Tambah Struk</span>
+            </a>
+        </li>
+
+        <!-- Master Section (Now moved to bottom) -->
+        <li x-data="{ open: false }">
+            <button @click="open = !open"
+                class="flex items-center justify-between gap-3 px-4 py-3 text-white hover:bg-slate-700 transition-colors rounded-lg mx-2 w-full">
+                <div class="flex items-center gap-3">
+                    <div class="p-1.5 bg-purple-100 text-purple-600 rounded-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h7"/>
+                        </svg>
+                    </div>
+                    <span class="transition-opacity duration-300" x-show="sidebarOpen" x-transition>Master</span>
+                </div>
+                <svg x-show="sidebarOpen" :class="{ 'rotate-180': open }"
+                    class="w-4 h-4 text-white transform transition-transform duration-300" fill="none"
+                    stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+            <!-- Submenu Master -->
+            <div x-show="open" x-transition x-cloak class="ml-10 mt-1 space-y-1"
+                 x-bind:class="sidebarOpen ? 'block' : 'hidden'">
+                <a href="#" class="block px-3 py-2 text-sm text-white hover:bg-slate-600 rounded">Master Data</a>
+                <a href="#" class="block px-3 py-2 text-sm text-white hover:bg-slate-600 rounded">Master Pegawai</a>
+            </div>
+        </li>
+    </ul>
+</nav>
         </aside>
 
         <!-- Main Content -->
