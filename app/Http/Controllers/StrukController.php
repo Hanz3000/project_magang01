@@ -235,28 +235,33 @@ class StrukController extends Controller
         exit;
     }
 
-    public function updateItem(Request $request, $id, $index)
+
+
+    public function updateItems(Request $request, $id)
     {
         $struk = Struk::findOrFail($id);
-        $items = json_decode($struk->items, true); // decode jadi array
+        $items = json_decode($struk->items, true); // Ambil data lama
 
-        // Validasi input item
         $validated = $request->validate([
-            'nama' => 'required|string',
-            'jumlah' => 'required|integer|min:1',
-            'harga' => 'required|numeric|min:0',
+            'item_index' => 'required|array',
+            'item_index.*' => 'required|integer',
+            'nama' => 'required|array',
+            'nama.*' => 'required|string',
+            'jumlah' => 'required|array',
+            'jumlah.*' => 'required|integer|min:1',
+            'harga' => 'required|array',
+            'harga.*' => 'required|numeric|min:0',
         ]);
 
-        // Update item berdasarkan index
-        if (isset($items[$index])) {
-            $items[$index]['nama'] = $validated['nama'];
-            $items[$index]['jumlah'] = $validated['jumlah'];
-            $items[$index]['harga'] = $validated['harga'];
-        } else {
-            return redirect()->back()->with('error', 'Item tidak ditemukan.');
+        foreach ($validated['item_index'] as $i => $index) {
+            if (isset($items[$index])) {
+                $items[$index]['nama'] = $validated['nama'][$i];
+                $items[$index]['jumlah'] = $validated['jumlah'][$i];
+                $items[$index]['harga'] = $validated['harga'][$i];
+            }
         }
 
-        // Hitung ulang total harga semua item
+        // Hitung ulang total harga
         $total = 0;
         foreach ($items as $item) {
             $total += $item['jumlah'] * $item['harga'];
@@ -266,8 +271,10 @@ class StrukController extends Controller
         $struk->total_harga = $total;
         $struk->save();
 
-        return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
+        return redirect()->route('struks.index')->with('success', 'Semua item berhasil diperbarui!');
     }
+
+
     public function addItem(Request $request, $id)
     {
         $struk = Struk::findOrFail($id);

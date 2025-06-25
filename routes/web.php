@@ -52,3 +52,4 @@ Route::middleware('auth')->group(function () {
 
 Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
 Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
+Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');

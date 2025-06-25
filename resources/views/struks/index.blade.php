@@ -49,85 +49,69 @@
                         @php $no = 1; @endphp
                         @foreach($struks as $struk)
                         @php $items = json_decode($struk->items, true); @endphp
-                        @foreach($items as $index => $item)
-                        @php $isEditing = request('edit') == $struk->id . '-' . $index; @endphp
-                        <tr>
-                            @if ($loop->first)
-                            <td rowspan="{{ count($items) }}" class="text-center">{{ $no++ }}</td>
-                            <td rowspan="{{ count($items) }}">{{ $struk->nama_toko }}</td>
-                            <td rowspan="{{ count($items) }}">{{ $struk->nomor_struk }}</td>
-                            <td rowspan="{{ count($items) }}">{{ $struk->tanggal_struk }}</td>
+                        @if (request('edit') == $struk->id)
+                        <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}">
+                            @csrf
+                            @method('PUT')
                             @endif
-
-                            @if ($isEditing)
-                            <form method="POST" action="{{ route('struks.updateItem', ['struk' => $struk->id, 'index' => $index]) }}">
-                                @csrf
-                                @method('PUT')
-                                <td><input name="nama" value="{{ $item['nama'] }}" class="w-full border rounded px-2 py-1"></td>
-                                <td><input name="jumlah" type="number" value="{{ $item['jumlah'] }}" class="w-16 border rounded px-2 py-1 text-center"></td>
-                                <td><input name="harga" type="number" value="{{ $item['harga'] }}" class="w-24 border rounded px-2 py-1 text-right"></td>
+                            @foreach($items as $index => $item)
+                            <tr>
                                 @if ($loop->first)
-                                <td rowspan="{{ count($items) }}" class="text-right font-semibold">
-                                    Rp{{ number_format($struk->total_harga, 0, ',', '.') }}
+                                <td rowspan="{{ count($items) }}" class="text-center">{{ $no++ }}</td>
+                                <td rowspan="{{ count($items) }}">{{ $struk->nama_toko }}</td>
+                                <td rowspan="{{ count($items) }}">{{ $struk->nomor_struk }}</td>
+                                <td rowspan="{{ count($items) }}">{{ $struk->tanggal_struk }}</td>
+                                @endif
+
+                                @if (request('edit') == $struk->id)
+                                <input type="hidden" name="item_index[]" value="{{ $index }}">
+                                <td><input name="nama[]" value="{{ $item['nama'] }}" class="w-full border rounded px-2 py-1"></td>
+                                <td><input name="jumlah[]" type="number" value="{{ $item['jumlah'] }}" class="w-16 border rounded px-2 py-1 text-center"></td>
+                                <td><input name="harga[]" type="number" value="{{ $item['harga'] }}" class="w-24 border rounded px-2 py-1 text-right"></td>
+                                <td class="text-right font-semibold">
+                                    Rp{{ number_format($item['jumlah'] * $item['harga'], 0, ',', '.') }}
                                 </td>
+                                @if ($loop->first)
                                 <td rowspan="{{ count($items) }}">
                                     <div class="flex flex-col gap-1">
                                         <a href="{{ route('struks.show', $struk->id) }}" class="text-green-600 hover:underline text-sm">Detail</a>
-                                        <button type="submit" class="text-blue-600 hover:underline text-sm">Simpan</button>
-                            </form>
-                            <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Yakin hapus?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-600 hover:underline text-sm">Hapus</button>
-                            </form>
+                                        <button type="submit" class="text-blue-600 hover:underline text-sm">Simpan Semua</button>
+                                        <a href="{{ route('struks.index') }}" class="text-slate-500 hover:underline text-xs">Batal</a>
+                                    </div>
+                                </td>
+                                @endif
+                                @else
+                                <td>{{ $item['nama'] }}</td>
+                                <td class="text-center">{{ $item['jumlah'] }}</td>
+                                <td class="text-right">Rp{{ number_format($item['harga'], 0, ',', '.') }}</td>
+                                <td class="text-right font-semibold">
+                                    Rp{{ number_format($item['jumlah'] * $item['harga'], 0, ',', '.') }}
+                                </td>
+                                @if ($loop->first)
+                                <td rowspan="{{ count($items) }}">
+                                    <div class="flex flex-col gap-1">
+                                        <a href="{{ route('struks.show', $struk->id) }}" class="text-green-600 hover:underline text-sm">Detail</a>
+                                        <a href="{{ route('struks.index', ['edit' => $struk->id]) }}" class="text-blue-600 hover:underline text-sm">Edit</a>
+                                        <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Yakin hapus?');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-600 hover:underline text-sm">Hapus</button>
+                                        </form>
+                                    </div>
+                                </td>
+                                @endif
+                                @endif
+                            </tr>
+                            @endforeach
+                            @if (request('edit') == $struk->id)
+                        </form>
+                        @endif
+                        @endforeach
+                    </tbody>
+                </table>
             </div>
-            </td>
-            @endif
-            @else
-            <td>{{ $item['nama'] }}</td>
-            <td class="text-center">{{ $item['jumlah'] }}</td>
-            <td class="text-right">Rp{{ number_format($item['harga'], 0, ',', '.') }}</td>
-            @if ($loop->first)
-            <td rowspan="{{ count($items) }}" class="text-right font-semibold">
-                Rp{{ number_format($struk->total_harga, 0, ',', '.') }}
-            </td>
-            <td rowspan="{{ count($items) }}">
-                <div class="flex flex-col gap-1">
-                    <a href="{{ route('struks.show', $struk->id) }}" class="text-green-600 hover:underline text-sm">Detail</a>
-                    <a href="{{ route('struks.index', ['edit' => $struk->id . '-' . $index]) }}" class="text-blue-600 hover:underline text-sm">Edit</a>
-                    <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Yakin hapus?');">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="text-red-600 hover:underline text-sm">Hapus</button>
-                    </form>
-                </div>
-            </td>
-            @endif
-            @endif
-            </tr>
-            @endforeach
-
-            @if(request()->has('edit') && Str::startsWith(request('edit'), $struk->id . '-'))
-            <tr>
-                <form action="{{ route('struks.addItem', $struk->id) }}" method="POST">
-                    @csrf
-                    <td></td>
-                    <td colspan="3" class="text-sm text-slate-500">Tambah Item Baru:</td>
-                    <td><input type="text" name="nama" class="w-full border rounded px-2 py-1" required></td>
-                    <td><input type="number" name="jumlah" class="w-16 border rounded px-2 py-1 text-center" required></td>
-                    <td><input type="number" name="harga" class="w-24 border rounded px-2 py-1 text-right" required></td>
-                    <td colspan="2" class="text-center">
-                        <button type="submit" class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition">Tambah</button>
-                    </td>
-                </form>
-            </tr>
-            @endif
-            @endforeach
-            </tbody>
-            </table>
         </div>
     </div>
-</div>
 </div>
 
 <style>
