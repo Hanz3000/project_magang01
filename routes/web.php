@@ -56,11 +56,9 @@ Route::middleware('auth')->group(function () {
     Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
     Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
 });
-<<<<<<< HEAD
+
 
 Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
 Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
 Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
 Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
-=======
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4

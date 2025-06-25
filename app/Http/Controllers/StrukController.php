@@ -22,19 +22,14 @@ class StrukController extends Controller
                 ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
         }
 
-<<<<<<< HEAD
+
         $struks = $query->latest()->paginate(10); // Gunakan pagination
 
         return view('struks.index', compact('struks'));
     }
 
 
-=======
-        $struks = $query->latest()->get();
-        return view('struks.index', compact('struks'));
-    }
 
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4
     public function create()
     {
         $barangList = Barang::all();
@@ -55,17 +50,13 @@ class StrukController extends Controller
             'foto_struk' => 'nullable|image|max:2048'
         ]);
 
-<<<<<<< HEAD
+
         $fotoFilename = null;
         if ($request->hasFile('foto_struk')) {
             $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
             $fotoFilename = basename($fotoPath);
         }
-=======
-        $fotoPath = $request->hasFile('foto_struk')
-            ? $request->file('foto_struk')->store('struk_foto', 'public')
-            : null;
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4
+
 
         Struk::create([
             'nama_toko' => $request->nama_toko,
@@ -120,13 +111,7 @@ class StrukController extends Controller
         return redirect()->route('struks.index')->with('success', 'Struk berhasil diperbarui!');
     }
 
-<<<<<<< HEAD
-    // (functio definitions for destroy, show, exportExcel, exportCSV, updateItems, addItem, deleteItem stay the same)
 
-
-    // Hapus struk
-=======
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4
     public function destroy(Struk $struk)
     {
         if ($struk->foto_struk) {
@@ -194,7 +179,7 @@ class StrukController extends Controller
         $hargaArr = $request->input('harga', []);
         $indexArr = $request->input('item_index', []);
 
-<<<<<<< HEAD
+
         $finalItems = [];
 
         foreach ($namaArr as $i => $nama) {
@@ -232,7 +217,7 @@ class StrukController extends Controller
         $total = collect($mergedItems)->sum(function ($item) {
             return $item['jumlah'] * $item['harga'];
         });
-=======
+
         $newItems = [];
         foreach ($validated['nama'] as $i => $nama) {
             $jumlah = $validated['jumlah'][$i];
@@ -248,7 +233,7 @@ class StrukController extends Controller
 
         $finalItems = array_values(array_merge($existingItems, $newItems));
         $total = collect($finalItems)->sum(fn($item) => $item['jumlah'] * $item['harga']);
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4
+
 
         $struk->items = json_encode($mergedItems);
         $struk->total_harga = $total;
@@ -257,12 +242,7 @@ class StrukController extends Controller
         return redirect()->route('struks.index')->with('success', 'Item berhasil disimpan!');
     }
 
-<<<<<<< HEAD
 
-
-
-=======
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4
     public function addItem(Request $request, $id)
     {
         $struk = Struk::findOrFail($id);
@@ -275,7 +255,7 @@ class StrukController extends Controller
         $struk->save();
         return redirect()->route('struks.index')->with('success', 'Item baru berhasil ditambahkan.');
     }
-<<<<<<< HEAD
+
 
     public function deleteItem($id, $index)
     {
@@ -294,6 +274,3 @@ class StrukController extends Controller
             ->with('success', 'Item berhasil dihapus.');
     }
 }
-=======
-}
->>>>>>> 23c926d54c4f10be5c3df7171725c4b598c60ae4
