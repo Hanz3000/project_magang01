@@ -9,10 +9,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 
-
 class StrukController extends Controller
 {
-    // Tampilkan semua struk
     public function index(Request $request)
     {
         $query = Struk::query();
@@ -23,18 +21,17 @@ class StrukController extends Controller
                 ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
         }
 
-        $struks = $query->latest()->get();
+        $struks = $query->latest()->paginate(10); // Gunakan pagination
 
         return view('struks.index', compact('struks'));
     }
 
-    // Tampilkan form tambah
+
     public function create()
     {
         return view('struks.create');
     }
 
-    // Simpan struk baru
     public function store(Request $request)
     {
         $request->validate([
@@ -58,9 +55,10 @@ class StrukController extends Controller
             'total_harga.required' => 'Total harga wajib diisi.',
         ]);
 
-        $fotoPath = null;
+        $fotoFilename = null;
         if ($request->hasFile('foto_struk')) {
             $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
+            $fotoFilename = basename($fotoPath);
         }
 
         Struk::create([
@@ -69,20 +67,18 @@ class StrukController extends Controller
             'tanggal_struk' => $request->tanggal_struk,
             'items' => json_encode($request->items),
             'total_harga' => $request->total_harga,
-            'foto_struk' => $fotoPath
+            'foto_struk' => $fotoFilename
         ]);
 
         return redirect()->route('struks.index')->with('success', 'Struk berhasil disimpan!');
     }
 
-    // Tampilkan form edit
     public function edit(Struk $struk)
     {
         $struk->items = json_decode($struk->items);
         return view('struks.edit', compact('struk'));
     }
 
-    // Update struk
     public function update(Request $request, Struk $struk)
     {
         $request->validate([
@@ -106,12 +102,12 @@ class StrukController extends Controller
             'total_harga.required' => 'Total harga wajib diisi.',
         ]);
 
-        // Ganti foto jika ada yang baru
         if ($request->hasFile('foto_struk')) {
             if ($struk->foto_struk) {
-                Storage::disk('public')->delete($struk->foto_struk);
+                Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
             }
-            $struk->foto_struk = $request->file('foto_struk')->store('struk_foto', 'public');
+            $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
+            $struk->foto_struk = basename($fotoPath);
         }
 
         $struk->update([
@@ -125,6 +121,9 @@ class StrukController extends Controller
 
         return redirect()->route('struks.index')->with('success', 'Struk berhasil diperbarui!');
     }
+
+    // (functio definitions for destroy, show, exportExcel, exportCSV, updateItems, addItem, deleteItem stay the same)
+
 
     // Hapus struk
     public function destroy(Struk $struk)
@@ -242,54 +241,56 @@ class StrukController extends Controller
         $struk = Struk::findOrFail($id);
         $existingItems = json_decode($struk->items, true) ?? [];
 
-        $validated = $request->validate([
-            'nama' => 'required|array',
-            'nama.*' => 'required|string',
-            'jumlah' => 'required|array',
-            'jumlah.*' => 'required|integer|min:1',
-            'harga' => 'required|array',
-            'harga.*' => 'required|numeric|min:0',
-        ]);
+        $namaArr = $request->input('nama', []);
+        $jumlahArr = $request->input('jumlah', []);
+        $hargaArr = $request->input('harga', []);
+        $indexArr = $request->input('item_index', []);
 
-        $newItems = [];
+        $finalItems = [];
 
-        foreach ($validated['nama'] as $i => $nama) {
-            $jumlah = $validated['jumlah'][$i];
-            $harga = $validated['harga'][$i];
+        foreach ($namaArr as $i => $nama) {
+            $jumlah = $jumlahArr[$i] ?? null;
+            $harga = $hargaArr[$i] ?? null;
 
-            if (isset($request->item_index[$i])) {
-                // Perbarui item lama
-                $index = $request->item_index[$i];
-                $existingItems[$index] = [
-                    'nama' => $nama,
-                    'jumlah' => $jumlah,
-                    'harga' => $harga,
-                ];
+            // Lewati jika salah satu kolom kosong (baris tidak valid)
+            if ($nama === null || $nama === '' || $jumlah === null || $harga === null) {
+                continue;
+            }
+
+            // Validasi manual tiap baris
+            if (!is_numeric($jumlah) || $jumlah < 1 || !is_numeric($harga) || $harga < 0) {
+                return back()->withErrors(['items' => 'Semua item harus memiliki jumlah >= 1 dan harga >= 0'])->withInput();
+            }
+
+            $item = [
+                'nama' => $nama,
+                'jumlah' => (int) $jumlah,
+                'harga' => (float) $harga,
+            ];
+
+            // Jika ada item_index berarti item lama, simpan di posisi lama
+            if (isset($indexArr[$i])) {
+                $existingItems[$indexArr[$i]] = $item;
             } else {
-                // Tambahkan item baru
-                if ($nama !== null && $jumlah > 0 && $harga >= 0) {
-                    $newItems[] = [
-                        'nama' => $nama,
-                        'jumlah' => $jumlah,
-                        'harga' => $harga,
-                    ];
-                }
+                $finalItems[] = $item;
             }
         }
 
-        // Gabungkan data
-        $finalItems = array_values(array_merge($existingItems, $newItems));
+        // Gabungkan item lama yang sudah di-update dan item baru
+        $mergedItems = array_merge($existingItems, $finalItems);
+        $mergedItems = array_values($mergedItems); // reset index
 
-        $total = collect($finalItems)->sum(function ($item) {
+        $total = collect($mergedItems)->sum(function ($item) {
             return $item['jumlah'] * $item['harga'];
         });
 
-        $struk->items = json_encode($finalItems);
+        $struk->items = json_encode($mergedItems);
         $struk->total_harga = $total;
         $struk->save();
 
         return redirect()->route('struks.index')->with('success', 'Item berhasil disimpan!');
     }
+
 
 
 
@@ -312,5 +313,22 @@ class StrukController extends Controller
         $struk->save();
 
         return redirect()->route('struks.index')->with('success', 'Item baru berhasil ditambahkan.');
+    }
+
+    public function deleteItem($id, $index)
+    {
+        $struk = Struk::findOrFail($id);
+        $items = json_decode($struk->items, true);
+
+        // Hapus item dengan index tertentu
+        if (isset($items[$index])) {
+            unset($items[$index]);
+            $items = array_values($items); // Reset indeks array
+            $struk->items = json_encode($items);
+            $struk->save();
+        }
+
+        return redirect()->route('struks.index', ['edit' => $struk->id])
+            ->with('success', 'Item berhasil dihapus.');
     }
 }

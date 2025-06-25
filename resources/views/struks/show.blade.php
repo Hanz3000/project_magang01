@@ -18,7 +18,7 @@
         @if ($struk->foto_struk)
         <div class="w-full md:w-60">
             <h3 class="font-semibold mb-2 text-gray-700">🖼️ Foto Struk:</h3>
-            <img src="{{ asset('storage/' . $struk->foto_struk) }}" class="rounded border w-full shadow">
+            <img src="{{ asset('storage/struk_foto/' . $struk->foto_struk) }}" class="rounded border w-full shadow">
         </div>
         @endif
     </div>
