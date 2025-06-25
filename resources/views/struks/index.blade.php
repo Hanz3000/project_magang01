@@ -1,158 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<<<<<<< HEAD
-<div class="max-w-7xl mx-auto px-4 py-6">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">📋 Daftar Struk</h2>
-
-    {{-- Tombol Tambah --}}
-    <div class="mb-6">
-        <a href="{{ route('struks.create') }}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">+ Tambah Struk</a>
-    </div>
-
-    {{-- Notifikasi --}}
-    @if (session('success'))
-    <div class="bg-green-100 border border-green-300 text-green-800 px-4 py-3 rounded mb-6">
-        {{ session('success') }}
-    </div>
-    @endif
-
-    {{-- Tabel --}}
-    <div class="overflow-x-auto bg-white rounded-lg shadow mb-6">
-        <table class="w-full table-auto text-sm text-left text-gray-700">
-            <thead class="bg-gray-100 text-gray-700 font-semibold">
-                <tr>
-                    <th class="p-3 border text-center">No</th>
-                    <th class="p-3 border">Nama Toko</th>
-                    <th class="p-3 border">Nomor Struk</th>
-                    <th class="p-3 border">Tanggal</th>
-                    <th class="p-3 border">Nama Barang</th>
-                    <th class="p-3 border text-center">Jumlah</th>
-                    <th class="p-3 border text-right">Harga Satuan</th>
-                    <th class="p-3 border text-right">Total</th>
-                    <th class="p-3 border text-center">Foto</th>
-                    <th class="p-3 border text-center">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @php $no = 1; @endphp
-                @foreach($struks as $struk)
-                @php $items = json_decode($struk->items); @endphp
-                @foreach($items as $index => $item)
-                <tr class="border-b hover:bg-gray-50">
-                    @if ($loop->first)
-                    <td class="p-3 border text-center" rowspan="{{ count($items) }}">{{ $no++ }}</td>
-                    <td class="p-3 border" rowspan="{{ count($items) }}">{{ $struk->nama_toko }}</td>
-                    <td class="p-3 border" rowspan="{{ count($items) }}">{{ $struk->nomor_struk }}</td>
-                    <td class="p-3 border" rowspan="{{ count($items) }}">{{ $struk->tanggal_struk }}</td>
-                    @endif
-
-                    <td class="p-3 border">
-                        {{ is_object($item) ? $item->nama : $item }}
-                    </td>
-                    <td class="p-3 border text-center">
-                        {{ is_object($item) ? $item->jumlah : '-' }}
-                    </td>
-                    <td class="p-3 border text-right">
-                        @if (is_object($item))
-                        Rp{{ number_format($item->harga, 0, ',', '.') }}
-                        @else
-                        -
-                        @endif
-                    </td>
-
-                    @if ($loop->first)
-                    <td class="p-3 border text-right font-semibold" rowspan="{{ count($items) }}">
-                        Rp{{ number_format($struk->total_harga, 0, ',', '.') }}
-                    </td>
-                    <td class="p-3 border text-center" rowspan="{{ count($items) }}">
-                        @if($struk->foto_struk)
-                        <img src="{{ asset('storage/' . $struk->foto_struk) }}" class="w-24 h-auto mx-auto rounded border" alt="Foto Struk">
-                        @else
-                        <span class="inline-block bg-gray-200 text-gray-600 px-2 py-1 text-xs rounded-full">Tidak ada</span>
-                        @endif
-                    </td>
-                    <td class="p-3 border text-center space-y-1" rowspan="{{ count($items) }}">
-                        <a href="{{ route('struks.show', $struk->id) }}" class="block text-green-600 hover:underline">Lihat Detail</a>
-                        <a href="{{ route('struks.edit', $struk->id) }}" class="block text-blue-600 hover:underline">Edit</a>
-                        <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus struk ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="text-red-600 hover:underline">Hapus</button>
-                        </form>
-                    </td>
-                    @endif
-                </tr>
-                @endforeach
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-
-    {{-- Tombol Export Pindah ke Bawah --}}
-    <div class="flex flex-wrap gap-3">
-        <a href="{{ route('struks.export.excel') }}" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Export Excel</a>
-        <a href="{{ route('struks.export.csv') }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600">Export CSV</a>
-    </div>
-</div>
-@endsection
-=======
 <div class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 animate-fadeIn">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {{-- Header Section --}}
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-8 transform transition-all duration-300 hover:shadow-md">
-            <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-blue-100 rounded-lg">
-                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                    <h1 class="text-2xl font-bold text-slate-800">Daftar Struk</h1>
-                </div>
-
-                <div class="flex items-center gap-3">
-                    <a href="{{ route('struks.create') }}"
-                        class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 shadow-sm hover:shadow-md">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                        </svg>
-                        Tambah Struk
-                    </a>
-                </div>
-            </div>
-
-            {{-- Export Actions integrated into header --}}
-            <div class="border-t border-slate-200 pt-4">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="p-1.5 bg-green-100 rounded-lg">
-                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                    </div>
-                    <span class="text-sm font-medium text-slate-700">Export Data:</span>
-                </div>
-
-                <div class="flex flex-wrap gap-3">
-                    <a href="{{ route('struks.export.excel') }}"
-                        class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Export Excel
-                    </a>
-                    <a href="{{ route('struks.export.csv') }}"
-                        class="inline-flex items-center gap-2 bg-amber-500 text-white px-4 py-2 rounded-lg hover:bg-amber-600 transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        Export CSV
-                    </a>
-                </div>
-            </div>
-        </div>
-
         {{-- Success Notification --}}
         @if (session('success'))
         <div class="bg-green-50 border border-green-200 text-green-700 p-4 rounded-lg mb-6 flex items-center gap-3 animate-slideDown">
@@ -166,13 +16,33 @@
         {{-- Table Card --}}
         <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
             <div class="px-6 py-4 border-b border-slate-200">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-slate-100 rounded-lg">
-                        <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-100 rounded-lg">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold text-slate-800">Data Struk</h3>
                     </div>
-                    <h3 class="text-lg font-semibold text-slate-800">Data Struk</h3>
+
+                    <div class="flex items-center gap-3">
+
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('struks.export.excel') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors duration-200 text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Excel
+                            </a>
+                            <a href="{{ route('struks.export.csv') }}" class="inline-flex items-center gap-2 px-3 py-2 bg-amber-100 text-amber-700 rounded-lg hover:bg-amber-200 transition-colors duration-200 text-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                CSV
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -243,25 +113,27 @@
                             </td>
                             <td class="px-4 py-4 text-center border-r border-slate-200" rowspan="{{ count($items) }}">
                                 @if($struk->foto_struk)
-                                <div x-data="{ open: false }">
-                                    <img @click="open = true" src="{{ asset('storage/' . $struk->foto_struk) }}"
-                                        class="w-20 h-20 object-cover rounded-lg shadow-sm border border-slate-200 hover:scale-110 transition-transform duration-200 cursor-pointer">
+                                <div x-data="{ open: false }" class="relative">
+                                    <div class="w-20 h-20 mx-auto overflow-hidden rounded-lg shadow-sm border border-slate-200 hover:shadow-md transition-all duration-200">
+                                        <img @click="open = true" src="{{ asset('storage/' . $struk->foto_struk) }}"
+                                            class="w-full h-full object-cover cursor-pointer hover:scale-110 transition-transform duration-200">
+                                    </div>
 
                                     <!-- Modal -->
                                     <div x-show="open" @click.away="open = false"
-                                        class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50"
+                                        class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4"
                                         x-transition:enter="transition ease-out duration-300"
                                         x-transition:enter-start="opacity-0"
                                         x-transition:enter-end="opacity-100"
                                         x-transition:leave="transition ease-in duration-200"
                                         x-transition:leave-start="opacity-100"
                                         x-transition:leave-end="opacity-0">
-                                        <div class="relative max-w-3xl w-full p-4">
+                                        <div class="relative max-w-3xl w-full max-h-[90vh] overflow-auto bg-white rounded-xl p-1">
                                             <img src="{{ asset('storage/' . $struk->foto_struk) }}"
-                                                class="w-full h-auto rounded-xl shadow-2xl border border-white">
+                                                class="w-full h-auto rounded-lg">
                                             <button @click="open = false"
-                                                class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full p-1 hover:bg-opacity-80">
-                                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                class="absolute top-2 right-2 text-white bg-black bg-opacity-50 rounded-full p-1.5 hover:bg-opacity-80 transition-all duration-200">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
@@ -322,16 +194,7 @@
             </div>
         </div>
 
-        {{-- Back Button --}}
-        <div class="mt-8 flex justify-start">
-            <a href="{{ url()->previous() }}"
-                class="inline-flex items-center gap-2 bg-slate-100 text-slate-700 px-6 py-3 rounded-lg hover:bg-slate-200 transition-all duration-200 shadow-sm hover:shadow-md">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                </svg>
-                Kembali
-            </a>
-        </div>
+
     </div>
 </div>
 
@@ -373,4 +236,3 @@
     }
 </style>
 @endsection
->>>>>>> a19649668aa87c9671b2d99401aca7bbf1836054
