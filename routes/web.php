@@ -49,3 +49,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 });
+
+Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
+Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');

@@ -13,20 +13,20 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
 class StrukController extends Controller
 {
     // Tampilkan semua struk
-public function index(Request $request)
-{
-    $query = Struk::query();
+    public function index(Request $request)
+    {
+        $query = Struk::query();
 
-    if ($request->filled('search')) {
-        $search = strtolower($request->search);
-        $query->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
-              ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
+        if ($request->filled('search')) {
+            $search = strtolower($request->search);
+            $query->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
+                ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
+        }
+
+        $struks = $query->latest()->get();
+
+        return view('struks.index', compact('struks'));
     }
-
-    $struks = $query->latest()->get();
-
-    return view('struks.index', compact('struks'));
-}
 
     // Tampilkan form tambah
     public function create()
@@ -233,5 +233,59 @@ public function index(Request $request)
         header("Content-Disposition: attachment; filename=\"$filename\"");
         $writer->save("php://output");
         exit;
+    }
+
+    public function updateItem(Request $request, $id, $index)
+    {
+        $struk = Struk::findOrFail($id);
+        $items = json_decode($struk->items, true); // decode jadi array
+
+        // Validasi input item
+        $validated = $request->validate([
+            'nama' => 'required|string',
+            'jumlah' => 'required|integer|min:1',
+            'harga' => 'required|numeric|min:0',
+        ]);
+
+        // Update item berdasarkan index
+        if (isset($items[$index])) {
+            $items[$index]['nama'] = $validated['nama'];
+            $items[$index]['jumlah'] = $validated['jumlah'];
+            $items[$index]['harga'] = $validated['harga'];
+        } else {
+            return redirect()->back()->with('error', 'Item tidak ditemukan.');
+        }
+
+        // Hitung ulang total harga semua item
+        $total = 0;
+        foreach ($items as $item) {
+            $total += $item['jumlah'] * $item['harga'];
+        }
+
+        $struk->items = json_encode($items);
+        $struk->total_harga = $total;
+        $struk->save();
+
+        return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
+    }
+    public function addItem(Request $request, $id)
+    {
+        $struk = Struk::findOrFail($id);
+        $items = json_decode($struk->items, true);
+
+        $items[] = [
+            'nama' => $request->input('nama'),
+            'jumlah' => $request->input('jumlah'),
+            'harga' => $request->input('harga'),
+        ];
+
+        $struk->items = json_encode($items);
+        $struk->total_harga = collect($items)->sum(function ($item) {
+            return $item['jumlah'] * $item['harga'];
+        });
+
+        $struk->save();
+
+        return redirect()->route('struks.index')->with('success', 'Item baru berhasil ditambahkan.');
     }
 }
