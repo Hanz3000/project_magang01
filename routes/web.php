@@ -21,6 +21,9 @@ Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showRes
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
 // ------------------- MASTER BARANG ROUTES -------------------
+Route::middleware('auth')->group(function () {
+    Route::resource('master-barang', MasterBarangController::class);
+});
 Route::get('/master-barang/create', [MasterBarangController::class, 'create'])->name('master-barang.create');
 Route::post('/master-barang', [MasterBarangController::class, 'store'])->name('master-barang.store');
 Route::resource('master-barang', MasterBarangController::class);

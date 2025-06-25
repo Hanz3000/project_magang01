@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="max-w-lg mx-auto mt-10 bg-white shadow-xl rounded-xl p-8">
-    <h2 class="text-3xl font-bold text-gray-800 mb-6">➕ Tambah Barang</h2>
+    <h2 class="text-3xl font-bold text-gray-800 mb-6">✏️ Edit Barang</h2>
 
     {{-- Error Validasi --}}
     @if ($errors->any())
@@ -15,14 +15,16 @@
         </div>
     @endif
 
-    <form action="{{ route('master-barang.store') }}" method="POST" class="space-y-6">
+    <form action="{{ route('master-barang.update', $barang->id) }}" method="POST" class="space-y-6">
         @csrf
+        @method('PUT')
 
         <div>
             <label for="nama_barang" class="block text-sm font-semibold text-gray-700 mb-1">Nama Barang</label>
-            <input type="text" name="nama_barang" id="nama_barang" value="{{ old('nama_barang') }}"
-                   placeholder="Contoh: Buku Tulis"
-                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400">
+            <input type="text" name="nama_barang" id="nama_barang"
+                   value="{{ old('nama_barang', $barang->nama_barang) }}"
+                   placeholder="Contoh: Bolpoin Hitam"
+                   class="w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-400 focus:border-green-400">
         </div>
 
         <div class="flex justify-end gap-3">
@@ -31,8 +33,8 @@
                 Batal
             </a>
             <button type="submit"
-                    class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
-                💾 Simpan
+                    class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition">
+                💾 Update
             </button>
         </div>
     </form>

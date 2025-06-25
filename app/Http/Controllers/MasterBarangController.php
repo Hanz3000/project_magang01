@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -31,23 +30,31 @@ class MasterBarangController extends Controller
         return redirect()->route('master-barang.index')->with('success', 'Barang berhasil ditambahkan.');
     }
 
-    public function show(string $id)
-    {
-        //
-    }
-
     public function edit(string $id)
     {
-        //
+        $barang = Barang::findOrFail($id);
+        return view('master_barang.edit', compact('barang'));
     }
 
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'nama_barang' => 'required|string|max:255',
+        ]);
+
+        $barang = Barang::findOrFail($id);
+        $barang->update([
+            'nama_barang' => $request->nama_barang
+        ]);
+
+        return redirect()->route('master-barang.index')->with('success', 'Barang berhasil diperbarui.');
     }
 
     public function destroy(string $id)
     {
-        //
+        $barang = Barang::findOrFail($id);
+        $barang->delete();
+
+        return redirect()->route('master-barang.index')->with('success', 'Barang berhasil dihapus.');
     }
 }
