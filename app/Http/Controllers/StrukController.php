@@ -18,9 +18,9 @@ public function index(Request $request)
     $query = Struk::query();
 
     if ($request->filled('search')) {
-        $search = $request->search;
-        $query->where('nama_toko', 'like', "%{$search}%")
-              ->orWhere('nomor_struk', 'like', "%{$search}%");
+        $search = strtolower($request->search);
+        $query->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
+              ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
     }
 
     $struks = $query->latest()->get();
