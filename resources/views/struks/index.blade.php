@@ -108,9 +108,10 @@
                             </td>
 
                             @if ($loop->first)
-                            <td class="px-4 py-4 text-right font-bold text-green-600 border-r border-slate-200" rowspan="{{ count($items) }}">
-                                <div class="text-lg">Rp{{ number_format($struk->total_harga, 0, ',', '.') }}</div>
+                            <td class="px-4 py-4 text-right font-bold border-r border-slate-200" rowspan="{{ count($items) }}">
+                                <div class="text-base">Rp{{ number_format($struk->total_harga, 0, ',', '.') }}</div>
                             </td>
+
                             <td class="px-4 py-4 text-center border-r border-slate-200" rowspan="{{ count($items) }}">
                                 @if($struk->foto_struk)
                                 <div x-data="{ open: false }" class="relative">
@@ -128,7 +129,7 @@
                                         x-transition:leave="transition ease-in duration-200"
                                         x-transition:leave-start="opacity-100"
                                         x-transition:leave-end="opacity-0">
-                                        <div class="relative max-w-3xl w-full max-h-[90vh] overflow-auto bg-white rounded-xl p-1">
+                                        <div class="relative max-w-xl w-full max-h-[60vh] overflow-auto bg-white rounded-xl p-1">
                                             <img src="{{ asset('storage/' . $struk->foto_struk) }}"
                                                 class="w-full h-auto rounded-lg">
                                             <button @click="open = false"

@@ -86,7 +86,7 @@
 
 {{-- Tambah item via JS --}}
 <script>
-    document.getElementById('add-item').addEventListener('click', function () {
+    document.getElementById('add-item').addEventListener('click', function() {
         const wrapper = document.getElementById('items-wrapper');
         const index = wrapper.querySelectorAll('.item-row').length;
         const div = document.createElement('div');
@@ -100,10 +100,56 @@
         wrapper.appendChild(div);
     });
 
-    document.addEventListener('click', function (e) {
+    document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('remove-item')) {
             e.target.closest('.item-row').remove();
         }
+    });
+
+
+    function hitungTotalHarga() {
+        let total = 0;
+        document.querySelectorAll('#items-wrapper .item-row').forEach(row => {
+            const jumlah = parseFloat(row.querySelector('[name$="[jumlah]"]')?.value) || 0;
+            const harga = parseFloat(row.querySelector('[name$="[harga]"]')?.value) || 0;
+            total += jumlah * harga;
+        });
+        document.querySelector('input[name="total_harga"]').value = total;
+    }
+
+    // Trigger hitung total saat input jumlah/harga berubah
+    document.addEventListener('input', function(e) {
+        if (e.target.name.includes('[jumlah]') || e.target.name.includes('[harga]')) {
+            hitungTotalHarga();
+        }
+    });
+
+    // Hitung total ulang setelah item ditambahkan
+    document.getElementById('add-item').addEventListener('click', function() {
+        const wrapper = document.getElementById('items-wrapper');
+        const index = wrapper.querySelectorAll('.item-row').length;
+        const div = document.createElement('div');
+        div.className = 'flex flex-wrap gap-2 item-row';
+        div.innerHTML = `
+            <input type="text" name="items[${index}][nama]" placeholder="Nama Barang" class="flex-1 p-2 border rounded">
+            <input type="number" name="items[${index}][jumlah]" placeholder="Jumlah" class="p-2 border rounded w-24">
+            <input type="number" name="items[${index}][harga]" placeholder="Harga" class="p-2 border rounded w-32">
+            <button type="button" class="remove-item text-red-500 font-bold px-2">×</button>
+        `;
+        wrapper.appendChild(div);
+    });
+
+    // Hitung ulang saat item dihapus
+    document.addEventListener('click', function(e) {
+        if (e.target && e.target.classList.contains('remove-item')) {
+            e.target.closest('.item-row').remove();
+            hitungTotalHarga();
+        }
+    });
+
+    // Jalankan saat halaman dimuat untuk inisialisasi
+    window.addEventListener('DOMContentLoaded', () => {
+        hitungTotalHarga();
     });
 </script>
 @endsection
