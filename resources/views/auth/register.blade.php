@@ -370,13 +370,9 @@
 
                 const ripple = document.createElement('span');
                 ripple.className = 'ripple-effect';
-                ripple.style.left = $ {
-                    x
-                }
-                px;
-                ripple.style.top = $ {
-                    y
-                }
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
                 px;
 
                 this.appendChild(ripple);
