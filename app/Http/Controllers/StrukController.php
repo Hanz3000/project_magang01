@@ -13,11 +13,20 @@ use PhpOffice\PhpSpreadsheet\Writer\Csv;
 class StrukController extends Controller
 {
     // Tampilkan semua struk
-    public function index()
-    {
-        $struks = Struk::latest()->get();
-        return view('struks.index', compact('struks'));
+public function index(Request $request)
+{
+    $query = Struk::query();
+
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where('nama_toko', 'like', "%{$search}%")
+              ->orWhere('nomor_struk', 'like', "%{$search}%");
     }
+
+    $struks = $query->latest()->get();
+
+    return view('struks.index', compact('struks'));
+}
 
     // Tampilkan form tambah
     public function create()
