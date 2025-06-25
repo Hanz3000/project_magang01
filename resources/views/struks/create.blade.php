@@ -2,25 +2,24 @@
 
 @section('content')
 <div class="max-w-3xl mx-auto p-4">
-
     <h2 class="text-xl font-bold mb-4">Tambah Struk</h2>
 
     {{-- Notifikasi Sukses --}}
     @if (session('success'))
-    <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
-        {{ session('success') }}
-    </div>
+        <div class="bg-green-100 text-green-700 p-3 rounded mb-4">
+            {{ session('success') }}
+        </div>
     @endif
 
-    {{-- Tampilkan Error Validasi --}}
+    {{-- Error Validasi --}}
     @if ($errors->any())
-    <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
-        <ul class="list-disc ml-5">
-            @foreach ($errors->all() as $error)
-            <li>- {{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
+        <div class="bg-red-100 text-red-700 p-3 rounded mb-4">
+            <ul class="list-disc ml-5">
+                @foreach ($errors->all() as $error)
+                    <li>- {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     <form action="{{ route('struks.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
@@ -38,7 +37,12 @@
         {{-- Dynamic Items --}}
         <div id="items-container">
             <div class="item-row flex space-x-2 mb-2">
-                <input type="text" name="items[0][nama]" placeholder="Nama Barang" class="p-2 border rounded w-1/3">
+                <select name="items[0][nama]" class="p-2 border rounded w-1/3">
+                    <option value="">Pilih Barang</option>
+                    @foreach ($barangList as $barang)
+                        <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                    @endforeach
+                </select>
                 <input type="number" name="items[0][jumlah]" placeholder="Jumlah" class="p-2 border rounded w-1/4 jumlah" oninput="updateTotal(this)">
                 <input type="number" name="items[0][harga]" placeholder="Harga Satuan" class="p-2 border rounded w-1/4 harga" oninput="updateTotal(this)">
                 <input type="number" readonly placeholder="Subtotal" class="p-2 border rounded w-1/4 subtotal bg-gray-100">
@@ -65,19 +69,29 @@
     </form>
 </div>
 
+{{-- Script --}}
 <script>
     let itemIndex = 1;
+    const barangOptions = @json($barangList);
 
     function tambahBarang() {
         const container = document.getElementById('items-container');
         const row = document.createElement('div');
         row.className = 'item-row flex space-x-2 mb-2';
+
+        let selectHtml = `<select name="items[${itemIndex}][nama]" class="p-2 border rounded w-1/3">
+                            <option value="">Pilih Barang</option>`;
+        barangOptions.forEach(item => {
+            selectHtml += `<option value="${item.nama_barang}">${item.nama_barang}</option>`;
+        });
+        selectHtml += `</select>`;
+
         row.innerHTML = `
-        <input type="text" name="items[${itemIndex}][nama]" placeholder="Nama Barang" class="p-2 border rounded w-1/3">
-        <input type="number" name="items[${itemIndex}][jumlah]" placeholder="Jumlah" class="p-2 border rounded w-1/4 jumlah" oninput="updateTotal(this)">
-        <input type="number" name="items[${itemIndex}][harga]" placeholder="Harga Satuan" class="p-2 border rounded w-1/4 harga" oninput="updateTotal(this)">
-        <input type="number" readonly placeholder="Subtotal" class="p-2 border rounded w-1/4 subtotal bg-gray-100">
-    `;
+            ${selectHtml}
+            <input type="number" name="items[${itemIndex}][jumlah]" placeholder="Jumlah" class="p-2 border rounded w-1/4 jumlah" oninput="updateTotal(this)">
+            <input type="number" name="items[${itemIndex}][harga]" placeholder="Harga Satuan" class="p-2 border rounded w-1/4 harga" oninput="updateTotal(this)">
+            <input type="number" readonly placeholder="Subtotal" class="p-2 border rounded w-1/4 subtotal bg-gray-100">
+        `;
         container.appendChild(row);
         itemIndex++;
     }
@@ -89,7 +103,6 @@
         const subtotal = jumlah * harga;
         row.querySelector('.subtotal').value = subtotal;
 
-        // Update total_harga
         let total = 0;
         document.querySelectorAll('.subtotal').forEach(input => {
             total += parseFloat(input.value) || 0;

@@ -5,30 +5,28 @@ use App\Http\Controllers\StrukController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\MasterBarangController;
 
-
-// --- Auth Routes ---
+// ------------------- AUTH ROUTES -------------------
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Tampilkan form lupa password
+// Forgot Password Routes
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
-
-// Kirim email reset password
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
-
-// Tampilkan form reset password
 Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
-
-// Proses reset password
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
+// ------------------- MASTER BARANG ROUTES -------------------
+Route::get('/master-barang/create', [MasterBarangController::class, 'create'])->name('master-barang.create');
+Route::post('/master-barang', [MasterBarangController::class, 'store'])->name('master-barang.store');
+Route::resource('master-barang', MasterBarangController::class);
+Route::resource('master-barang', App\Http\Controllers\MasterBarangController::class)->middleware('auth');
 
-
-// --- Protected Routes ---
+// ------------------- PROTECTED ROUTES -------------------
 Route::middleware('auth')->group(function () {
 
     // Halaman utama redirect ke daftar struk
@@ -36,20 +34,22 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('struks.index');
     });
 
-    // Resource route untuk struk
-    Route::resource('struks', StrukController::class)->except(['index', 'show']); // supaya tidak dobel
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Route index dan show tetap didefinisikan manual agar bisa diakses tanpa override
+    // STRUK: Route resource, kecuali index & show
+    Route::resource('struks', StrukController::class)->except(['index', 'show']);
+
+    // Index dan Show didefinisikan manual agar tidak tertimpa
     Route::get('/struks', [StrukController::class, 'index'])->name('struks.index');
     Route::get('/struks/{struk}', [StrukController::class, 'show'])->name('struks.show');
 
-    // Export routes
+    // Export Excel & CSV
     Route::get('/struks/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');
     Route::get('/struks/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
 
-    Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
+    // Tambah/Update item struk
+    Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
+    Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
+    Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
 });
-
-Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
-Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
-Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
