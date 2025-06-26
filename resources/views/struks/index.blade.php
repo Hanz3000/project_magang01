@@ -21,7 +21,6 @@
                 <p class="text-gray-600">Kelola dan atur semua struk pembelian Anda</p>
             </div>
             <div class="flex flex-wrap gap-2">
-
                 <div class="relative group">
                     <button
                         class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
@@ -59,58 +58,53 @@
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">Data Struk</h3>
                             <p class="text-sm text-gray-500">{{ $struks->total() }} struk ditemukan</p>
-                            {{-- Use total() for pagination --}}
                         </div>
                     </div>
-                    {{-- Search Form --}}
-                    <form action="{{ route('struks.index') }}" method="GET" class="relative" id="searchForm">
+                    <div class="relative">
                         <input type="text" name="search" id="searchInput" placeholder="Cari struk..."
-                            class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all"
+                            class="pl-10 pr-10 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all"
                             value="{{ request('search') }}" autocomplete="off">
-                        <button type="submit" class="absolute left-3 top-2.5 text-gray-400">
+                        <button type="button" class="absolute left-3 top-2.5 text-gray-400">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
                         </button>
+                        <div id="searchSpinner" class="absolute right-3 top-2.5 hidden">
+                            <svg class="animate-spin h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
                         @if (request('search'))
-                        <a href="{{ route('struks.index') }}"
-                            class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                        <button id="clearSearch" class="absolute right-10 top-2.5 text-gray-400 hover:text-gray-600"
                             title="Bersihkan pencarian">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
-                        </a>
+                        </button>
                         @endif
-                    </form>
+                    </div>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
+            <div id="tableContainer" class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            {{-- Added "No." column header --}}
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko
-                            </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
-                                Struk</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                            </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
-                            </th>
-                            <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total
-                            </th>
-                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk
-                            </th>
-                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi
-                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang</th>
+                            <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        @forelse ($struks as $index => $struk) {{-- Added $index to get the loop iteration --}}
+                        @forelse ($struks as $index => $struk)
                         @php
                         $items = json_decode($struk->items, true);
                         $totalHarga = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
@@ -118,7 +112,6 @@
 
                         <tr class="hover:bg-gray-50 transition-colors">
                             <td class="px-6 py-4 whitespace-nowrap text-center">{{ $struks->firstItem() + $index }}</td>
-                            {{-- Display row number --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium text-gray-900">{{ $struk->nama_toko }}</div>
                             </td>
@@ -126,8 +119,7 @@
                                 {{ $struk->nomor_struk }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}
-                                </div>
+                                <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="max-w-xs">
@@ -171,7 +163,6 @@
                                         </svg>
                                     </a>
                                     <a href="{{ route('struks.index', ['edit' => $struk->id, 'search' => request('search')]) }}"
-                                        {{-- Preserve search query on edit --}}
                                         class="text-gray-400 hover:text-blue-600 p-1 rounded-full hover:bg-blue-50 transition-colors"
                                         title="Edit">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +191,7 @@
 
                         @if (request('edit') == $struk->id)
                         <tr class="bg-indigo-50">
-                            <td colspan="8" class="px-6 py-4"> {{-- Adjusted colspan for the new column --}}
+                            <td colspan="8" class="px-6 py-4">
                                 <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}"
                                     class="space-y-4">
                                     @csrf
@@ -209,7 +200,6 @@
 
                                     <div class="space-y-3">
                                         @foreach ($items as $idx => $item)
-                                        {{-- Changed loop variable to $idx to avoid conflict with $index --}}
                                         <div class="flex items-center space-x-4">
                                             <input type="hidden" name="item_index[]" value="{{ $idx }}">
                                             <input name="nama[]" value="{{ $item['nama'] }}"
@@ -225,10 +215,8 @@
                                             <button type="button"
                                                 onclick="confirmDeleteItem('{{ $struk->id }}', '{{ $idx }}')"
                                                 class="text-red-500 hover:text-red-700 p-1">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                    viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="2"
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
                                                     </path>
                                                 </svg>
@@ -237,7 +225,6 @@
                                         </div>
                                         @endforeach
 
-                                        {{-- Add new item row --}}
                                         <div class="flex items-center space-x-4 pt-2" id="newItemRow">
                                             <input name="nama_new"
                                                 class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
@@ -248,13 +235,12 @@
                                             <input name="harga_new" type="number"
                                                 class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
                                                 placeholder="Harga">
-                                            <span class="w-5"></span> {{-- Placeholder for delete button alignment --}}
+                                            <span class="w-5"></span>
                                         </div>
                                     </div>
 
                                     <div class="flex justify-end space-x-3 pt-2">
                                         <a href="{{ route('struks.index', ['search' => request('search')]) }}"
-                                            {{-- Preserve search query on cancel --}}
                                             class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Batal</a>
                                         <button type="submit"
                                             class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Simpan
@@ -267,7 +253,6 @@
                         @empty
                         <tr>
                             <td colspan="8" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
-                            {{-- Adjusted colspan for the new column --}}
                         </tr>
                         @endforelse
                     </tbody>
@@ -277,7 +262,6 @@
             @if ($struks->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
                 {{ $struks->appends(['search' => request('search')])->links() }}
-                {{-- Append search query to pagination links --}}
             </div>
             @endif
         </div>
@@ -306,61 +290,125 @@
 </div>
 
 <script>
-// Image modal functions
-function openModal(imageSrc) {
-    document.getElementById('modalImage').src = imageSrc;
-    document.getElementById('imageModal').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeModal() {
-    document.getElementById('imageModal').classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-}
-
-// Close modal when clicking outside image
-document.getElementById('imageModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeModal();
+document.addEventListener('DOMContentLoaded', function() {
+    // Image modal functions
+    function openModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
     }
-});
 
-// Confirm item deletion
-function confirmDeleteItem(strukId, index) {
-    if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
-        const form = document.createElement('form');
-        form.method = 'POST'; // Use POST for form submission
-        form.action = `/struks/${strukId}/item/${index}`; // Correct route for delete item
-
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'DELETE'; // Specify DELETE method
-
-        form.appendChild(csrfToken);
-        form.appendChild(methodInput);
-        document.body.appendChild(form);
-        form.submit();
+    function closeModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
     }
-}
 
-// Auto-hide success message after 5 seconds
-@if(session('success'))
-setTimeout(() => {
-    const successMessage = document.querySelector('.fixed.top-4.right-4');
-    if (successMessage) {
-        successMessage.style.transform = 'translateX(100%)';
+    // Close modal when clicking outside image
+    document.getElementById('imageModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeModal();
+        }
+    });
+
+    // Confirm item deletion
+    function confirmDeleteItem(strukId, index) {
+        if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/struks/${strukId}/item/${index}`;
+
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+
+            form.appendChild(csrfToken);
+            form.appendChild(methodInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Auto-hide success message after 5 seconds
+    @if(session('success'))
+    setTimeout(() => {
+        const successMessage = document.querySelector('.fixed.top-4.right-4');
+        if (successMessage) {
+            successMessage.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                successMessage.remove();
+            }, 300);
+        }
+    }, 5000);
+    @endif
+
+    // Live search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchSpinner = document.getElementById('searchSpinner');
+    const clearSearch = document.getElementById('clearSearch');
+    const tableContainer = document.getElementById('tableContainer');
+    let searchTimeout;
+
+    // Live search as you type
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchSpinner.classList.remove('hidden');
+        
+        searchTimeout = setTimeout(() => {
+            const searchTerm = searchInput.value.trim();
+            fetch(`{{ route('struks.index') }}?search=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.text())
+                .then(html => {
+                    // Parse the response and extract just the table
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const newTable = doc.getElementById('tableContainer').innerHTML;
+                    
+                    // Fade out old table
+                    tableContainer.style.opacity = '0';
+                    tableContainer.style.transition = 'opacity 0.2s ease';
+                    
+                    setTimeout(() => {
+                        // Replace with new table
+                        tableContainer.innerHTML = newTable;
+                        // Fade in new table
+                        tableContainer.style.opacity = '1';
+                        searchSpinner.classList.add('hidden');
+                    }, 200);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    searchSpinner.classList.add('hidden');
+                });
+        }, 500); // 500ms delay after typing stops
+    });
+
+    // Clear search
+    if (clearSearch) {
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            searchInput.dispatchEvent(new Event('input'));
+        });
+    }
+
+    // Add animation to table rows when page loads
+    document.querySelectorAll('tbody tr').forEach((row, index) => {
+        row.style.opacity = '0';
+        row.style.transform = 'translateY(10px)';
+        row.style.transition = 'all 0.3s ease-out';
+        row.style.transitionDelay = `${index * 0.05}s`;
+        
         setTimeout(() => {
-            successMessage.remove();
-        }, 300);
-    }
-}, 5000);
-@endif
+            row.style.opacity = '1';
+            row.style.transform = 'translateY(0)';
+        }, 50);
+    });
+});
 </script>
 
 <style>
@@ -369,11 +417,15 @@ setTimeout(() => {
         opacity: 0;
         transform: translateY(-20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .group:hover .group-hover\:block {
@@ -438,35 +490,10 @@ setTimeout(() => {
     color: #9ca3af;
     border-color: #e5e7eb;
 }
+
+/* Smooth transitions for table */
+#tableContainer {
+    transition: opacity 0.2s ease;
+}
 </style>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const searchForm = document.getElementById('searchForm');
-        let timer;
-
-        // Fungsi untuk melakukan pencarian
-        function performSearch() {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                searchForm.submit();
-            }, 500); // Delay 500ms setelah mengetik
-        }
-
-        // Event listener untuk input
-        searchInput.addEventListener('input', function() {
-            performSearch();
-        });
-
-        // Event listener untuk tombol clear
-        const clearButton = document.querySelector('[title="Bersihkan pencarian"]');
-        if (clearButton) {
-            clearButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                searchInput.value = '';
-                searchForm.submit();
-            });
-        }
-    });
-</script>
 @endsection
