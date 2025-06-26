@@ -56,7 +56,6 @@ Route::middleware('auth')->group(function () {
     Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
     Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
 });
-<<<<<<< HEAD
 
 
 Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
@@ -66,5 +65,3 @@ Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteIt
 
 Route::get('/struks/autocomplete-items', [StrukController::class, 'autocompleteItems'])->name('struks.autocomplete-items');
 Route::get('/struks/search-barang', [StrukController::class, 'searchBarang'])->name('struks.search-barang');
-=======
->>>>>>> b264ac88febb988686c7a9371c79a47b69009098
