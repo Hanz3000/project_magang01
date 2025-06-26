@@ -60,14 +60,13 @@
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">Data Struk</h3>
                             <p class="text-sm text-gray-500">{{ $struks->total() }} struk ditemukan</p>
-                            {{-- Use total() for pagination --}}
                         </div>
                     </div>
                     {{-- Search Form --}}
                     <form action="{{ route('struks.index') }}" method="GET" class="relative">
                         <input type="text" name="search" placeholder="Cari struk..."
                             class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all"
-                            value="{{ request('search') }}"> {{-- Keep old search value --}}
+                            value="{{ request('search') }}">
                         <button type="submit" class="absolute left-3 top-2.5 text-gray-400">
                             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -91,13 +90,14 @@
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th> {{-- Added "No." column header --}}
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
                                 Struk</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
+                            </th>
                             <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total
                             </th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk
@@ -107,14 +107,14 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
-                        @forelse ($struks as $index => $struk) {{-- Added $index to get the loop iteration --}}
+                        @forelse ($struks as $index => $struk)
                         @php
                         $items = json_decode($struk->items, true);
                         $totalHarga = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition-colors">
-                            <td class="px-6 py-4 whitespace-nowrap text-center">{{ $struks->firstItem() + $index }}</td> {{-- Display row number --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-center">{{ $struks->firstItem() + $index }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium text-gray-900">{{ $struk->nama_toko }}</div>
                             </td>
@@ -170,7 +170,6 @@
                                         </svg>
                                     </a>
                                     <a href="{{ route('struks.index', ['edit' => $struk->id, 'search' => request('search')]) }}"
-                                        {{-- Preserve search query on edit --}}
                                         class="text-gray-400 hover:text-blue-600 p-1 rounded-full hover:bg-blue-50 transition-colors"
                                         title="Edit">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor"
@@ -202,16 +201,16 @@
 
                         @if (request('edit') == $struk->id)
                         <tr class="bg-indigo-50">
-                            <td colspan="8" class="px-6 py-4"> {{-- Adjusted colspan for the new column --}}
+                            <td colspan="8" class="px-6 py-4">
                                 <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}"
                                     class="space-y-4">
                                     @csrf
                                     @method('PUT')
                                     <h4 class="font-medium text-gray-700 mb-2">Edit Item Struk</h4>
 
-                                    <div class="space-y-3">
-                                        @foreach ($items as $idx => $item) {{-- Changed loop variable to $idx to avoid conflict with $index --}}
-                                        <div class="flex items-center space-x-4">
+                                    <div id="itemsContainer" class="space-y-3">
+                                        @foreach ($items as $idx => $item)
+                                        <div class="flex items-center space-x-4 item-row">
                                             <input type="hidden" name="item_index[]"
                                                 value="{{ $idx }}">
                                             <input name="nama[]" value="{{ $item['nama'] }}"
@@ -237,28 +236,36 @@
                                                     </path>
                                                 </svg>
                                             </button>
+                                            @else
+                                            {{-- Placeholder for alignment if only one item --}}
+                                            <span class="w-5"></span>
                                             @endif
                                         </div>
                                         @endforeach
+                                    </div>
 
-                                        {{-- Add new item row --}}
-                                        <div class="flex items-center space-x-4 pt-2" id="newItemRow">
-                                            <input name="nama_new"
-                                                class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                placeholder="Nama item baru">
-                                            <input name="jumlah_new" type="number"
-                                                class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                placeholder="Jumlah">
-                                            <input name="harga_new" type="number"
-                                                class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                placeholder="Harga">
-                                            <span class="w-5"></span> {{-- Placeholder for delete button alignment --}}
-                                        </div>
+                                    {{-- Row untuk tambah item baru --}}
+                                    <div class="flex items-center space-x-4 item-row border-2 border-dashed border-indigo-200 rounded-lg p-3 bg-indigo-25">
+                                        <input type="text"
+                                            class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                            placeholder="Nama item baru">
+                                        <input type="number"
+                                            class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                            placeholder="Jumlah">
+                                        <input type="number"
+                                            class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                            placeholder="Harga">
+                                        <button type="button" onclick="addNewItemField()"
+                                            class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                            </svg>
+                                        </button>
                                     </div>
 
                                     <div class="flex justify-end space-x-3 pt-2">
                                         <a href="{{ route('struks.index', ['search' => request('search')]) }}"
-                                            {{-- Preserve search query on cancel --}}
                                             class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Batal</a>
                                         <button type="submit"
                                             class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Simpan
@@ -270,7 +277,7 @@
                         @endif
                         @empty
                         <tr>
-                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td> {{-- Adjusted colspan for the new column --}}
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -279,7 +286,7 @@
 
             @if ($struks->hasPages())
             <div class="px-6 py-4 border-t border-gray-200">
-                {{ $struks->appends(['search' => request('search')])->links() }} {{-- Append search query to pagination links --}}
+                {{ $struks->appends(['search' => request('search')])->links() }}
             </div>
             @endif
         </div>
@@ -332,8 +339,8 @@
     function confirmDeleteItem(strukId, index) {
         if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
             const form = document.createElement('form');
-            form.method = 'POST'; // Use POST for form submission
-            form.action = `/struks/${strukId}/item/${index}`; // Correct route for delete item
+            form.method = 'POST';
+            form.action = `/struks/${strukId}/item/${index}`;
 
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
@@ -343,13 +350,32 @@
             const methodInput = document.createElement('input');
             methodInput.type = 'hidden';
             methodInput.name = '_method';
-            methodInput.value = 'DELETE'; // Specify DELETE method
+            methodInput.value = 'DELETE';
 
             form.appendChild(csrfToken);
             form.appendChild(methodInput);
             document.body.appendChild(form);
             form.submit();
         }
+    }
+
+    // Function to add new item fields
+    function addNewItemField() {
+        const itemsContainer = document.getElementById('itemsContainer');
+        const newItemRow = document.createElement('div');
+        newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
+
+        newItemRow.innerHTML = `
+            <input name="nama_new[]" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Nama item baru">
+            <input name="jumlah_new[]" type="number" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah">
+            <input name="harga_new[]" type="number" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga">
+            <button type="button" onclick="this.closest('.item-row').remove()" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        `;
+        itemsContainer.appendChild(newItemRow);
     }
 
     // Auto-hide success message after 5 seconds
