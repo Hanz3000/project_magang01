@@ -11,44 +11,44 @@
 
     {{-- Pesan Validasi --}}
     @if ($errors->any())
-        <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded mb-6">
-            <p class="font-medium">Terjadi kesalahan:</p>
-            <ul class="list-disc list-inside text-sm mt-1">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded mb-6">
+        <p class="font-medium">Terjadi kesalahan:</p>
+        <ul class="list-disc list-inside text-sm mt-1">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 
-    <form action="{{ route('pegawai.store') }}" method="POST" class="space-y-4" onsubmit="return confirm('Apakah Anda yakin ingin menyimpan data pegawai ini?')">
+    <form action="{{ route('pegawai.store') }}" method="POST" class="space-y-4">
         @csrf
 
         <div>
             <label for="nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Pegawai</label>
             <input type="text" name="nama" id="nama"
-                   value="{{ old('nama') }}"
-                   placeholder="Contoh: John Doe"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                   required>
+                value="{{ old('nama') }}"
+                placeholder="Contoh: John Doe"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                required>
         </div>
 
         <div>
             <label for="nip" class="block text-sm font-medium text-gray-700 mb-1">NIP</label>
             <input type="text" name="nip" id="nip"
-                   value="{{ old('nip') }}"
-                   placeholder="Contoh: 12345678"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                   required>
+                value="{{ old('nip') }}"
+                placeholder="Contoh: 12345678"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                required>
         </div>
 
         <div class="flex justify-end gap-3 pt-4">
             <a href="{{ route('pegawai.index') }}"
-               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Batal
             </a>
-            <button type="submit" 
-                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <button type="submit"
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Simpan
             </button>
         </div>

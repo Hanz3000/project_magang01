@@ -294,8 +294,32 @@ class StrukController extends Controller
 
         return redirect()->route('struks.index', ['search' => request('search')])
             ->with('success', 'Item struk berhasil diperbarui.');
+
+
+
+        // Merge updated existing items with newly added items
+        $mergedItems = array_values(array_merge($existingItems, $processedItems));
+
+        // Recalculate total price based on the merged and validated items
+        $total = collect($mergedItems)->sum(function ($item) {
+            return $item['jumlah'] * $item['harga'];
+        });
+
+        // Update the 'items' and 'total_harga' columns in the Struk model
+        $struk->items = json_encode($mergedItems); // Save back as JSON string
+        $struk->total_harga = $total;
+        $struk->save(); // Save changes to the database
+
+        // Redirect back to the struk index page with a success message
+        return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
     }
 
+
+    /**
+     * Add a single new item to a specific Struk.
+     * This method might be redundant if updateItems is designed to handle both updates and additions.
+     * Consider if this separate endpoint is truly necessary.
+     */
     public function addItem(Request $request, $id)
     {
         $struk = Struk::findOrFail($id);
