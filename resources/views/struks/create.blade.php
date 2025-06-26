@@ -243,6 +243,56 @@
     box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1) !important;
 }
 
+.select2-container--default .select2-search--dropdown .select2-search__field {
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 6px !important;
+    padding: 8px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+    background-color: #5a67d8 !important;
+}
+
+.select2-container--default .select2-results__option {
+    padding: 8px 12px;
+    position: relative;
+    padding-left: 35px;
+}
+
+.select2-container--default .select2-results__option:before {
+    content: "";
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px;
+    height: 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 3px;
+    background: white;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true]:before,
+.select2-container--default .select2-results__option--highlighted[aria-selected]:before {
+    content: "✓";
+    color: white;
+    background-color: #5a67d8;
+    border-color: #5a67d8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.select2-container--open .select2-dropdown {
+    top: 0;
+    bottom: auto;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
+    border-top: none;
+}
+
 .total-display {
     font-size: 1.5rem;
     font-weight: 700;
@@ -302,7 +352,6 @@
     <div class="form-card">
         <div class="form-inner">
 
-
             {{-- Notifikasi --}}
             @if (session('success'))
             <div class="alert alert-success">
@@ -312,7 +361,7 @@
             @endif
 
             {{-- Error --}}
-            @if ($errors->any()))
+            @if ($errors->any())
             <div class="alert alert-error">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
                 <strong>Terjadi kesalahan:</strong>
@@ -506,26 +555,21 @@ $(document).ready(function() {
 });
 
 function initializeSelect2(element = '.select-barang') {
-    $(element).select2({
-        placeholder: "🔍 Cari dan pilih barang...",
-        width: '100%',
-        minimumResultsForSearch: 0,
-        language: {
-            noResults: function() {
-                return "❌ Barang tidak ditemukan";
-            },
-            searching: function() {
-                return "🔍 Mencari barang...";
+    $(element).each(function() {
+        $(this).select2({
+            placeholder: "Cari atau pilih barang...",
+            width: '100%',
+            dropdownParent: $(this).closest('td'), // Penting: pastikan dropdown di dalam sel TD
+            dropdownPosition: 'below',
+            language: {
+                noResults: function() {
+                    return "Barang tidak ditemukan";
+                },
+                searching: function() {
+                    return "Mencari...";
+                }
             }
-        },
-        templateResult: function(data) {
-            if (!data.id) return data.text;
-            return $('<span><i class="fas fa-box mr-2"></i>' + data.text + '</span>');
-        },
-        templateSelection: function(data) {
-            if (!data.id) return data.text;
-            return $('<span><i class="fas fa-box mr-2"></i>' + data.text + '</span>');
-        }
+        });
     });
 }
 
