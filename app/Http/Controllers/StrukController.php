@@ -9,9 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
-// Import for better type hinting if using Form Requests
-// use App\Http\Requests\StrukStoreRequest;
-// use App\Http\Requests\StrukUpdateRequest;
+
 
 class StrukController extends Controller
 {
@@ -238,58 +236,66 @@ class StrukController extends Controller
         // Find struk by ID or throw 404 if not found
         $struk = Struk::findOrFail($id);
 
-        // Validate the request data for items
+        // Validasi untuk item yang ada
         $request->validate([
             'nama.*' => 'required|string|max:255',
             'jumlah.*' => 'required|integer|min:1',
             'harga.*' => 'required|numeric|min:0',
-            'item_index.*' => 'nullable|integer', // Optional: for existing items
+            'item_index.*' => 'nullable|integer',
+            // Validasi untuk item baru (opsional jika diisi)
+            'nama_new.*' => 'nullable|string|max:255',
+            'jumlah_new.*' => 'nullable|integer|min:1',
+            'harga_new.*' => 'nullable|numeric|min:0',
         ]);
 
-        // Decode existing items to a PHP array. Use `?? []` for an empty array default.
+        // Decode existing items to array
         $existingItems = json_decode($struk->items, true) ?? [];
 
-        // Get input data from the request
+        // === Update atau simpan ulang item yang sudah ada ===
         $namaArr = $request->input('nama', []);
         $jumlahArr = $request->input('jumlah', []);
         $hargaArr = $request->input('harga', []);
         $indexArr = $request->input('item_index', []);
 
-        $processedItems = []; // Array to store processed items (both old and new)
-
-        // Iterate through the input 'nama' array
         foreach ($namaArr as $i => $nama) {
-            $jumlah = $jumlahArr[$i] ?? null;
-            $harga = $hargaArr[$i] ?? null;
-
-            // This check should ideally be handled by the validation rules above.
-            // If you keep it here, it duplicates validation logic.
-            // if ($nama === null || $nama === '' || $jumlah === null || $harga === null) {
-            //      continue;
-            // }
-
-            // Create an item array
             $item = [
                 'nama' => $nama,
-                'jumlah' => (int) $jumlah, // Ensure quantity is an integer
-                'harga' => (float) $harga, // Ensure price is a float
+                'jumlah' => (int) $jumlahArr[$i],
+                'harga' => (float) $hargaArr[$i],
             ];
 
-            // Check if item_index exists, meaning this is an existing item being updated
-            if (isset($indexArr[$i])) {
-                // Update the existing item in the existingItems array at the corresponding index
-                // Make sure the index exists to prevent errors if item_index is out of bounds
-                if (isset($existingItems[$indexArr[$i]])) {
-                    $existingItems[$indexArr[$i]] = $item;
-                } else {
-                    // If index is provided but doesn't exist in existingItems, treat as new
-                    $processedItems[] = $item;
-                }
+            // Cek apakah index disediakan dan valid
+            if (isset($indexArr[$i]) && isset($existingItems[$indexArr[$i]])) {
+                $existingItems[$indexArr[$i]] = $item;
             } else {
-                // If no item_index, it's a new item, add to processedItems
-                $processedItems[] = $item;
+                $existingItems[] = $item;
             }
         }
+
+        // === Tambahkan item baru jika ada ===
+        $namaBaru = $request->input('nama_new', []);
+        $jumlahBaru = $request->input('jumlah_new', []);
+        $hargaBaru = $request->input('harga_new', []);
+
+        foreach ($namaBaru as $i => $nama) {
+            // Hanya tambahkan jika nama, jumlah, dan harga tidak kosong/null
+            if ($nama && isset($jumlahBaru[$i], $hargaBaru[$i])) {
+                $existingItems[] = [
+                    'nama' => $nama,
+                    'jumlah' => (int) $jumlahBaru[$i],
+                    'harga' => (float) $hargaBaru[$i],
+                ];
+            }
+        }
+
+        // Simpan perubahan ke database
+        $struk->items = json_encode($existingItems);
+        $struk->save();
+
+        return redirect()->route('struks.index', ['search' => request('search')])
+            ->with('success', 'Item struk berhasil diperbarui.');
+
+
 
         // Merge updated existing items with newly added items
         $mergedItems = array_values(array_merge($existingItems, $processedItems));
