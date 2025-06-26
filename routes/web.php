@@ -62,3 +62,6 @@ Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'
 Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
 Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
 Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
+
+Route::get('/struks/autocomplete-items', [StrukController::class, 'autocompleteItems'])->name('struks.autocomplete-items');
+Route::get('/struks/search-barang', [StrukController::class, 'searchBarang'])->name('struks.search-barang');
