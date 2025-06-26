@@ -15,19 +15,7 @@
             <p class="font-medium">Terjadi kesalahan:</p>
             <ul class="list-disc list-inside text-sm mt-1">
                 @foreach ($errors->all() as $error)
-                    <li>
-                        @if ($error == 'The nama field is required.')
-                            • Nama pegawai wajib diisi
-                        @elseif ($error == 'The nip field is required.')
-                            • NIP wajib diisi
-                        @elseif ($error == 'The nip must be a number.')
-                            • NIP harus berupa angka
-                        @elseif ($error == 'The nip must be between 5 and 20 digits.')
-                            • NIP harus terdiri dari 5 sampai 20 digit
-                        @else
-                            {{ $error }}
-                        @endif
-                    </li>
+                    <li>{{ $error }}</li>
                 @endforeach
             </ul>
         </div>
@@ -51,9 +39,7 @@
                    value="{{ old('nip') }}"
                    placeholder="Contoh: 12345678"
                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                   required
-                   pattern="\d{5,20}"
-                   title="Harus angka antara 5-20 digit">
+                   required>
         </div>
 
         <div class="flex justify-end gap-3 pt-4">
@@ -62,7 +48,7 @@
                 Batal
             </a>
             <button type="submit" 
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Simpan
             </button>
         </div>
