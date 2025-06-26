@@ -90,11 +90,11 @@
                         </div>
                     </button>
 
-                    <!-- Submenu -->
-                    <div x-show="open" x-cloak class="ml-10 mt-1 space-y-1" :class="sidebarOpen ? 'block' : 'hidden'">
-                        <a href="{{ route('master-barang.index') }}" class="block px-3 py-2 text-sm text-white hover:bg-slate-600 rounded">Master Barang</a>
-                        <a href="#" class="block px-3 py-2 text-sm text-white hover:bg-slate-600 rounded">Master Pegawai</a>
-                    </div>
+                <!-- Submenu -->
+                <div x-show="open" x-cloak class="ml-10 mt-1 space-y-1" :class="sidebarOpen ? 'block' : 'hidden'">
+                    <a href="{{ route('master-barang.index') }}" class="block px-3 py-2 text-sm text-white hover:bg-slate-600 rounded">Master Barang</a>
+                    <a href="{{ route('pegawai.index') }}" class="block px-3 py-2 text-sm text-white hover:bg-slate-600 rounded">Master Pegawai</a>
+                </div>
                 </li>
             </ul>
         </nav>
