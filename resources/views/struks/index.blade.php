@@ -209,6 +209,7 @@
                                     <h4 class="font-medium text-gray-700 mb-2">Edit Item Struk</h4>
 
                                     <div id="itemsContainer" class="space-y-3">
+                                        {{-- Existing items will be rendered here by PHP --}}
                                         @foreach ($items as $idx => $item)
                                         <div class="flex items-center space-x-4 item-row">
                                             {{-- Hidden input to identify the original item index --}}
@@ -257,11 +258,12 @@
                                             class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
                                             placeholder="Harga" id="newItemHarga">
                                         <button type="button" onclick="addNewItemField()"
-                                            class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium">
+                                            class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-1">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                             </svg>
+                                            Tambah Item
                                         </button>
                                     </div>
 
@@ -341,8 +343,7 @@
         if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
             const form = document.createElement('form');
             form.method = 'POST';
-            // Corrected template literal syntax
-            form.action = `/struks/${strukId}/item/${index}`;
+            form.action = `/struks/${strukId}/item/${index}`; // Corrected template literal syntax
 
             const csrfToken = document.createElement('input');
             csrfToken.type = 'hidden';
@@ -369,11 +370,12 @@
         const itemsContainer = document.getElementById('itemsContainer');
 
         // Only add if all new item fields have values
-        if (newItemNama.value && newItemJumlah.value && newItemHarga.value) {
+        if (newItemNama.value.trim() && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
             const newItemRow = document.createElement('div');
             newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
 
-            // IMPORTANT: Use the same 'name' attributes as existing items for submission
+            // IMPORTANT: These new inputs use the same 'name' attributes as existing items for submission
+            // This is crucial for the simplified controller logic.
             newItemRow.innerHTML = `
                 <input name="nama[]" value="${newItemNama.value}" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Nama item baru">
                 <input name="jumlah[]" type="number" value="${newItemJumlah.value}" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah">
