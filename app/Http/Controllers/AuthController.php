@@ -24,6 +24,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            $request->session()->put('show_welcome', true); // <-- Tambahkan baris ini
             return redirect()->intended('/');
         }
 
