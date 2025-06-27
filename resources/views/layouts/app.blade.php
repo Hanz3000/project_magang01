@@ -23,12 +23,14 @@
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Ganti background agar mirip login */
+            background: #e3f2fd;
             background-attachment: fixed;
             position: relative;
         }
 
         body::before {
+            /* Efek radial biru seperti login */
             content: '';
             position: fixed;
             top: 0;
@@ -36,9 +38,9 @@
             width: 100%;
             height: 100%;
             background:
-                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.2) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, #b3e5fc 0%, transparent 60%),
+                radial-gradient(circle at 80% 20%, #b3e5fc 0%, transparent 60%),
+                radial-gradient(circle at 50% 50%, #90caf9 0%, transparent 70%);
             pointer-events: none;
             z-index: -1;
         }
@@ -262,8 +264,9 @@
         }
 
         .main-content {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
+            /* Ganti background utama konten agar putih seperti login */
+            background: transparent;
+            backdrop-filter: none;
         }
 
         .floating-particles {
@@ -339,12 +342,13 @@
         }
 
         .content-area {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
+            /* Card putih seperti login */
+            background: #fff;
+            backdrop-filter: none;
             border-radius: 20px;
             box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.2);
+                0 20px 40px rgba(0, 0, 0, 0.08),
+                0 0 0 1px rgba(33, 150, 243, 0.08);
             position: relative;
             overflow: hidden;
         }
@@ -410,6 +414,39 @@
             background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
             padding-left: 1.25rem;
         }
+
+        /* Animasi untuk teks sidebar */
+        .sidebar-text-enter {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+
+        .sidebar-text-enter-active {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 300ms ease-out;
+        }
+
+        .sidebar-text-exit {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .sidebar-text-exit-active {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 200ms ease-in;
+        }
+
+        /* Optimasi untuk sidebar kecil */
+        .sidebar-small .menu-item {
+            padding: 0.75rem 0;
+            justify-content: center;
+        }
+
+        .sidebar-small .menu-icon {
+            margin: 0 auto;
+        }
     </style>
 </head>
 
@@ -418,18 +455,18 @@
     x-init="if(showWelcome){ setTimeout(() => showWelcome = false, 3000); }">
     <!-- Welcome Animation -->
     <div x-show="showWelcome" x-transition:leave="transition ease-in duration-300"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-purple-700">
-        <div class="text-center text-white space-y-6">
-            <div class="mx-auto w-24 h-24 border-4 border-white border-t-transparent rounded-full animate-spin flex items-center justify-center">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-[#e3f2fd]">
+        <div class="text-center space-y-6">
+            <div class="mx-auto w-24 h-24 border-4 border-blue-200 border-t-transparent rounded-full animate-spin flex items-center justify-center">
                 <div class="w-16 h-16 border-4 border-blue-300 border-b-transparent rounded-full animate-spin-reverse"></div>
             </div>
             <div class="space-y-2">
-                <h2 class="text-3xl font-bold tracking-tight text-white/90">Selamat Datang</h2>
-                <p class="text-indigo-200 font-medium">Sistem Inventaris Barang</p>
+                <h2 class="text-3xl font-bold tracking-tight text-blue-800">Selamat Datang</h2>
+                <p class="text-blue-500 font-medium">Sistem Inventaris Barang</p>
             </div>
             <div class="pt-4">
-                <div class="h-1.5 w-40 mx-auto bg-white/20 rounded-full overflow-hidden">
-                    <div class="h-full bg-white rounded-full animate-progress"></div>
+                <div class="h-1.5 w-40 mx-auto bg-blue-100 rounded-full overflow-hidden">
+                    <div class="h-full bg-blue-400 rounded-full animate-progress"></div>
                 </div>
             </div>
         </div>
@@ -454,40 +491,42 @@
 
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="sidebar-gradient text-white shadow-2xl transition-all duration-500 ease-in-out relative"
-            :class="sidebarOpen ? 'w-72' : 'w-20'">
-            <!-- Header Logo -->
+        <aside class="sidebar-gradient text-white shadow-2xl transition-all duration-500 ease-in-out relative flex flex-col"
+            :class="sidebarOpen ? 'w-72 px-4' : 'w-20 px-2'">
 
-            <div class="flex items-center p-6 border-b border-white/20">
-                <div class="flex items-center gap-4">
+            <!-- Header Logo -->
+            <div class="flex items-center p-4 border-b border-white/20">
+                <div class="flex items-center gap-4 w-full" :class="sidebarOpen ? 'justify-start' : 'justify-center'">
                     <div class="logo-container p-3 rounded-xl hover:rotate-6 transition-transform duration-300">
                         <svg class="w-6 h-6 text-white icon-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                         </svg>
                     </div>
-                    <div x-show="sidebarOpen" x-transition class="overflow-hidden">
+                    <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300"
+                        x-transition:leave="transition ease-in duration-200" class="overflow-hidden">
                         <h1 class="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                            <span class="block animate-slide-up" style="animation-delay: 0.1s;">Inventaris</span>
-                            <span class="block text-sm font-medium text-white/80 animate-slide-up" style="animation-delay: 0.2s;">Sistem Manajemen</span>
+                            <span class="block">Inventaris</span>
+                            <span class="block text-sm font-medium text-white/80">Sistem Manajemen</span>
                         </h1>
                     </div>
                 </div>
             </div>
+
             <!-- Sidebar Menu -->
-            <nav class="px-4 py-6">
-                <ul class="space-y-4 pb-24"> {{-- Extra padding for logout spacing --}}
-                    <!-- Menu Items -->
-                    <li class="fade-in" style="animation-delay: 0.1s;">
+            <nav class="flex-1 overflow-y-auto py-4">
+                <ul class="space-y-2">
+                    <li>
                         <a href="{{ url('/dashboard') }}"
-                            class="menu-item group flex items-center gap-4 px-4 py-4 rounded-xl hover-glow transition-all duration-300">
+                            class="menu-item group flex items-center gap-3 px-3 py-3 rounded-xl hover-glow transition-all duration-300"
+                            :class="sidebarOpen ? 'justify-start' : 'justify-center'">
                             <div class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg">
                                 <svg class="w-5 h-5 text-white icon-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <span x-show="sidebarOpen" x-transition class="font-medium">Dashboard</span>
+                            <span x-show="sidebarOpen" x-transition.opacity.duration.300ms class="font-medium">Dashboard</span>
                         </a>
                     </li>
 
@@ -542,6 +581,9 @@
                             x-transition:enter="transition ease-out duration-300"
                             x-transition:enter-start="opacity-0 transform -translate-y-2"
                             x-transition:enter-end="opacity-100 transform translate-y-0"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="opacity-100 scale-100"
+                            x-transition:leave-end="opacity-0 scale-95"
                             class="ml-6 mt-3 space-y-2 text-sm">
                             <a href="{{ route('master-barang.index') }}"
                                 class="submenu-item block px-4 py-3 text-white rounded-lg font-medium">Master Barang</a>
