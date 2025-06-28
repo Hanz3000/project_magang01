@@ -17,7 +17,7 @@
         <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
-                <p class="text-gray-600">Kelola dan atur semua struk pembelian Anda</p>
+                <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
             </div>
             <div class="flex flex-wrap gap-2">
                 <div class="relative group">
@@ -104,20 +104,24 @@
                                 <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="max-w-xs space-y-1">
+                                <div class="max-w-xs space-y-2">
                                     @foreach ($items as $item)
-                                    <div class="text-gray-700">{{ $item['nama'] ?? '-' }}</div>
+                                    <div class="flex items-start">
+                                        <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
+                                        <span class="text-gray-700 break-words">{{ $item['nama'] ?? '-' }}</span>
+                                    </div>
                                     @endforeach
                                 </div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="max-w-xs space-y-1">
+                                <div class="max-w-xs space-y-2">
                                     @foreach ($items as $item)
-                                    <div class="text-gray-500 text-sm">x{{ $item['jumlah'] ?? '-' }}</div>
+                                    <div class="text-gray-500 text-sm">
+                                        <span class="whitespace-nowrap">x{{ $item['jumlah'] ?? '-' }}</span>
+                                    </div>
                                     @endforeach
                                 </div>
                             </td>
-
                             <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-indigo-600">
                                 Rp{{ number_format($totalHarga, 0, ',', '.') }}
                             </td>
@@ -254,113 +258,113 @@
 </div>
 
 <script>
-// Image modal functions
-function openModal(imageSrc) {
-    document.getElementById('modalImage').src = imageSrc;
-    document.getElementById('imageModal').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeModal() {
-    document.getElementById('imageModal').classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-}
-
-// Initialize autocomplete for item search
-function initAutocomplete(inputElement) {
-    const resultsContainer = inputElement.nextElementSibling;
-
-    inputElement.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.trim();
-
-        if (searchTerm.length < 2) {
-            resultsContainer.classList.add('hidden');
-            return;
-        }
-
-        fetch(`/struks/search-items?term=${encodeURIComponent(searchTerm)}`)
-            .then(response => response.json())
-            .then(data => {
-                resultsContainer.innerHTML = '';
-
-                if (data.length === 0) {
-                    resultsContainer.classList.add('hidden');
-                    return;
-                }
-
-                data.forEach(item => {
-                    const option = document.createElement('div');
-                    option.className = 'px-4 py-2 hover:bg-indigo-50 cursor-pointer';
-                    option.textContent = item.nama;
-                    option.addEventListener('click', function() {
-                        inputElement.value = item.nama;
-                        const priceInput = inputElement.closest('.item-row').querySelector('input[name*="harga"]');
-                        if (priceInput && (!priceInput.value || priceInput.value === '0')) {
-                            priceInput.value = item.harga;
-                        }
-                        resultsContainer.classList.add('hidden');
-                    });
-                    resultsContainer.appendChild(option);
-                });
-
-                resultsContainer.classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Error fetching autocomplete data:', error);
-                resultsContainer.classList.add('hidden');
-            });
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.relative')) {
-            resultsContainer.classList.add('hidden');
-        }
-    });
-}
-
-// Initialize all autocomplete fields when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.item-search').forEach(input => {
-        initAutocomplete(input);
-    });
-});
-
-// Confirm item deletion
-function confirmDeleteItem(strukId, index) {
-    if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/struks/${strukId}/item/${index}`;
-
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'DELETE';
-
-        form.appendChild(csrfToken);
-        form.appendChild(methodInput);
-        document.body.appendChild(form);
-        form.submit();
+    // Image modal functions
+    function openModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
     }
-}
 
-// Function to add new item fields
-function addNewItemField() {
-    const newItemNama = document.getElementById('newItemNama');
-    const newItemJumlah = document.getElementById('newItemJumlah');
-    const newItemHarga = document.getElementById('newItemHarga');
-    const itemsContainer = document.getElementById('itemsContainer');
+    function closeModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
 
-    if (newItemNama.value.trim() && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
-        const newItemRow = document.createElement('div');
-        newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
+    // Initialize autocomplete for item search
+    function initAutocomplete(inputElement) {
+        const resultsContainer = inputElement.nextElementSibling;
 
-        newItemRow.innerHTML = `
+        inputElement.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim();
+
+            if (searchTerm.length < 2) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            fetch(`/struks/search-items?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+
+                    if (data.length === 0) {
+                        resultsContainer.classList.add('hidden');
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const option = document.createElement('div');
+                        option.className = 'px-4 py-2 hover:bg-indigo-50 cursor-pointer';
+                        option.textContent = item.nama;
+                        option.addEventListener('click', function() {
+                            inputElement.value = item.nama;
+                            const priceInput = inputElement.closest('.item-row').querySelector('input[name*="harga"]');
+                            if (priceInput && (!priceInput.value || priceInput.value === '0')) {
+                                priceInput.value = item.harga;
+                            }
+                            resultsContainer.classList.add('hidden');
+                        });
+                        resultsContainer.appendChild(option);
+                    });
+
+                    resultsContainer.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching autocomplete data:', error);
+                    resultsContainer.classList.add('hidden');
+                });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.relative')) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // Initialize all autocomplete fields when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.item-search').forEach(input => {
+            initAutocomplete(input);
+        });
+    });
+
+    // Confirm item deletion
+    function confirmDeleteItem(strukId, index) {
+        if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/struks/${strukId}/item/${index}`;
+
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+
+            form.appendChild(csrfToken);
+            form.appendChild(methodInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Function to add new item fields
+    function addNewItemField() {
+        const newItemNama = document.getElementById('newItemNama');
+        const newItemJumlah = document.getElementById('newItemJumlah');
+        const newItemHarga = document.getElementById('newItemHarga');
+        const itemsContainer = document.getElementById('itemsContainer');
+
+        if (newItemNama.value.trim() && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
+            const newItemRow = document.createElement('div');
+            newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
+
+            newItemRow.innerHTML = `
             <div class="flex-1 relative">
                 <input name="nama[]" value="${newItemNama.value}" 
                     class="item-search w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
@@ -379,242 +383,254 @@ function addNewItemField() {
                 </svg>
             </button>
         `;
-        itemsContainer.appendChild(newItemRow);
+            itemsContainer.appendChild(newItemRow);
 
-        const newInput = newItemRow.querySelector('.item-search');
-        initAutocomplete(newInput);
+            const newInput = newItemRow.querySelector('.item-search');
+            initAutocomplete(newInput);
 
-        newItemNama.value = '';
-        newItemJumlah.value = '';
-        newItemHarga.value = '';
-    } else {
-        alert('Harap isi semua kolom untuk item baru (Nama, Jumlah, Harga).');
-    }
-}
-
-// Auto-hide success message after 5 seconds
-@if(session('success'))
-setTimeout(() => {
-    const successMessage = document.querySelector('.fixed.top-4.right-4');
-    if (successMessage) {
-        successMessage.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            successMessage.remove();
-        }, 300);
-    }
-}, 5000);
-@endif
-
-// Search functionality with cursor preservation
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const clearSearch = document.getElementById('clearSearch');
-    let searchTimeout;
-
-    // Live search as you type
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        
-        // Save current cursor position
-        const cursorPosition = this.selectionStart;
-        localStorage.setItem('searchCursorPosition', cursorPosition);
-        
-        searchTimeout = setTimeout(() => {
-            const searchTerm = searchInput.value.trim();
-            const url = new URL(window.location.href);
-            
-            if (searchTerm) {
-                url.searchParams.set('search', searchTerm);
-            } else {
-                url.searchParams.delete('search');
-            }
-            
-            // Preserve edit parameter if exists
-            @if(request('edit'))
-            url.searchParams.set('edit', '{{ request('edit') }}');
-            @endif
-            
-            window.location.href = url.toString();
-        }, 500);
-    });
-
-    // Prevent form submission on Enter key
-    searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
+            newItemNama.value = '';
+            newItemJumlah.value = '';
+            newItemHarga.value = '';
+        } else {
+            alert('Harap isi semua kolom untuk item baru (Nama, Jumlah, Harga).');
         }
-    });
+    }
 
-    // Clear search
-    if (clearSearch) {
-        clearSearch.addEventListener('click', function() {
-            localStorage.removeItem('searchCursorPosition');
-            const url = new URL(window.location.href);
-            url.searchParams.delete('search');
-            
-            // Preserve edit parameter if exists
-            @if(request('edit'))
-            url.searchParams.set('edit', '{{ request('edit') }}');
-            @endif
-            
-            window.location.href = url.toString();
+    // Auto-hide success message after 5 seconds
+    @if(session('success'))
+    setTimeout(() => {
+        const successMessage = document.querySelector('.fixed.top-4.right-4');
+        if (successMessage) {
+            successMessage.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                successMessage.remove();
+            }, 300);
+        }
+    }, 5000);
+    @endif
+
+    // Search functionality with cursor preservation
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        let searchTimeout;
+
+        // Live search as you type
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+
+            // Save current cursor position
+            const cursorPosition = this.selectionStart;
+            localStorage.setItem('searchCursorPosition', cursorPosition);
+
+            searchTimeout = setTimeout(() => {
+                const searchTerm = searchInput.value.trim();
+                const url = new URL(window.location.href);
+
+                if (searchTerm) {
+                    url.searchParams.set('search', searchTerm);
+                } else {
+                    url.searchParams.delete('search');
+                }
+
+                // Preserve edit parameter if exists
+                @if(request('edit'))
+                url.searchParams.set('edit', '{{ request('
+                    edit ') }}');
+                @endif
+
+                window.location.href = url.toString();
+            }, 500);
         });
-    }
 
-    // Restore cursor position after page load
-    const savedCursorPosition = localStorage.getItem('searchCursorPosition');
-    if (searchInput.value && savedCursorPosition) {
-        // Delay slightly to ensure input is fully rendered
-        setTimeout(() => {
-            searchInput.focus();
-            searchInput.selectionStart = searchInput.selectionEnd = parseInt(savedCursorPosition);
-            localStorage.removeItem('searchCursorPosition');
-        }, 50);
-    }
+        // Prevent form submission on Enter key
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
 
-    // Add animation to table rows when page loads
-    document.querySelectorAll('tbody tr').forEach((row, index) => {
-        row.style.opacity = '0';
-        row.style.transform = 'translateY(10px)';
-        row.style.transition = 'all 0.3s ease-out';
-        row.style.transitionDelay = `${index * 0.05}s`;
-        
-        setTimeout(() => {
-            row.style.opacity = '1';
-            row.style.transform = 'translateY(0)';
-        }, 50);
+        // Clear search
+        if (clearSearch) {
+            clearSearch.addEventListener('click', function() {
+                localStorage.removeItem('searchCursorPosition');
+                const url = new URL(window.location.href);
+                url.searchParams.delete('search');
+
+                // Preserve edit parameter if exists
+                @if(request('edit'))
+                url.searchParams.set('edit', '{{ request('
+                    edit ') }}');
+                @endif
+
+                window.location.href = url.toString();
+            });
+        }
+
+        // Restore cursor position after page load
+        const savedCursorPosition = localStorage.getItem('searchCursorPosition');
+        if (searchInput.value && savedCursorPosition) {
+            // Delay slightly to ensure input is fully rendered
+            setTimeout(() => {
+                searchInput.focus();
+                searchInput.selectionStart = searchInput.selectionEnd = parseInt(savedCursorPosition);
+                localStorage.removeItem('searchCursorPosition');
+            }, 50);
+        }
+
+        // Add animation to table rows when page loads
+        document.querySelectorAll('tbody tr').forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(10px)';
+            row.style.transition = 'all 0.3s ease-out';
+            row.style.transitionDelay = `${index * 0.05}s`;
+
+            setTimeout(() => {
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, 50);
+        });
     });
-});
 </script>
 
 <style>
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
-    to {
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slideIn {
+        animation: slideIn 0.3s ease-out forwards;
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .group:hover .group-hover\:block {
+        display: block;
+    }
+
+    .group:hover .group-hover\:opacity-100 {
         opacity: 1;
-        transform: translateY(0);
     }
-}
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+    .group:hover .group-hover\:visible {
+        visibility: visible;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+
+    .hover-scale {
+        transition: transform 0.2s ease;
     }
-}
 
-.animate-slideIn {
-    animation: slideIn 0.3s ease-out forwards;
-}
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
 
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
-}
+    /* Custom pagination styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+    }
 
-.group:hover .group-hover\:block {
-    display: block;
-}
+    .pagination li {
+        margin: 0 4px;
+    }
 
-.group:hover .group-hover\:opacity-100 {
-    opacity: 1;
-}
+    .pagination a,
+    .pagination span {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+    }
 
-.group:hover .group-hover\:visible {
-    visibility: visible;
-}
+    .pagination a {
+        color: #4f46e5;
+        border: 1px solid #e5e7eb;
+    }
 
-.hover-scale {
-    transition: transform 0.2s ease;
-}
+    .pagination a:hover {
+        background-color: #f5f3ff;
+    }
 
-.hover-scale:hover {
-    transform: scale(1.02);
-}
+    .pagination .active span {
+        background-color: #4f46e5;
+        color: white;
+    }
 
-/* Custom pagination styling */
-.pagination {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    padding: 0;
-}
+    .pagination .disabled span {
+        color: #9ca3af;
+        border-color: #e5e7eb;
+    }
 
-.pagination li {
-    margin: 0 4px;
-}
+    .autocomplete-results {
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
 
-.pagination a,
-.pagination span {
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-}
+    .autocomplete-results div {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+    }
 
-.pagination a {
-    color: #4f46e5;
-    border: 1px solid #e5e7eb;
-}
+    .autocomplete-results div:last-child {
+        border-bottom: none;
+    }
 
-.pagination a:hover {
-    background-color: #f5f3ff;
-}
+    .autocomplete-results div:hover {
+        background-color: #f3f4f6;
+    }
 
-.pagination .active span {
-    background-color: #4f46e5;
-    color: white;
-}
+    /* Smooth transitions for all elements */
+    * {
+        transition: all 0.2s ease;
+    }
 
-.pagination .disabled span {
-    color: #9ca3af;
-    border-color: #e5e7eb;
-}
+    /* Loading animation */
+    @keyframes pulse {
+        0% {
+            opacity: 0.6;
+        }
 
-.autocomplete-results {
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
+        50% {
+            opacity: 1;
+        }
 
-.autocomplete-results div {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #f3f4f6;
-}
+        100% {
+            opacity: 0.6;
+        }
+    }
 
-.autocomplete-results div:last-child {
-    border-bottom: none;
-}
-
-.autocomplete-results div:hover {
-    background-color: #f3f4f6;
-}
-
-/* Smooth transitions for all elements */
-* {
-    transition: all 0.2s ease;
-}
-
-/* Loading animation */
-@keyframes pulse {
-    0% { opacity: 0.6; }
-    50% { opacity: 1; }
-    100% { opacity: 0.6; }
-}
-
-.loading-pulse {
-    animation: pulse 1.5s infinite;
-}
+    .loading-pulse {
+        animation: pulse 1.5s infinite;
+    }
 </style>
 @endsection
