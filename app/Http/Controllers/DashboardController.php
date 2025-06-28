@@ -25,10 +25,16 @@ class DashboardController extends Controller
                         $nama = $item['nama'];
                         $jumlah = $item['jumlah'];
 
+                        // Simpan jumlah dan nomor_struk
                         if (!isset($barangList[$nama])) {
-                            $barangList[$nama] = $jumlah;
+                            $barangList[$nama] = [
+                                'jumlah' => $jumlah,
+                                'nomor_struk' => $struk->nomor_struk,
+                            ];
                         } else {
-                            $barangList[$nama] += $jumlah;
+                            $barangList[$nama]['jumlah'] += $jumlah;
+                            // Jika ingin menampilkan nomor_struk terakhir, update di sini
+                            $barangList[$nama]['nomor_struk'] = $struk->nomor_struk;
                         }
                     }
                 }

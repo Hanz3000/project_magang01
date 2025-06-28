@@ -9,15 +9,9 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
-// Import for better type hinting if using Form Requests
-// use App\Http\Requests\StrukStoreRequest;
-// use App\Http\Requests\StrukUpdateRequest;
 
 class StrukController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = Struk::query();
@@ -27,11 +21,10 @@ class StrukController extends Controller
             $query->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
                 ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
         }
-
-        // Use pagination for better performance on large datasets
         $struks = $query->latest()->paginate(10);
+        $barangList = Barang::all();
 
-        return view('struks.index', compact('struks'));
+        return view('struks.index', compact('struks', 'barangList'));
     }
 
     /**
@@ -233,87 +226,40 @@ class StrukController extends Controller
      * Update items within a specific Struk.
      * This method seems intended to handle updates of existing items and adding new ones dynamically.
      */
+
     public function updateItems(Request $request, $id)
     {
-        // Find struk by ID or throw 404 if not found
         $struk = Struk::findOrFail($id);
 
-        // Validate the request data for items
         $request->validate([
             'nama.*' => 'required|string|max:255',
             'jumlah.*' => 'required|integer|min:1',
             'harga.*' => 'required|numeric|min:0',
-            'item_index.*' => 'nullable|integer', // Optional: for existing items
         ]);
 
-        // Decode existing items to a PHP array. Use `?? []` for an empty array default.
-        $existingItems = json_decode($struk->items, true) ?? [];
-
-        // Get input data from the request
         $namaArr = $request->input('nama', []);
         $jumlahArr = $request->input('jumlah', []);
         $hargaArr = $request->input('harga', []);
-        $indexArr = $request->input('item_index', []);
 
-        $processedItems = []; // Array to store processed items (both old and new)
-
-        // Iterate through the input 'nama' array
+        $items = [];
         foreach ($namaArr as $i => $nama) {
-            $jumlah = $jumlahArr[$i] ?? null;
-            $harga = $hargaArr[$i] ?? null;
-
-            // This check should ideally be handled by the validation rules above.
-            // If you keep it here, it duplicates validation logic.
-            // if ($nama === null || $nama === '' || $jumlah === null || $harga === null) {
-            //      continue;
-            // }
-
-            // Create an item array
-            $item = [
+            $items[] = [
                 'nama' => $nama,
-                'jumlah' => (int) $jumlah, // Ensure quantity is an integer
-                'harga' => (float) $harga, // Ensure price is a float
+                'jumlah' => (int) ($jumlahArr[$i] ?? 0),
+                'harga' => (float) ($hargaArr[$i] ?? 0),
             ];
-
-            // Check if item_index exists, meaning this is an existing item being updated
-            if (isset($indexArr[$i])) {
-                // Update the existing item in the existingItems array at the corresponding index
-                // Make sure the index exists to prevent errors if item_index is out of bounds
-                if (isset($existingItems[$indexArr[$i]])) {
-                    $existingItems[$indexArr[$i]] = $item;
-                } else {
-                    // If index is provided but doesn't exist in existingItems, treat as new
-                    $processedItems[] = $item;
-                }
-            } else {
-                // If no item_index, it's a new item, add to processedItems
-                $processedItems[] = $item;
-            }
         }
 
-        // Merge updated existing items with newly added items
-        $mergedItems = array_values(array_merge($existingItems, $processedItems));
+        $total = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
 
-        // Recalculate total price based on the merged and validated items
-        $total = collect($mergedItems)->sum(function ($item) {
-            return $item['jumlah'] * $item['harga'];
-        });
-
-        // Update the 'items' and 'total_harga' columns in the Struk model
-        $struk->items = json_encode($mergedItems); // Save back as JSON string
+        $struk->items = json_encode($items);
         $struk->total_harga = $total;
-        $struk->save(); // Save changes to the database
+        $struk->save();
 
-        // Redirect back to the struk index page with a success message
         return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
     }
 
 
-    /**
-     * Add a single new item to a specific Struk.
-     * This method might be redundant if `updateItems` is designed to handle both updates and additions.
-     * Consider if this separate endpoint is truly necessary.
-     */
     public function addItem(Request $request, $id)
     {
         $struk = Struk::findOrFail($id);
@@ -358,10 +304,12 @@ class StrukController extends Controller
             $struk->save(); // Save changes
         }
 
-        // Redirect back to the struk index page (or the struk edit page if preferred)
-        // If you want to redirect to the edit page, make sure your route accepts 'edit' as a parameter.
         return redirect()->route('struks.index')->with('success', 'Item berhasil dihapus.');
-        // Alternative to redirect back to edit page:
-        // return redirect()->route('struks.edit', $struk->id)->with('success', 'Item berhasil dihapus.');
+    }
+
+    public function items($id)
+    {
+        $struk = Struk::findOrFail($id);
+        return response()->json(json_decode($struk->items, true));
     }
 }

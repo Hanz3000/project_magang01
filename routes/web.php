@@ -25,19 +25,23 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 Route::middleware('auth')->group(function () {
 
     // ------------------- REDIRECT HOME -------------------
-    Route::get('/', fn () => redirect()->route('struks.index'));
+    Route::get('/', fn() => redirect()->route('dashboard'));
 
     // ------------------- DASHBOARD -------------------
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // ------------------- MASTER BARANG -------------------
+    Route::delete('/master-barang/bulk-delete', [MasterBarangController::class, 'bulkDelete'])->name('master-barang.bulk-delete');
     Route::resource('master-barang', MasterBarangController::class);
 
     // ------------------- MASTER PEGAWAI -------------------
     Route::get('/pegawai', [PegawaiController::class, 'index'])->name('pegawai.index');
     Route::get('/pegawai/create', [PegawaiController::class, 'create'])->name('pegawai.create');
     Route::post('/pegawai', [PegawaiController::class, 'store'])->name('pegawai.store');
+    Route::delete('/pegawai/bulk-delete', [PegawaiController::class, 'bulkDelete'])->name('pegawai.bulk-delete');
     Route::resource('pegawai', \App\Http\Controllers\PegawaiController::class);
+
+
 
     // ------------------- STRUK -------------------
     Route::resource('struks', StrukController::class)->except(['index', 'show']);
@@ -45,6 +49,9 @@ Route::middleware('auth')->group(function () {
     // Khusus Index dan Show dibuat manual agar tidak tertimpa
     Route::get('/struks', [StrukController::class, 'index'])->name('struks.index');
     Route::get('/struks/{struk}', [StrukController::class, 'show'])->name('struks.show');
+
+    // filepath: routes/web.php
+    Route::get('/struks/{struk}/items', [StrukController::class, 'items']);
 
     // Export Excel & CSV
     Route::get('/struks/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');

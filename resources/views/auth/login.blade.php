@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
-    <title>Login - Inventaris Barang</title>
+    <title>Masuk - Inventaris Barang</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- TailwindCSS via CDN -->
@@ -165,8 +165,8 @@
             <div class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <i class="fas fa-box-open text-primary-600 text-3xl"></i>
             </div>
-            <h2 class="text-3xl font-bold text-slate-800 mb-2">Welcome Back</h2>
-            <p class="text-slate-500">Sign in to your inventory account</p>
+            <h2 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang</h2>
+            <p class="text-slate-500">Masuk ke akun inventaris Anda</p>
         </div>
 
         @if ($errors->any())
@@ -186,20 +186,20 @@
             @csrf
 
             <div class="animate-fadeIn" style="animation-delay: 0.4s;">
-                <label for="email" class="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
+                <label for="email" class="block text-sm font-medium text-slate-700 mb-2">Alamat Email</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-envelope text-slate-400"></i>
                     </div>
                     <input type="email" id="email" name="email"
                         class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl input-field focus:border-primary-500 focus:ring-primary-500"
-                        placeholder="you@example.com"
+                        placeholder="Masukan alamat email"
                         value="{{ old('email') }}" required autofocus>
                 </div>
             </div>
 
             <div class="animate-fadeIn" style="animation-delay: 0.5s;">
-                <label for="password" class="block text-sm font-medium text-slate-700 mb-2">Password</label>
+                <label for="password" class="block text-sm font-medium text-slate-700 mb-2">Kata Sandi</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <i class="fas fa-lock text-slate-400"></i>
@@ -217,22 +217,21 @@
             <div class="flex items-center justify-between text-sm animate-fadeIn" style="animation-delay: 0.6s;">
                 <label class="inline-flex items-center">
                     <input type="checkbox" name="remember" class="h-4 w-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
-                    <span class="ml-2 text-slate-600">Remember me</span>
+                    <span class="ml-2 text-slate-600">Ingat saya</span>
                 </label>
-                <a href="{{ route('password.request') }}" class="text-primary-600 hover:text-primary-800 hover:underline">Forgot password?</a>
-
+                <a href="{{ route('password.request') }}" class="text-primary-600 hover:text-primary-800 hover:underline">Lupa kata sandi?</a>
             </div>
 
             <button type="submit"
                 class="w-full bg-primary-600 text-white py-3 px-4 rounded-xl btn-primary font-semibold animate-fadeIn" style="animation-delay: 0.7s;">
-                Sign In
+                Masuk
                 <i class="fas fa-arrow-right ml-2"></i>
             </button>
         </form>
 
         <div class="text-center text-sm mt-6 animate-fadeIn" style="animation-delay: 1s;">
-            <span class="text-slate-600">Don't have an account?</span>
-            <a href="{{ route('register') }}" class="text-primary-600 font-medium hover:underline ml-1">Sign up</a>
+            <span class="text-slate-600">Belum punya akun?</span>
+            <a href="{{ route('register') }}" class="text-primary-600 font-medium hover:underline ml-1">Daftar</a>
         </div>
     </div>
 

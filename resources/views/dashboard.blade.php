@@ -52,31 +52,31 @@
             </div>
 
             @if (isset($latestStruk) && $latestStruk)
-                <div class="space-y-3 text-gray-700">
-                    <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Nama Toko:</span>
-                        <span class="font-medium">{{ $latestStruk->nama_toko }}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Nomor Struk:</span>
-                        <span class="font-mono">{{ $latestStruk->nomor_struk }}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Tanggal:</span>
-                        <span>{{ $latestStruk->tanggal_struk }}</span>
-                    </div>
-                    <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Total:</span>
-                        <span class="font-medium">Rp *******</span>
-                    </div>
+            <div class="space-y-3 text-gray-700">
+                <div class="flex items-center">
+                    <span class="w-24 text-gray-500">Nama Toko:</span>
+                    <span class="font-medium">{{ $latestStruk->nama_toko }}</span>
                 </div>
+                <div class="flex items-center">
+                    <span class="w-24 text-gray-500">Nomor Struk:</span>
+                    <span class="font-mono">{{ $latestStruk->nomor_struk }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-24 text-gray-500">Tanggal:</span>
+                    <span>{{ $latestStruk->tanggal_struk }}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="w-24 text-gray-500">Total:</span>
+                    <span class="font-medium">Rp *******</span>
+                </div>
+            </div>
             @else
-                <div class="text-center py-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <p class="mt-2 text-gray-600">Belum ada struk terbaru tercatat.</p>
-                </div>
+            <div class="text-center py-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <p class="mt-2 text-gray-600">Belum ada struk terbaru tercatat.</p>
+            </div>
             @endif
         </div>
 
@@ -87,11 +87,11 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd" />
                     </svg>
-                    Daftar Barang Belanja
+                    Daftar Pemasukan Barang
                 </h2>
-                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex w-full md:w-64">
+                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex">
                     <input type="text" name="search" value="{{ request('search') }}"
-                        class="flex-grow border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent text-sm"
+                        class="flex-grow md:w-64 border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent text-sm"
                         placeholder="Cari nama barang...">
                     <button type="submit"
                         class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm flex items-center justify-center">
@@ -110,26 +110,30 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Struk</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($barangList ?? [] as $nama => $jumlah)
-                            <tr class="hover:bg-gray-50 transition-colors duration-150">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $nama }}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $jumlah }}</td>
-                            </tr>
+                        @forelse ($barangList ?? [] as $nama => $data)
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $nama }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ is_array($data) ? $data['jumlah'] : $data }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ is_array($data) && isset($data['nomor_struk']) ? $data['nomor_struk'] : '-' }}
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
-                                    <div class="flex flex-col items-center justify-center py-6">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <p class="mt-2">Tidak ada data barang ditemukan.</p>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="3" class="px-6 py-4 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center justify-center py-6">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="mt-2">Tidak ada data barang ditemukan.</p>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>

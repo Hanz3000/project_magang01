@@ -61,4 +61,14 @@ class PegawaiController extends Controller
 
         return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil dihapus.');
     }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = explode(',', $request->ids);
+        if (!empty($ids)) {
+            \App\Models\Pegawai::whereIn('id', $ids)->delete();
+            return redirect()->route('pegawai.index')->with('success', 'Pegawai terpilih berhasil dihapus.');
+        }
+        return redirect()->route('pegawai.index')->with('success', 'Tidak ada pegawai yang dipilih.');
+    }
 }

@@ -145,11 +145,17 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
                                     </a>
-                                    <a href="{{ route('struks.index', ['edit' => $struk->id, 'search' => request('search')]) }}" class="text-gray-400 hover:text-blue-600 p-1 rounded-full hover:bg-blue-50 transition-colors" title="Edit">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    <!-- Ganti tombol edit menjadi tombol modal -->
+                                    <button type="button" onclick="openEditModal({{ $struk->id }})"
+                                        class="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 px-3 py-1 rounded-md transition-colors"
+                                        title="Edit">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                            </path>
                                         </svg>
-                                    </a>
+                                        Edit
+                                    </button>
                                     <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
                                         @csrf
                                         @method('DELETE')
@@ -165,60 +171,79 @@
 
                         @if (request('edit') == $struk->id)
                         <tr class="bg-indigo-50 animate-fadeIn">
-                            <td colspan="9" class="px-6 py-4">
-                                <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}" class="space-y-4">
-                                    @csrf
-                                    @method('PUT')
-                                    <h4 class="font-medium text-gray-700 mb-2">Edit Item Struk</h4>
+                            <td colspan="9" class="px-0 py-4">
+                                <div class="px-6 max-w-5xl ml-auto">
+                                    <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}" class="space-y-4">
+                                        @csrf
+                                        @method('PUT')
 
-                                    <div id="itemsContainer" class="space-y-3">
-                                        @foreach ($items as $idx => $item)
-                                        <div class="flex items-center space-x-4 item-row">
-                                            <input type="hidden" name="item_index[]" value="{{ $idx }}">
-                                            <div class="flex-1 relative">
-                                                <input name="nama[]" value="{{ $item['nama'] ?? '' }}"
-                                                    class="item-search w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                    placeholder="Cari item...">
-                                                <div class="autocomplete-results absolute z-10 w-full mt-1 hidden bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
+                                        <h4 class="font-medium text-gray-700 mb-2">Edit Item Struk</h4>
+
+                                        <div id="itemsContainer" class="space-y-3">
+                                            @foreach ($items as $idx => $item)
+                                            <div class="flex items-center space-x-4 item-row">
+                                                <input type="hidden" name="item_index[]" value="{{ $idx }}">
+                                                <div class="flex-1 relative">
+                                                    <select name="nama[]" class="item-select w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                                                        <option value="" disabled {{ empty($item['nama']) ? 'selected' : '' }}>Pilih Barang</option>
+                                                        @foreach ($barangList as $barang)
+                                                        <option value="{{ $barang->nama_barang }}" {{ (isset($item['nama']) && $item['nama'] == $barang->nama_barang) ? 'selected' : '' }}>
+                                                            {{ $barang->nama_barang }}
+                                                        </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <input name="jumlah[]" type="number" value="{{ $item['jumlah'] ?? '' }}"
+                                                    class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                                    placeholder="Jumlah">
+                                                <input name="harga[]" type="number" value="{{ $item['harga'] ?? '' }}"
+                                                    class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                                    placeholder="Harga">
+                                                @if (count($items) > 1)
+                                                <button type="button" onclick="confirmDeleteItem('{{ $struk->id }}', '{{ $idx }}')" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                                @else
+                                                <span class="w-5 h-5"></span>
+                                                @endif
                                             </div>
-                                            <input name="jumlah[]" type="number" value="{{ $item['jumlah'] ?? '' }}"
-                                                class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                placeholder="Jumlah">
-                                            <input name="harga[]" type="number" value="{{ $item['harga'] ?? '' }}"
-                                                class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                placeholder="Harga">
-                                            @if (count($items) > 1)
-                                            <button type="button" onclick="confirmDeleteItem('{{ $struk->id }}', '{{ $idx }}')" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                                </svg>
-                                            </button>
-                                            @else
-                                            <span class="w-5 h-5"></span>
-                                            @endif
+                                            @endforeach
                                         </div>
-                                        @endforeach
-                                    </div>
 
-                                    <div class="flex items-center space-x-4 item-row border-2 border-dashed border-indigo-200 rounded-lg p-3 bg-indigo-25">
-                                        <input type="text" class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Nama item baru" id="newItemNama">
-                                        <input type="number" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="newItemJumlah">
-                                        <input type="number" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga" id="newItemHarga">
-                                        <button type="button" onclick="addNewItemField()" class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-1">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                            </svg>
-                                            Tambah Item
-                                        </button>
-                                    </div>
+                                        <!-- Tambah Item -->
+                                        <div class="flex items-center space-x-4 item-row border-2 border-dashed border-indigo-200 rounded-lg p-3 bg-indigo-25">
+                                            <select class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" id="newItemNama" style="min-width:0">
+                                                <option value="" disabled selected>Pilih Barang</option>
+                                                @foreach ($barangList as $barang)
+                                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                                                @endforeach
+                                            </select>
+                                            <input type="number" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="newItemJumlah">
+                                            <input type="number" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga" id="newItemHarga">
+                                            <button type="button" onclick="addNewItemField()" class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-1">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                                Tambah Item
+                                            </button>
+                                        </div>
 
-                                    <div class="flex justify-end space-x-3 pt-2">
-                                        <a href="{{ route('struks.index', ['search' => request('search')]) }}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Batal</a>
-                                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Simpan Perubahan</button>
-                                    </div>
-                                </form>
+                                        <!-- Tombol -->
+                                        <div class="flex justify-end space-x-3 pt-2">
+                                            <a href="{{ route('struks.index', ['search' => request('search')]) }}"
+                                                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Batal</a>
+                                            <button type="submit"
+                                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">Simpan
+                                                Perubahan</button>
+                                        </div>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
+
                         @endif
                         @empty
                         <tr class="animate-fadeIn">
@@ -257,6 +282,111 @@
     </div>
 </div>
 
+{{-- Modal Edit Struk --}}
+<div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <!-- Modal Header -->
+        <div class="bg-white px-6 py-4 border-b border-gray-200 rounded-t-lg">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-indigo-100 rounded-lg">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Edit Item Struk</h3>
+                        <p class="text-sm text-gray-500">Ubah, tambah, atau hapus item dalam struk</p>
+                    </div>
+                </div>
+                <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- Modal Body -->
+        <div class="px-6 py-4">
+            <form method="POST" action="" id="editItemsForm">
+                @csrf
+                @method('PUT')
+                <div class="grid grid-cols-12 gap-4 pb-3 mb-4 border-b border-gray-200">
+                    <div class="col-span-5">
+                        <label class="block text-sm font-medium text-gray-700">Nama Barang</label>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 text-center">Jumlah</label>
+                    </div>
+                    <div class="col-span-3">
+                        <label class="block text-sm font-medium text-gray-700 text-right">Harga Satuan</label>
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-sm font-medium text-gray-700 text-center">Aksi</label>
+                    </div>
+                </div>
+                <div id="modalItemsContainer" class="space-y-3 mb-6"></div>
+                <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 bg-indigo-50">
+                    <div class="flex items-center gap-2 mb-3">
+                        <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        <span class="text-sm font-medium text-indigo-700">Tambah Item Baru</span>
+                    </div>
+                    <div class="grid grid-cols-12 gap-4 items-end">
+                        <div class="col-span-5">
+                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
+                                id="modalNewItemNama">
+                                <option value="" disabled selected>Pilih Barang</option>
+                                @foreach ($barangList as $barang)
+                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-span-2">
+                            <input type="number"
+                                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                placeholder="Jumlah" id="modalNewItemJumlah" min="1">
+                        </div>
+                        <div class="col-span-3">
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
+                                <input type="number"
+                                    class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                    placeholder="0" id="modalNewItemHarga" min="0">
+                            </div>
+                        </div>
+                        <div class="col-span-2 flex justify-center">
+                            <button type="button" onclick="addNewItemToModal()"
+                                class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Tambah
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- Modal Footer -->
+        <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg">
+            <div class="flex justify-end space-x-3">
+                <button type="button" onclick="closeEditModal()"
+                    class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+                    Batal
+                </button>
+                <button type="button" onclick="submitEditForm()"
+                    class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium shadow-sm">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     // Image modal functions
     function openModal(imageSrc) {
@@ -269,6 +399,152 @@
         document.getElementById('imageModal').classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
     }
+
+    // Modal Edit Struk
+    let currentEditStrukId = null;
+
+    function openEditModal(strukId) {
+        currentEditStrukId = strukId;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        // Set form action
+        document.getElementById('editItemsForm').action = `/struks/${strukId}/update-items`;
+        // Load items
+        loadExistingItems(strukId);
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('modalItemsContainer').innerHTML = '';
+        clearNewItemFields();
+    }
+
+    function loadExistingItems(strukId) {
+        const container = document.getElementById('modalItemsContainer');
+        fetch(`/struks/${strukId}/items`)
+            .then(response => response.json())
+            .then(items => {
+                container.innerHTML = '';
+                items.forEach((item, index) => {
+                    addItemRowToModal(item, index);
+                });
+            })
+            .catch(error => {
+                container.innerHTML = '<div class="text-red-500">Gagal memuat data item.</div>';
+            });
+    }
+
+    function addItemRowToModal(item = {}, index = null) {
+        const container = document.getElementById('modalItemsContainer');
+        const itemIndex = index !== null ? index : container.children.length;
+        // Build select options
+        let options = `<option value="" disabled ${!item.nama ? 'selected' : ''}>Pilih Barang</option>`;
+        @foreach($barangList as $barang)
+        options += `<option value="{{ $barang->nama_barang }}" ${item.nama === '{{ $barang->nama_barang }}' ? 'selected' : ''}>{{ $barang->nama_barang }}</option>`;
+        @endforeach
+        const itemRow = document.createElement('div');
+        itemRow.className = 'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
+        itemRow.innerHTML = `
+            <input type="hidden" name="item_index[]" value="${itemIndex}">
+            <div class="col-span-5">
+                <select name="nama[]" class="item-select w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white">
+                    ${options}
+                </select>
+            </div>
+            <div class="col-span-2">
+                <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    placeholder="Jumlah" min="1">
+            </div>
+            <div class="col-span-3">
+                <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
+                    <input name="harga[]" type="number" value="${item.harga || ''}"
+                        class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                        placeholder="0" min="0">
+                </div>
+            </div>
+            <div class="col-span-2 flex justify-center">
+                <button type="button" onclick="removeItemFromModal(this)"
+                    class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors"
+                    title="Hapus Item">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        `;
+        container.appendChild(itemRow);
+    }
+
+    function addNewItemToModal() {
+        const nama = document.getElementById('modalNewItemNama').value;
+        const jumlah = document.getElementById('modalNewItemJumlah').value;
+        const harga = document.getElementById('modalNewItemHarga').value;
+        if (!nama || !jumlah || !harga) {
+            alert('Mohon lengkapi semua field untuk item baru');
+            return;
+        }
+        const newItem = {
+            nama: nama,
+            jumlah: jumlah,
+            harga: harga
+        };
+        addItemRowToModal(newItem);
+        clearNewItemFields();
+    }
+
+    function clearNewItemFields() {
+        document.getElementById('modalNewItemNama').value = '';
+        document.getElementById('modalNewItemJumlah').value = '';
+        document.getElementById('modalNewItemHarga').value = '';
+    }
+
+    function removeItemFromModal(button) {
+        const container = document.getElementById('modalItemsContainer');
+        if (container.children.length > 1) {
+            button.closest('.item-row').remove();
+        } else {
+            alert('Tidak dapat menghapus item terakhir');
+        }
+    }
+
+    function submitEditForm() {
+        const form = document.getElementById('editItemsForm');
+        const container = document.getElementById('modalItemsContainer');
+        if (container.children.length === 0) {
+            alert('Minimal harus ada satu item');
+            return;
+        }
+        // Validate all items have required fields
+        const itemRows = container.querySelectorAll('.item-row');
+        let isValid = true;
+        itemRows.forEach((row, index) => {
+            const nama = row.querySelector('select[name="nama[]"]').value;
+            const jumlah = row.querySelector('input[name="jumlah[]"]').value;
+            const harga = row.querySelector('input[name="harga[]"]').value;
+            if (!nama || !jumlah || !harga) {
+                isValid = false;
+            }
+        });
+        if (!isValid) {
+            alert('Mohon lengkapi semua field yang diperlukan');
+            return;
+        }
+        form.submit();
+    }
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('editModal').classList.contains('hidden')) {
+            closeEditModal();
+        }
+    });
 
     // Initialize autocomplete for item search
     function initAutocomplete(inputElement) {
@@ -360,7 +636,7 @@
         const newItemHarga = document.getElementById('newItemHarga');
         const itemsContainer = document.getElementById('itemsContainer');
 
-        if (newItemNama.value.trim() && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
+        if (newItemNama.value && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
             const newItemRow = document.createElement('div');
             newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
 
@@ -388,7 +664,7 @@
             const newInput = newItemRow.querySelector('.item-search');
             initAutocomplete(newInput);
 
-            newItemNama.value = '';
+            newItemNama.selectedIndex = 0;
             newItemJumlah.value = '';
             newItemHarga.value = '';
         } else {
@@ -609,7 +885,7 @@
         background-color: #f3f4f6;
     }
 
-    /* Smooth transitions for all elements */
+
     * {
         transition: all 0.2s ease;
     }

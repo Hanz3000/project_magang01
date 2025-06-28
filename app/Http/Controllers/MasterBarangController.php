@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -56,5 +57,17 @@ class MasterBarangController extends Controller
         $barang->delete();
 
         return redirect()->route('master-barang.index')->with('success', 'Barang berhasil dihapus.');
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if ($ids) {
+            \App\Models\Barang::whereIn('id', $ids)->delete();
+            return redirect()->route('master-barang.index')->with('success', 'Barang terpilih berhasil dihapus.');
+        }
+
+        return redirect()->route('master-barang.index')->with('success', 'Tidak ada barang yang dipilih.');
     }
 }
