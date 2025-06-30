@@ -14,19 +14,22 @@ class Pengeluaran extends Model
         'nama_toko',
         'nomor_struk',
         'tanggal',
-        'daftar_barang', // untuk menyimpan array items termasuk nama barang
+        'daftar_barang',
         'total',
         'jumlah_item',
-        'bukti_pembayaran'
+        'bukti_pembayaran',
+        'pegawai_id', // tambahkan pegawai_id ke fillable
     ];
 
     protected $casts = [
         'tanggal' => 'date:Y-m-d',
-        'daftar_barang' => 'array', // otomatis konversi JSON ke array
-        'total' => 'decimal:2'
+        'daftar_barang' => 'array',
+        'total' => 'decimal:2',
     ];
 
-    // Accessor untuk memastikan daftar_barang selalu return array
+    /**
+     * Accessor untuk memastikan daftar_barang selalu return array.
+     */
     public function getDaftarBarangAttribute($value)
     {
         try {
@@ -37,9 +40,19 @@ class Pengeluaran extends Model
         }
     }
 
-    // Mutator untuk menyimpan array sebagai JSON
+    /**
+     * Mutator untuk menyimpan array sebagai JSON.
+     */
     public function setDaftarBarangAttribute($value)
     {
         $this->attributes['daftar_barang'] = is_array($value) ? json_encode($value) : $value;
+    }
+
+    /**
+     * Relasi ke Pegawai.
+     */
+    public function pegawai()
+    {
+        return $this->belongsTo(Pegawai::class);
     }
 }

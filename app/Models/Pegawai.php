@@ -10,4 +10,12 @@ class Pegawai extends Model
     use HasFactory;
 
     protected $fillable = ['nama', 'nip'];
+
+    /**
+     * Relasi: Pegawai memiliki banyak Pengeluaran
+     */
+    public function pengeluarans()
+    {
+        return $this->hasMany(Pengeluaran::class);
+    }
 }

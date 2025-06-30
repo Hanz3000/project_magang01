@@ -7,6 +7,18 @@
     <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
         @csrf
 
+        {{-- PENAMBAHAN: dropdown pilih pegawai --}}
+        <div>
+            <label class="block mb-1">Pilih Pegawai</label>
+            <select name="pegawai_id" class="w-full border rounded px-3 py-2" required>
+                <option value="">-- Pilih Pegawai --</option>
+                @foreach ($pegawais as $pegawai)
+                    <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
+                @endforeach
+            </select>
+        </div>
+        {{-- END PENAMBAHAN --}}
+
         <div>
             <label class="block mb-1">Nama Toko</label>
             <input type="text" name="nama_toko" class="w-full border rounded px-3 py-2" required>

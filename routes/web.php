@@ -16,6 +16,8 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/pengeluarans', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
+Route::resource('pegawais', PegawaiController::class);
 
 // ------------------- FORGOT PASSWORD -------------------
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
@@ -89,4 +91,10 @@ Route::prefix('pengeluarans')->name('pengeluarans.')->group(function () {
     Route::get('/{pengeluaran}', [PengeluaranController::class, 'show'])->whereNumber('pengeluaran')->name('show');
     Route::put('/{pengeluaran}', [PengeluaranController::class, 'update'])->whereNumber('pengeluaran')->name('update');
     Route::delete('/{pengeluaran}', [PengeluaranController::class, 'destroy'])->whereNumber('pengeluaran')->name('destroy');
+});
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+    Route::get('/pengeluarans/create', [PengeluaranController::class, 'create'])->name('pengeluarans.create');
+    Route::post('/pengeluarans', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
+    Route::get('/pengeluarans/{pengeluaran}', [PengeluaranController::class, 'show'])->name('pengeluarans.show');
 });
