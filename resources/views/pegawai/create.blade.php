@@ -17,7 +17,7 @@
     @endif
 
     {{-- Pesan Validasi --}}
-    @if ($errors->any())
+    @if ($errors->any()))
     <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded mb-6">
         <p class="font-medium">Terjadi kesalahan:</p>
         <ul class="list-disc list-inside text-sm mt-1">
@@ -27,7 +27,6 @@
         </ul>
     </div>
     @endif
-
 
     <form action="{{ route('pegawai.store') }}" method="POST" class="space-y-4">
         @csrf
@@ -55,11 +54,31 @@
                 class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Batal
             </a>
-            <button type="submit"
-                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <button type="submit" name="action" value="save_and_continue"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                Tambah dan Lanjut
+            </button>
+            <button type="submit" name="action" value="save"
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Simpan
             </button>
         </div>
     </form>
 </div>
+
+@if(session('success') && request()->has('action') && request()->input('action') === 'save_and_continue')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Clear form fields
+        document.getElementById('nama').value = '';
+        document.getElementById('nip').value = '';
+
+        // Focus on first field
+        document.getElementById('nama').focus();
+
+        // Scroll to top to see success message
+        window.scrollTo(0, 0);
+    });
+</script>
+@endif
 @endsection

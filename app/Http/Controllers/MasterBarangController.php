@@ -28,6 +28,11 @@ class MasterBarangController extends Controller
             'nama_barang' => $request->nama_barang
         ]);
 
+        // Tambahkan pengecekan action
+        if ($request->has('action') && $request->action === 'save_and_continue') {
+            return redirect()->back()->with('success', 'Barang berhasil ditambahkan. Silakan tambah barang baru.');
+        }
+
         return redirect()->route('master-barang.index')->with('success', 'Barang berhasil ditambahkan.');
     }
 

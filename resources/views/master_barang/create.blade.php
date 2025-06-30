@@ -36,7 +36,11 @@
                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">
                 Batal
             </a>
-            <button type="submit"
+            <button type="submit" name="action" value="save_and_continue"
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                Tambah dan Lanjut
+            </button>
+            <button type="submit" name="action" value="save"
                 class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
                 Simpan
             </button>

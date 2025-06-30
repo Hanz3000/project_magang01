@@ -29,8 +29,17 @@ class PegawaiController extends Controller
         // Simpan data ke database
         Pegawai::create($request->only('nama', 'nip'));
 
-        // Redirect ke halaman index dengan pesan sukses
-        return redirect()->route('pegawai.index')->with('success', 'Data pegawai berhasil ditambahkan.');
+        // Jika klik "Tambah dan Lanjut"
+        if ($request->action === 'save_and_continue') {
+            return redirect()
+                ->route('pegawai.create')
+                ->with('success', 'Data pegawai berhasil ditambahkan. Silakan tambah data baru.');
+        }
+
+        // Redirect ke halaman index dengan pesan sukses (untuk tombol Simpan biasa)
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Data pegawai berhasil ditambahkan.');
     }
 
     public function edit(Pegawai $pegawai)
@@ -52,14 +61,18 @@ class PegawaiController extends Controller
             'nip' => $request->nip,
         ]);
 
-        return redirect()->route('pegawai.index')->with('success', 'Data pegawai berhasil diperbarui.');
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Data pegawai berhasil diperbarui.');
     }
 
     public function destroy(Pegawai $pegawai)
     {
         $pegawai->delete();
 
-        return redirect()->route('pegawai.index')->with('success', 'Pegawai berhasil dihapus.');
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Pegawai berhasil dihapus.');
     }
 
     public function bulkDelete(Request $request)
@@ -67,8 +80,12 @@ class PegawaiController extends Controller
         $ids = explode(',', $request->ids);
         if (!empty($ids)) {
             \App\Models\Pegawai::whereIn('id', $ids)->delete();
-            return redirect()->route('pegawai.index')->with('success', 'Pegawai terpilih berhasil dihapus.');
+            return redirect()
+                ->route('pegawai.index')
+                ->with('success', 'Pegawai terpilih berhasil dihapus.');
         }
-        return redirect()->route('pegawai.index')->with('success', 'Tidak ada pegawai yang dipilih.');
+        return redirect()
+            ->route('pegawai.index')
+            ->with('success', 'Tidak ada pegawai yang dipilih.');
     }
 }
