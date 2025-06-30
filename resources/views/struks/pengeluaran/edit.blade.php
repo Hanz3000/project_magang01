@@ -4,137 +4,144 @@
 <div class="max-w-4xl mx-auto py-10">
     <h1 class="text-2xl font-bold mb-6">Edit Pengeluaran</h1>
 
-    <form action="{{ route('pengeluarans.update', $pengeluaran->id) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md p-6 space-y-6">
+    <form action="{{ route('pengeluarans.update', $pengeluaran->id) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow p-6 space-y-6">
         @csrf
         @method('PUT')
 
-        <!-- Informasi Header -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-                <label class="block text-gray-700 font-medium mb-2">Nama Toko</label>
-                <input type="text" name="nama_toko" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="{{ old('nama_toko', $pengeluaran->nama_toko) }}" required>
-            </div>
+        {{-- Pilih Pegawai --}}
+        <div>
+            <label class="block font-medium mb-1">Pilih Pegawai</label>
+            <select name="pegawai_id" class="w-full border rounded px-3 py-2" required>
+                <option value="">-- Pilih Pegawai --</option>
+                @foreach ($pegawais as $pegawai)
+                    <option value="{{ $pegawai->id }}" {{ $pegawai->id == $pengeluaran->pegawai_id ? 'selected' : '' }}>
+                        {{ $pegawai->nama }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
 
+        {{-- Info Header --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-                <label class="block text-gray-700 font-medium mb-2">Nomor Struk</label>
-                <input type="text" name="nomor_struk" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="{{ old('nomor_struk', $pengeluaran->nomor_struk) }}" required>
+                <label class="block mb-1">Nama Toko</label>
+                <input type="text" name="nama_toko" class="w-full border rounded px-3 py-2" value="{{ old('nama_toko', $pengeluaran->nama_toko) }}" required>
             </div>
-
             <div>
-                <label class="block text-gray-700 font-medium mb-2">Tanggal</label>
-                <input type="date" name="tanggal" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" value="{{ old('tanggal', $pengeluaran->tanggal) }}" required>
+                <label class="block mb-1">Nomor Struk</label>
+                <input type="text" name="nomor_struk" class="w-full border rounded px-3 py-2" value="{{ old('nomor_struk', $pengeluaran->nomor_struk) }}" required>
+            </div>
+            <div>
+                <label class="block mb-1">Tanggal</label>
+                <input type="date" name="tanggal" class="w-full border rounded px-3 py-2" value="{{ old('tanggal', $pengeluaran->tanggal) }}" required>
             </div>
         </div>
 
-        <!-- Daftar Barang -->
-        <div class="border rounded-lg p-4">
-            <h3 class="font-bold text-lg mb-4">Daftar Barang</h3>
-            
-            <div id="barang-container">
-                @foreach($pengeluaran->items as $index => $item)
-                <div class="barang-item grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Nama Barang</label>
-                        <input type="text" name="items[{{$index}}][nama]" class="w-full border border-gray-300 rounded-lg px-3 py-2" value="{{ $item->nama_barang }}" required>
+        {{-- Daftar Barang --}}
+        <div class="border rounded p-4">
+            <h3 class="font-bold mb-2">Detail Barang</h3>
+            <div id="items-container">
+                @foreach ($pengeluaran->daftar_barang as $index => $item)
+                    <div class="item-item space-y-2 mb-4">
+                        <div>
+                            <label class="block mb-1">Nama Barang</label>
+                            <input type="text" name="items[{{ $index }}][nama]" value="{{ $item['nama'] }}" class="w-full border rounded px-3 py-2" required>
+                        </div>
+                        <div>
+                            <label class="block mb-1">Jumlah</label>
+                            <input type="number" name="items[{{ $index }}][jumlah]" value="{{ $item['jumlah'] }}" class="w-full border rounded px-3 py-2 jumlah" min="1" oninput="hitungTotal()" required>
+                        </div>
+                        <div>
+                            <label class="block mb-1">Harga Satuan</label>
+                            <input type="number" name="items[{{ $index }}][harga]" value="{{ $item['harga'] }}" class="w-full border rounded px-3 py-2 harga" min="0" oninput="hitungTotal()" required>
+                        </div>
+                        <div>
+                            <label class="block mb-1">Subtotal</label>
+                            <input type="text" class="w-full border rounded px-3 py-2 subtotal" value="Rp {{ number_format($item['subtotal'], 0, ',', '.') }}" readonly>
+                            <input type="hidden" name="items[{{ $index }}][subtotal]" value="{{ $item['subtotal'] }}" class="subtotal-hidden">
+                        </div>
+                        <button type="button" class="hapus-item bg-red-100 text-red-600 px-2 py-1 rounded text-sm hover:bg-red-200"
+                                onclick="hapusItem(this)">
+                            Hapus Barang
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Jumlah</label>
-                        <input type="number" name="items[{{$index}}][jumlah]" class="w-full border border-gray-300 rounded-lg px-3 py-2 jumlah" min="1" value="{{ $item->jumlah }}" oninput="hitungTotal()" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Harga Satuan</label>
-                        <input type="number" name="items[{{$index}}][harga]" class="w-full border border-gray-300 rounded-lg px-3 py-2 harga" min="0" value="{{ $item->harga_satuan }}" oninput="hitungTotal()" required>
-                    </div>
-                    <div>
-                        <label class="block text-gray-700 text-sm font-medium mb-1">Subtotal</label>
-                        <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 subtotal" value="Rp {{ number_format($item->subtotal, 0, ',', '.') }}" readonly>
-                        <input type="hidden" name="items[{{$index}}][subtotal]" class="subtotal-hidden" value="{{ $item->subtotal }}">
-                    </div>
-                </div>
                 @endforeach
             </div>
-
-            <button type="button" id="tambah-barang" class="mt-4 bg-blue-100 text-blue-600 px-4 py-2 rounded-lg text-sm hover:bg-blue-200">
+            <button type="button" id="tambah-item" class="bg-blue-100 text-blue-600 px-3 py-1 rounded text-sm hover:bg-blue-200">
                 + Tambah Barang
             </button>
         </div>
 
-        <!-- Total Pembayaran -->
-        <div class="bg-gray-50 p-4 rounded-lg">
-            <div class="flex justify-between items-center">
-                <span class="font-bold text-gray-700">Total Pembayaran</span>
-                <span id="total-pembayaran" class="font-bold text-xl">Rp {{ number_format($pengeluaran->total_harga, 0, ',', '.') }}</span>
-                <input type="hidden" name="total_harga" id="total-hidden" value="{{ $pengeluaran->total_harga }}">
-            </div>
+        {{-- Total --}}
+        <div>
+            <label class="block mb-1">Total Pembayaran</label>
+            <input type="text" id="total-pembayaran" class="w-full border rounded px-3 py-2 font-bold" readonly
+                   value="Rp {{ number_format($pengeluaran->total, 0, ',', '.') }}">
+            <input type="hidden" name="total" id="total-hidden" value="{{ $pengeluaran->total }}">
         </div>
 
-        <!-- Upload Struk -->
+        {{-- Upload Struk --}}
         <div>
-            <label class="block text-gray-700 font-medium mb-2">Upload Struk (Opsional)</label>
-            <input type="file" name="foto_struk" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            
-            @if($pengeluaran->foto_struk)
-            <div class="mt-2 flex items-center">
-                <span class="text-sm text-gray-600 mr-2">Struk saat ini:</span>
-                <a href="{{ asset('storage/pengeluaran_struk/' . $pengeluaran->foto_struk) }}" target="_blank" class="text-indigo-600 hover:text-indigo-800 text-sm">Lihat Struk</a>
-                <button type="button" onclick="hapusStruk()" class="ml-4 text-red-600 hover:text-red-800 text-sm flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Hapus
-                </button>
-                <input type="hidden" name="hapus_struk" id="hapus-struk" value="0">
-            </div>
+            <label class="block mb-1">Upload Struk (Opsional)</label>
+            <input type="file" name="bukti_pembayaran" class="w-full border rounded px-3 py-2">
+            @if ($pengeluaran->bukti_pembayaran)
+                <p class="text-sm mt-1">
+                    Struk saat ini: 
+                    <a href="{{ asset('storage/'.$pengeluaran->bukti_pembayaran) }}" target="_blank" class="text-indigo-600 underline">
+                        Lihat Struk
+                    </a>
+                </p>
             @endif
         </div>
 
-        <!-- Tombol Aksi -->
-        <div class="flex justify-end space-x-4 pt-4">
-            <a href="{{ route('pengeluarans.index') }}" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition duration-200">
-                Kembali
-            </a>
-            <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition duration-200">
+        {{-- Tombol Aksi --}}
+        <div class="flex gap-4">
+            <button type="submit" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
                 Simpan Perubahan
             </button>
+            <a href="{{ route('pengeluarans.index') }}" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
+                Kembali
+            </a>
         </div>
     </form>
 </div>
 
+{{-- Script --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Inisialisasi counter untuk item baru
-        let counter = {{ count($pengeluaran->items) }};
-        
-        // Tambah barang baru
-        document.getElementById('tambah-barang').addEventListener('click', function() {
-            const container = document.getElementById('barang-container');
+        const container = document.getElementById('items-container');
+        const addButton = document.getElementById('tambah-item');
+        let counter = {{ count($pengeluaran->daftar_barang) }};
+
+        addButton.addEventListener('click', function() {
             const newItem = document.createElement('div');
-            newItem.className = 'barang-item grid grid-cols-1 md:grid-cols-4 gap-4 mb-4';
+            newItem.className = 'item-item space-y-2 mb-4';
             newItem.innerHTML = `
                 <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Nama Barang</label>
-                    <input type="text" name="items[${counter}][nama]" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+                    <label class="block mb-1">Nama Barang</label>
+                    <input type="text" name="items[${counter}][nama]" class="w-full border rounded px-3 py-2" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Jumlah</label>
-                    <input type="number" name="items[${counter}][jumlah]" class="w-full border border-gray-300 rounded-lg px-3 py-2 jumlah" min="1" oninput="hitungTotal()" required>
+                    <label class="block mb-1">Jumlah</label>
+                    <input type="number" name="items[${counter}][jumlah]" class="w-full border rounded px-3 py-2 jumlah" min="1" oninput="hitungTotal()" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Harga Satuan</label>
-                    <input type="number" name="items[${counter}][harga]" class="w-full border border-gray-300 rounded-lg px-3 py-2 harga" min="0" oninput="hitungTotal()" required>
+                    <label class="block mb-1">Harga Satuan</label>
+                    <input type="number" name="items[${counter}][harga]" class="w-full border rounded px-3 py-2 harga" min="0" oninput="hitungTotal()" required>
                 </div>
                 <div>
-                    <label class="block text-gray-700 text-sm font-medium mb-1">Subtotal</label>
-                    <input type="text" class="w-full border border-gray-300 rounded-lg px-3 py-2 subtotal" value="Rp 0" readonly>
-                    <input type="hidden" name="items[${counter}][subtotal]" class="subtotal-hidden" value="0">
+                    <label class="block mb-1">Subtotal</label>
+                    <input type="text" class="w-full border rounded px-3 py-2 subtotal" readonly>
+                    <input type="hidden" name="items[${counter}][subtotal]" class="subtotal-hidden">
                 </div>
+                <button type="button" class="hapus-item bg-red-100 text-red-600 px-2 py-1 rounded text-sm hover:bg-red-200"
+                        onclick="hapusItem(this)">
+                    Hapus Barang
+                </button>
             `;
             container.appendChild(newItem);
             counter++;
         });
-        
-        // Hitung total awal
-        hitungTotal();
     });
 
     function formatRupiah(angka) {
@@ -143,31 +150,27 @@
 
     function hitungTotal() {
         let total = 0;
-        const items = document.querySelectorAll('.barang-item');
-        
-        items.forEach(item => {
+        const itemItems = document.querySelectorAll('.item-item');
+
+        itemItems.forEach(item => {
             const jumlah = parseFloat(item.querySelector('.jumlah').value) || 0;
             const harga = parseFloat(item.querySelector('.harga').value) || 0;
             const subtotal = jumlah * harga;
-            
-            // Update tampilan subtotal
+
             item.querySelector('.subtotal').value = formatRupiah(subtotal);
             item.querySelector('.subtotal-hidden').value = subtotal;
-            
+
             total += subtotal;
         });
-        
-        // Update total pembayaran
-        document.getElementById('total-pembayaran').textContent = formatRupiah(total);
+
+        document.getElementById('total-pembayaran').value = formatRupiah(total);
         document.getElementById('total-hidden').value = total;
     }
 
-    function hapusStruk() {
-        if(confirm('Apakah Anda yakin ingin menghapus struk ini?')) {
-            document.getElementById('hapus-struk').value = '1';
-            document.querySelector('input[name="foto_struk"]').value = '';
-            document.querySelector('a[target="_blank"]').parentElement.style.display = 'none';
-        }
+    function hapusItem(button) {
+        const item = button.closest('.item-item');
+        item.remove();
+        hitungTotal();
     }
 </script>
 @endsection
