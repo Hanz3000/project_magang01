@@ -154,7 +154,7 @@
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                             </path>
                                         </svg>
-                                        Edit
+
                                     </button>
                                     <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
                                         @csrf
@@ -256,8 +256,50 @@
             </div>
 
             @if ($struks->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $struks->appends(['search' => request('search')])->links() }}
+            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                <div class="text-sm text-gray-600">
+                    Menampilkan {{ $struks->firstItem() }} sampai {{ $struks->lastItem() }} dari {{ $struks->total() }} hasil
+                </div>
+                <div class="flex space-x-1">
+                    {{-- Previous Page Link --}}
+                    @if ($struks->onFirstPage())
+                    <span class="px-3 py-1 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </span>
+                    @else
+                    <a href="{{ $struks->previousPageUrl() }}" class="px-3 py-1 rounded-lg border border-gray-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </a>
+                    @endif
+
+                    {{-- Pagination Elements --}}
+                    @foreach ($struks->getUrlRange(1, $struks->lastPage()) as $page => $url)
+                    @if ($page == $struks->currentPage())
+                    <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white">{{ $page }}</span>
+                    @else
+                    <a href="{{ $url }}" class="px-3 py-1 rounded-lg border border-gray-200 text-gray-700 hover:bg-indigo-50 transition-colors">{{ $page }}</a>
+                    @endif
+                    @endforeach
+
+                    {{-- Next Page Link --}}
+                    @if ($struks->hasMorePages())
+                    <a href="{{ $struks->nextPageUrl() }}" class="px-3 py-1 rounded-lg border border-gray-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                    @else
+                    <span class="px-3 py-1 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </span>
+                    @endif
+                </div>
             </div>
             @endif
         </div>
@@ -495,6 +537,16 @@
                 items.forEach((item, index) => {
                     addItemRowToModal(item, index);
                 });
+
+                // After loading items, check if there's only one and disable delete button
+                if (items.length === 1) {
+                    const deleteButton = container.querySelector('button[onclick="removeItemFromModal(this)"]');
+                    if (deleteButton) {
+                        deleteButton.disabled = true;
+                        deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        deleteButton.classList.remove('hover:text-red-700', 'hover:bg-red-50');
+                    }
+                }
             })
             .catch(error => {
                 container.innerHTML = '<div class="text-red-500">Gagal memuat data item.</div>';
@@ -509,40 +561,55 @@
         @foreach($barangList as $barang)
         options += `<option value="{{ $barang->nama_barang }}" ${item.nama === '{{ $barang->nama_barang }}' ? 'selected' : ''}>{{ $barang->nama_barang }}</option>`;
         @endforeach
+
+        // Check if this will be the only item
+        const willBeOnlyItem = container.children.length === 0;
+        const disableDelete = willBeOnlyItem;
+
         const itemRow = document.createElement('div');
         itemRow.className = 'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
         itemRow.innerHTML = `
-            <input type="hidden" name="item_index[]" value="${itemIndex}">
-            <div class="col-span-5">
-                <select name="nama[]" class="item-select w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white">
-                    ${options}
-                </select>
+        <input type="hidden" name="item_index[]" value="${itemIndex}">
+        <div class="col-span-5">
+            <select name="nama[]" class="item-select w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white">
+                ${options}
+            </select>
+        </div>
+        <div class="col-span-2">
+            <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                placeholder="Jumlah" min="1">
+        </div>
+        <div class="col-span-3">
+            <div class="relative">
+                <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
+                <input name="harga[]" type="number" value="${item.harga || ''}"
+                    class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    placeholder="0" min="0">
             </div>
-            <div class="col-span-2">
-                <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                    placeholder="Jumlah" min="1">
-            </div>
-            <div class="col-span-3">
-                <div class="relative">
-                    <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
-                    <input name="harga[]" type="number" value="${item.harga || ''}"
-                        class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                        placeholder="0" min="0">
-                </div>
-            </div>
-            <div class="col-span-2 flex justify-center">
-                <button type="button" onclick="removeItemFromModal(this)"
-                    class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors"
-                    title="Hapus Item">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
-            </div>
-        `;
+        </div>
+        <div class="col-span-2 flex justify-center">
+            <button type="button" onclick="removeItemFromModal(this)"
+                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ${disableDelete ? 'opacity-50 cursor-not-allowed' : ''}"
+                title="Hapus Item" ${disableDelete ? 'disabled' : ''}>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        </div>
+    `;
         container.appendChild(itemRow);
+
+        // If we're adding a second item, enable all delete buttons
+        if (container.children.length === 2) {
+            const deleteButtons = container.querySelectorAll('button[onclick="removeItemFromModal(this)"]');
+            deleteButtons.forEach(btn => {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('hover:text-red-700', 'hover:bg-red-50');
+            });
+        }
     }
 
     function addNewItemToModal() {
@@ -572,6 +639,15 @@
         const container = document.getElementById('modalItemsContainer');
         if (container.children.length > 1) {
             button.closest('.item-row').remove();
+            // After removing, check if we're down to one item and disable delete buttons
+            if (container.children.length === 1) {
+                const deleteButtons = container.querySelectorAll('button[onclick="removeItemFromModal(this)"]');
+                deleteButtons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.classList.remove('hover:text-red-700', 'hover:bg-red-50');
+                });
+            }
         } else {
             alert('Tidak dapat menghapus item terakhir');
         }
