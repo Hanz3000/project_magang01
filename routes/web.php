@@ -6,9 +6,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StrukController;
 use App\Http\Controllers\MasterBarangController;
-use App\Http\Controllers\PegawaiController; // Master Pegawai
+use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PengeluaranController;
-
+use App\Http\Controllers\TransaksiController;
 
 // ------------------- AUTH ROUTES -------------------
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -16,8 +16,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/pengeluarans', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
-Route::resource('pegawais', PegawaiController::class);
 
 // ------------------- FORGOT PASSWORD -------------------
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
@@ -27,7 +25,6 @@ Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'
 
 // ------------------- PROTECTED ROUTES (AUTH REQUIRED) -------------------
 Route::middleware('auth')->group(function () {
-
     // ------------------- REDIRECT HOME -------------------
     Route::get('/', fn() => redirect()->route('dashboard'));
 
@@ -35,68 +32,73 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // ------------------- MASTER BARANG -------------------
-    Route::delete('/master-barang/bulk-delete', [MasterBarangController::class, 'bulkDelete'])->name('master-barang.bulk-delete');
-    Route::resource('master-barang', MasterBarangController::class);
+    Route::prefix('master-barang')->group(function () {
+        Route::delete('/bulk-delete', [MasterBarangController::class, 'bulkDelete'])->name('master-barang.bulk-delete');
+        Route::get('/', [MasterBarangController::class, 'index'])->name('master-barang.index');
+        Route::get('/create', [MasterBarangController::class, 'create'])->name('master-barang.create');
+        Route::post('/', [MasterBarangController::class, 'store'])->name('master-barang.store');
+        Route::get('/{master_barang}/edit', [MasterBarangController::class, 'edit'])->name('master-barang.edit');
+        Route::put('/{master_barang}', [MasterBarangController::class, 'update'])->name('master-barang.update');
+        Route::delete('/{master_barang}', [MasterBarangController::class, 'destroy'])->name('master-barang.destroy');
+    });
 
     // ------------------- MASTER PEGAWAI -------------------
-    Route::get('/pegawai', [PegawaiController::class, 'index'])->name('pegawai.index');
-    Route::get('/pegawai/create', [PegawaiController::class, 'create'])->name('pegawai.create');
-    Route::post('/pegawai', [PegawaiController::class, 'store'])->name('pegawai.store');
-    Route::delete('/pegawai/bulk-delete', [PegawaiController::class, 'bulkDelete'])->name('pegawai.bulk-delete');
-    Route::resource('pegawai', \App\Http\Controllers\PegawaiController::class);
+    Route::prefix('pegawai')->group(function () {
+        Route::delete('/bulk-delete', [PegawaiController::class, 'bulkDelete'])->name('pegawai.bulk-delete');
+        Route::get('/', [PegawaiController::class, 'index'])->name('pegawai.index');
+        Route::get('/create', [PegawaiController::class, 'create'])->name('pegawai.create');
+        Route::post('/', [PegawaiController::class, 'store'])->name('pegawai.store');
+        Route::get('/{pegawai}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
+        Route::put('/{pegawai}', [PegawaiController::class, 'update'])->name('pegawai.update');
+        Route::delete('/{pegawai}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy');
+    });
 
+    // ------------------- TRANSAKSI GABUNGAN -------------------
+    Route::prefix('transaksi')->group(function () {
+        Route::get('/create', [TransaksiController::class, 'create'])->name('transaksi.create');
+        Route::post('/struk', [TransaksiController::class, 'storeStruk'])->name('transaksi.store.struk');
+        Route::post('/pengeluaran', [TransaksiController::class, 'storePengeluaran'])->name('transaksi.store.pengeluaran');
+    });
 
+    // ------------------- STRUK (PEMASUKAN) -------------------
+    Route::prefix('struks')->group(function () {
+        Route::get('/', [StrukController::class, 'index'])->name('struks.index');
+        Route::get('/create', [StrukController::class, 'create'])->name('struks.create');
+        Route::post('/', [StrukController::class, 'store'])->name('struks.store');
+        Route::get('/{struk}', [StrukController::class, 'show'])->name('struks.show');
+        Route::get('/{struk}/edit', [StrukController::class, 'edit'])->name('struks.edit');
+        Route::put('/{struk}', [StrukController::class, 'update'])->name('struks.update');
+        Route::delete('/{struk}', [StrukController::class, 'destroy'])->name('struks.destroy');
+        Route::delete('/bulk-delete', [StrukController::class, 'bulkDelete'])->name('struks.bulk-delete');
+        
+        // Item routes
+        Route::get('/{struk}/items', [StrukController::class, 'items']);
+        Route::post('/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
+        Route::put('/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
+        Route::put('/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
+        Route::delete('/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
+        
+        // Search routes
+        Route::get('/autocomplete-items', [StrukController::class, 'autocompleteItems'])->name('struks.autocomplete-items');
+        Route::get('/search-barang', [StrukController::class, 'searchBarang'])->name('struks.search-barang');
+        
+        // Export routes
+        Route::get('/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');
+        Route::get('/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
+    });
 
-    // ------------------- STRUK -------------------
-    Route::delete('/struks/bulk-delete', [StrukController::class, 'bulkDelete'])->name('struks.bulk-delete');
-    Route::resource('struks', StrukController::class)->except(['index', 'show']);
-
-
-    // Khusus Index dan Show dibuat manual agar tidak tertimpa
-    Route::get('/struks', [StrukController::class, 'index'])->name('struks.index');
-    Route::get('/struks/{struk}', [StrukController::class, 'show'])->name('struks.show');
-
-    // filepath: routes/web.php
-    Route::get('/struks/{struk}/items', [StrukController::class, 'items']);
-
-    // Export Excel & CSV
-    Route::get('/struks/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');
-    Route::get('/struks/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
-
-    // Tambah, Update, dan Hapus item struk
-    Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
-    Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
-    Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
-    Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
-});
-
-
-Route::put('/struks/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
-Route::post('/struks/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
-Route::put('/struks/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
-Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
-
-Route::get('/struks/autocomplete-items', [StrukController::class, 'autocompleteItems'])->name('struks.autocomplete-items');
-Route::get('/struks/search-barang', [StrukController::class, 'searchBarang'])->name('struks.search-barang');
-
-
-Route::prefix('pengeluarans')->name('pengeluarans.')->group(function () {
-    // Export routes
-    Route::get('/export/excel', [PengeluaranController::class, 'exportExcel'])->name('export.excel');
-    Route::get('/export/csv', [PengeluaranController::class, 'exportCSV'])->name('export.csv');
-
-    // Resource routes
-    Route::get('/', [PengeluaranController::class, 'index'])->name('index');
-    Route::get('/create', [PengeluaranController::class, 'create'])->name('create');
-    Route::post('/', [PengeluaranController::class, 'store'])->name('store');
-    Route::get('/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->whereNumber('pengeluaran')->name('edit');
-    Route::get('/{pengeluaran}', [PengeluaranController::class, 'show'])->whereNumber('pengeluaran')->name('show');
-    Route::put('/{pengeluaran}', [PengeluaranController::class, 'update'])->whereNumber('pengeluaran')->name('update');
-    Route::delete('/{pengeluaran}', [PengeluaranController::class, 'destroy'])->whereNumber('pengeluaran')->name('destroy');
-});
-Route::middleware(['auth'])->group(function () {
-    Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
-    Route::get('/pengeluarans/create', [PengeluaranController::class, 'create'])->name('pengeluarans.create');
-    Route::post('/pengeluarans', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
-    Route::get('/pengeluarans/{pengeluaran}', [PengeluaranController::class, 'show'])->name('pengeluarans.show');
+    // ------------------- PENGELUARAN -------------------
+    Route::prefix('pengeluarans')->group(function () {
+        Route::get('/', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+        Route::get('/create', [PengeluaranController::class, 'create'])->name('pengeluarans.create');
+        Route::post('/', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
+        Route::get('/{pengeluaran}', [PengeluaranController::class, 'show'])->name('pengeluarans.show');
+        Route::get('/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->name('pengeluarans.edit');
+        Route::put('/{pengeluaran}', [PengeluaranController::class, 'update'])->name('pengeluarans.update');
+        Route::delete('/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluarans.destroy');
+        
+        // Export routes
+        Route::get('/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
+        Route::get('/export/csv', [PengeluaranController::class, 'exportCSV'])->name('pengeluarans.export.csv');
+    });
 });

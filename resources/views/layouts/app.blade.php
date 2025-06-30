@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventaris Barang</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
@@ -23,13 +23,10 @@
     }
 
     body {
-        /* Ganti background agar mirip login */
         background: #e3f2fd;
         background-attachment: fixed;
         position: relative;
     }
-
-
 
     .sidebar-gradient {
         background: var(--sidebar-gradient);
@@ -250,7 +247,6 @@
     }
 
     .main-content {
-        /* Ganti background utama konten agar putih seperti login */
         background: transparent;
         backdrop-filter: none;
     }
@@ -328,7 +324,6 @@
     }
 
     .content-area {
-        /* Card putih seperti login */
         background: #fff;
         backdrop-filter: none;
         border-radius: 20px;
@@ -464,10 +459,7 @@
     {{ session()->forget('show_welcome') }}
     @endif
 
-
-
     <div class="flex min-h-screen">
-
         <!-- Sidebar -->
         <aside
             class="sidebar-gradient text-white shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative flex flex-col overflow-hidden"
@@ -574,7 +566,7 @@
 
                     <!-- Tambah Struk -->
                     <li>
-                        <a href="{{ route('struks.create') }}"
+                        <a href="{{ route('transaksi.create') }}"
                             class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-amber-600/30 hover:to-orange-600/30">
                             <div
                                 class="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-md group-hover:scale-105 transition-transform duration-200">
@@ -586,8 +578,8 @@
                             <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 delay-200"
                                 x-transition:leave="transition ease-in duration-200"
                                 class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Tambah Struk</span>
-                                <p class="text-xs text-slate-300">Buat struk baru</p>
+                                <span class="font-medium block">Tambah Transaksi</span>
+                                <p class="text-xs text-slate-300">Buat transaksi baru</p>
                             </div>
                         </a>
                     </li>
@@ -649,9 +641,7 @@
 
         <!-- Main Content -->
         <main class="flex-1 h-screen overflow-y-auto main-content">
-
             <header class="header-glass px-6 py-4 shadow-lg sticky top-0 z-40">
-
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-4">
                         <button @click="sidebarOpen = !sidebarOpen"
@@ -728,22 +718,67 @@
             <!-- Content Area -->
             <div class="p-6 min-h-full">
                 <div class="content-area p-6 fade-in">
+                    <!-- Flash Messages -->
+                    @if(session('success'))
+                    <div class="mb-6 p-4 bg-green-100 border-l-4 border-green-500 text-green-700 rounded">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if(session('error'))
+                    <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($errors->any())
+                    <div class="mb-6 p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                            <span>Terjadi kesalahan:</span>
+                        </div>
+                        <ul class="mt-2 ml-6 list-disc">
+                            @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    <!-- Main Content -->
                     @yield('content')
                 </div>
+            </div>
+        </main>
+    </div>
 
+    <!-- Floating Particles Background -->
+    <div class="floating-particles">
+        @for ($i = 0; $i < 20; $i++)
+            <div class="particle" style="
+                left: {{ rand(0, 100) }}%;
+                animation-duration: {{ rand(5, 15) }}s;
+                animation-delay: {{ rand(0, 5) }}s;
+                width: {{ rand(2, 6) }}px;
+                height: {{ rand(2, 6) }}px;
+            "></div>
+        @endfor
+    </div>
 
-
-
-
-
-</html>
-</body>
-</div>
-</main>
-</div>
-</div>
-</main>
-</div>
+    <!-- Scripts -->
+    @stack('scripts')
 </body>
 
 </html>
