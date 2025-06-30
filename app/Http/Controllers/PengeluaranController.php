@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\PengeluaranExport;
-use App\Exports\PengeluaranCsvExport;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Writer\Csv;
+
 
 class PengeluaranController extends Controller
 {
@@ -26,8 +27,8 @@ class PengeluaranController extends Controller
             ->with('pegawai')
             ->when($search, function ($query, $search) {
                 $query->where('nama_toko', 'like', "%{$search}%")
-                      ->orWhere('nomor_struk', 'like', "%{$search}%")
-                      ->orWhereJsonContains('daftar_barang', ['nama' => $search]);
+                    ->orWhere('nomor_struk', 'like', "%{$search}%")
+                    ->orWhereJsonContains('daftar_barang', ['nama' => $search]);
             })
             ->orderBy('tanggal', 'desc')
             ->paginate(self::ITEMS_PER_PAGE);
@@ -66,7 +67,6 @@ class PengeluaranController extends Controller
             return redirect()
                 ->route('pengeluarans.index')
                 ->with('success', 'Data pengeluaran berhasil disimpan.');
-
         } catch (\Exception $e) {
             Log::error('Error saving pengeluaran', [
                 'error' => $e->getMessage(),
@@ -115,7 +115,6 @@ class PengeluaranController extends Controller
             return redirect()
                 ->route('pengeluarans.index')
                 ->with('success', 'Data berhasil diperbarui.');
-
         } catch (\Exception $e) {
             Log::error('Error updating pengeluaran', [
                 'id' => $pengeluaran->id,
@@ -139,7 +138,6 @@ class PengeluaranController extends Controller
             return redirect()
                 ->route('pengeluarans.index')
                 ->with('success', 'Data berhasil dihapus.');
-
         } catch (\Exception $e) {
             Log::error('Error deleting pengeluaran', [
                 'id' => $pengeluaran->id,
@@ -155,7 +153,7 @@ class PengeluaranController extends Controller
     {
         return $request->validate([
             'nama_toko' => 'required|string|max:100',
-            'nomor_struk' => 'required|string|max:50|unique:pengeluarans,nomor_struk' 
+            'nomor_struk' => 'required|string|max:50|unique:pengeluarans,nomor_struk'
                 . ($pengeluaran ? ',' . $pengeluaran->id : ''),
             'tanggal' => 'required|date',
             'pegawai_id' => 'required|exists:pegawais,id',
@@ -208,11 +206,58 @@ class PengeluaranController extends Controller
 
     public function exportExcel()
     {
-        return Excel::download(new PengeluaranExport, 'pengeluaran-' . now()->format('Y-m-d') . '.xlsx');
+        $pengeluarans = Pengeluaran::all();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray(['ID', 'Nama Toko', 'Nomor Struk', 'Tanggal', 'Pegawai', 'Total'], null, 'A1');
+
+        $row = 2;
+        foreach ($pengeluarans as $p) {
+            $sheet->fromArray([
+                $p->id,
+                $p->nama_toko,
+                $p->nomor_struk,
+                $p->tanggal,
+                $p->pegawai?->nama ?? '-', // pastikan eager loading `pegawai`
+                $p->total
+            ], null, "A$row");
+
+            $row++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="pengeluaran.xlsx"');
+        $writer->save('php://output');
+        exit;
     }
 
     public function exportCSV()
     {
-        return Excel::download(new PengeluaranCsvExport, 'pengeluaran-' . now()->format('Y-m-d') . '.csv');
+        $pengeluarans = Pengeluaran::all();
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->fromArray(['ID', 'Nama Toko', 'Nomor Struk', 'Tanggal', 'Pegawai', 'Total'], null, 'A1');
+
+        $row = 2;
+        foreach ($pengeluarans as $p) {
+            $sheet->fromArray([
+                $p->id,
+                $p->nama_toko,
+                $p->nomor_struk,
+                $p->tanggal,
+                $p->pegawai?->nama ?? '-',
+                $p->total
+            ], null, "A$row");
+            $row++;
+        }
+
+        $writer = new Csv($spreadsheet);
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="pengeluaran.csv"');
+        $writer->save('php://output');
+        exit;
     }
 }
