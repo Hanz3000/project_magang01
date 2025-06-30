@@ -48,10 +48,10 @@
                 @if ($struk->foto_struk)
                 <div class="mt-6 pt-6 border-t border-gray-200">
                     <p class="text-sm font-medium text-gray-500 mb-3">Foto Struk</p>
-                    <img src="{{ asset('storage/struk_foto/' . $struk->foto_struk) }}" 
-                         alt="Foto Struk"
-                         class="rounded-lg border-2 border-gray-200 shadow-md w-full max-w-xs cursor-pointer transition-all duration-300"
-                         onclick="openModal('{{ asset('storage/struk_foto/' . $struk->foto_struk) }}')">
+                    <img src="{{ asset('storage/struk_foto/' . $struk->foto_struk) }}"
+                        alt="Foto Struk"
+                        class="rounded-lg border-2 border-gray-200 shadow-md w-full max-w-xs cursor-pointer transition-all duration-300"
+                        onclick="openModal('{{ asset('storage/struk_foto/' . $struk->foto_struk) }}')">
                 </div>
                 @endif
             </div>
@@ -59,13 +59,13 @@
             <!-- Items Table -->
             <div class="bg-gray-50 rounded-xl overflow-hidden border border-gray-100 shadow-sm">
                 <div class="px-5 py-4 border-b border-gray-200 bg-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 flex items-center space-x-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 18h16"/>
-                </svg>
-                <span>Daftar Barang</span>
-            </h3>
+                    <h3 class="text-lg font-semibold text-gray-800 flex items-center space-x-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 18h16" />
+                        </svg>
+                        <span>Daftar Barang</span>
+                    </h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full divide-y divide-gray-200">
@@ -82,14 +82,14 @@
                             $items = [];
                             $rawItems = $struk->items;
                             if (is_string($rawItems)) {
-                                $decoded = json_decode($rawItems, true);
-                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                    $items = $decoded;
-                                }
+                            $decoded = json_decode($rawItems, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                            $items = $decoded;
+                            }
                             } elseif (is_object($rawItems) || is_array($rawItems)) {
-                                foreach ($rawItems as $key => $value) {
-                                    $items[$key] = is_object($value) ? (array) $value : $value;
-                                }
+                            foreach ($rawItems as $key => $value) {
+                            $items[$key] = is_object($value) ? (array) $value : $value;
+                            }
                             }
                             @endphp
 
@@ -115,7 +115,7 @@
             <!-- Back button -->
             <div class="flex justify-start">
                 <a href="{{ route('struks.index') }}"
-                   class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition select-none">
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition select-none">
                     Kembali
                 </a>
             </div>
@@ -127,9 +127,16 @@
 <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 flex items-center justify-center">
     <div class="relative">
         <img id="modalImage" src="" class="max-h-[80vh] rounded shadow-lg select-none">
-        <button onclick="closeModal()" class="absolute top-2 right-2 text-white text-2xl select-none">✖️</button>
+
+        <!-- Tombol close dengan ikon -->
+        <button onclick="closeModal()" class="absolute top-2 right-2 text-white hover:text-gray-300 transition duration-200">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
     </div>
 </div>
+
 
 <script>
     function openModal(src) {
@@ -137,7 +144,7 @@
         document.getElementById('imageModal').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
     }
-    
+
     function closeModal() {
         document.getElementById('imageModal').classList.add('hidden');
         document.body.style.overflow = 'auto';
