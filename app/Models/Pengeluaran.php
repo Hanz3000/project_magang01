@@ -32,12 +32,7 @@ class Pengeluaran extends Model
      */
     public function getDaftarBarangAttribute($value)
     {
-        try {
-            return is_array($value) ? $value : json_decode($value, true) ?? [];
-        } catch (\Exception $e) {
-            Log::error('Gagal decode daftar_barang:', ['id' => $this->id, 'value' => $value]);
-            return [];
-        }
+        return json_decode($value, true);
     }
 
     /**
@@ -54,5 +49,13 @@ class Pengeluaran extends Model
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class);
+    }
+
+    /**
+     * Hitung total seluruh barang keluar dari semua struk pengeluaran.
+     */
+    public static function totalBarangKeluar()
+    {
+        return static::sum('jumlah_item');
     }
 }

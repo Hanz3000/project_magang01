@@ -18,9 +18,13 @@ class StrukController extends Controller
 
         if ($request->filled('search')) {
             $search = strtolower($request->search);
-            $query->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
-                ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"]);
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(items::text) like ?', ["%{$search}%"]);
+            });
         }
+
         $struks = $query->latest()->paginate(10);
         $barangList = Barang::all();
 

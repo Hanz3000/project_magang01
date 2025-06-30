@@ -10,74 +10,148 @@
         </div>
 
         <!-- Info Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-blue-50 text-blue-600 mr-4">
+                        <!-- Ikon Struk -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">Total Struk Tercatat</p>
-                        <p class="text-2xl font-semibold text-gray-800">{{ $totalStruk ?? '0' }}</p>
+                        <p class="text-sm text-gray-500">Total Struk</p>
+                        <p class="text-2xl font-semibold text-gray-800 whitespace-nowrap">{{ $totalStruk ?? '0' }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-green-50 text-green-600 mr-4">
+                        <!-- Ikon Barang Masuk -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 whitespace-nowrap">Total Barang Masuk</p>
+                        <p class="text-2xl font-semibold text-gray-800 whitespace-nowrap">{{ $totalBarangMasuk ?? '0' }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-red-50 text-red-600 mr-4">
+                        <!-- Ikon Barang Keluar -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m8 8V4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-500 whitespace-nowrap">Total Barang Keluar</p>
+                        <p class="text-2xl font-semibold text-gray-800 whitespace-nowrap">{{ $totalBarangKeluar ?? '0' }}</p>
                     </div>
                 </div>
             </div>
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-purple-50 text-purple-600 mr-4">
+                        <!-- Ikon Tanggal -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">Tanggal Hari Ini</p>
-                        <p class="text-2xl font-semibold text-gray-800">{{ now()->format('d M Y') }}</p>
+                        <p class="text-lg font-semibold text-gray-800 whitespace-nowrap">{{ now()->format('d-m-Y') }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Struk Terbaru -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-xl font-semibold text-gray-800 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+        <!-- Struk Terbaru & Struk Pengeluaran Terbaru (Side by Side) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <!-- Struk Terbaru -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-2 5a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        Struk Pemasukan Terbaru
+                    </h2>
+                    <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Update Terkini</span>
+                </div>
+
+                @if (isset($latestStruk) && $latestStruk)
+                <div class="space-y-3 text-gray-700">
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Nama Toko:</span>
+                        <span class="font-medium">{{ $latestStruk->nama_toko }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Nomor Struk:</span>
+                        <span class="font-mono">{{ $latestStruk->nomor_struk }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Tanggal:</span>
+                        <span>{{ $latestStruk->tanggal_struk }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Total:</span>
+                        <span class="font-medium">Rp *******</span>
+                    </div>
+                </div>
+                @else
+                <div class="text-center py-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    Struk Terbaru
-                </h2>
-                <span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded-full">Update Terkini</span>
+                    <p class="mt-2 text-gray-600">Belum ada struk terbaru tercatat.</p>
+                </div>
+                @endif
             </div>
 
-            @if (isset($latestStruk) && $latestStruk)
-            <div class="space-y-3 text-gray-700">
-                <div class="flex items-center">
-                    <span class="w-24 text-gray-500">Nama Toko:</span>
-                    <span class="font-medium">{{ $latestStruk->nama_toko }}</span>
+            <!-- Struk Pengeluaran Terbaru -->
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V7h2v2z" clip-rule="evenodd" />
+                        </svg>
+                        Struk Pengeluaran Terbaru
+                    </h2>
+                    <span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded-full">Update Terkini</span>
                 </div>
-                <div class="flex items-center">
-                    <span class="w-24 text-gray-500">Nomor Struk:</span>
-                    <span class="font-mono">{{ $latestStruk->nomor_struk }}</span>
+
+                @if (isset($latestPengeluaranStruk) && $latestPengeluaranStruk)
+                <div class="space-y-3 text-gray-700">
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Nama Toko:</span>
+                        <span class="font-medium">{{ $latestPengeluaranStruk->nama_toko ?? '-' }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Nomor Struk:</span>
+                        <span class="font-mono">{{ $latestPengeluaranStruk->nomor_struk }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Tanggal:</span>
+                        <span>{{ $latestPengeluaranStruk->tanggal ?? '-' }}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="w-24 text-gray-500">Total:</span>
+                        <span class="font-medium">Rp *******</span>
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <span class="w-24 text-gray-500">Tanggal:</span>
-                    <span>{{ $latestStruk->tanggal_struk }}</span>
+                @else
+                <div class="text-center py-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p class="mt-2 text-gray-600">Belum ada struk pengeluaran terbaru tercatat.</p>
                 </div>
-                <div class="flex items-center">
-                    <span class="w-24 text-gray-500">Total:</span>
-                    <span class="font-medium">Rp *******</span>
-                </div>
+                @endif
             </div>
-            @else
-            <div class="text-center py-6">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                <p class="mt-2 text-gray-600">Belum ada struk terbaru tercatat.</p>
-            </div>
-            @endif
         </div>
 
         <!-- Daftar Barang -->
@@ -115,7 +189,7 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($barangList ?? [] as $nama => $data)
+                        @forelse ($barangList as $nama => $data)
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $nama }}</td>
@@ -142,17 +216,35 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">
+                {{ $barangList->links('vendor.pagination.custom') }}
+                <div class="showing-results mt-2 text-sm text-gray-600 text-center">
+                    Menampilkan {{ $barangList->firstItem() }} sampai {{ $barangList->lastItem() }} dari {{ $barangList->total() }} hasil
+                </div>
+            </div>
         </div>
 
         <!-- Item Pengeluaran Terbaru -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V7h2v2z" clip-rule="evenodd" />
                     </svg>
-                    Item Pengeluaran Terbaru
+                    Daftar Pengeluaran Barang
                 </h2>
+                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex">
+                    <input type="text" name="search_pengeluaran" value="{{ request('search_pengeluaran') }}"
+                        class="flex-grow md:w-64 border border-red-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-sm"
+                        placeholder="Cari nama barang pengeluaran...">
+                    <button type="submit"
+                        class="bg-red-600 text-white px-4 py-2 rounded-r-md hover:bg-red-700 text-sm flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        Cari
+                    </button>
+                </form>
             </div>
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -167,7 +259,7 @@
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
                         @php $no = 1; @endphp
-                        @forelse ($latestPengeluaranItems ?? [] as $pengeluaran)
+                        @forelse ($latestPengeluaranItems as $pengeluaran)
                         @foreach($pengeluaran->daftar_barang as $item)
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $no++ }}</td>
@@ -187,8 +279,74 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">
+                {{ $latestPengeluaranItems->links('vendor.pagination.custom') }}
+                <div class="showing-results mt-2 text-sm text-gray-600 text-center">
+                    Menampilkan {{ $latestPengeluaranItems->firstItem() }} sampai {{ $latestPengeluaranItems->lastItem() }} dari {{ $latestPengeluaranItems->total() }} hasil
+                </div>
+            </div>
         </div>
 
     </div>
 </div>
 @endsection
+
+<style>
+    /* Custom Pagination Styles */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin: 1.5rem 0;
+    }
+
+    .pagination li {
+        margin: 0 0.25rem;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.375rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .pagination li a {
+        color: #4b5563;
+        background-color: #f3f4f6;
+        border: 1px solid #e5e7eb;
+    }
+
+    .pagination li a:hover {
+        background-color: #e5e7eb;
+        color: #1f2937;
+    }
+
+    .pagination li.active span {
+        background-color: #3b82f6;
+        color: white;
+        border-color: #3b82f6;
+    }
+
+    .pagination li.disabled span {
+        color: #9ca3af;
+        background-color: #f3f4f6;
+        border-color: #e5e7eb;
+        cursor: not-allowed;
+    }
+
+    /* Showing results text */
+    .showing-results {
+        color: #6b7280;
+        font-size: 0.875rem;
+        margin-top: 1rem;
+        text-align: center;
+    }
+</style>
