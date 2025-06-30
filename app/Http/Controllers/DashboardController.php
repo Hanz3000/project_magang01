@@ -25,16 +25,16 @@ class DashboardController extends Controller
                         $nama = $item['nama'];
                         $jumlah = $item['jumlah'];
 
-                        // Simpan jumlah dan nomor_struk
                         if (!isset($barangList[$nama])) {
                             $barangList[$nama] = [
                                 'jumlah' => $jumlah,
                                 'nomor_struk' => $struk->nomor_struk,
+                                'tanggal' => $struk->tanggal_struk // Add this line
                             ];
                         } else {
                             $barangList[$nama]['jumlah'] += $jumlah;
-                            // Jika ingin menampilkan nomor_struk terakhir, update di sini
                             $barangList[$nama]['nomor_struk'] = $struk->nomor_struk;
+                            $barangList[$nama]['tanggal'] = $struk->tanggal_struk; // Add this line
                         }
                     }
                 }
@@ -51,6 +51,8 @@ class DashboardController extends Controller
                 ->toArray();
         }
 
-        return view('dashboard', compact('totalStruk', 'latestStruk', 'barangList'));
+        $latestPengeluaranItems = \App\Models\Pengeluaran::latest()->take(5)->get();
+
+        return view('dashboard', compact('barangList', 'totalStruk', 'latestStruk', 'latestPengeluaranItems'));
     }
 }
