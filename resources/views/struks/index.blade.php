@@ -14,12 +14,21 @@
         </div>
         @endif
 
+        <!-- Form untuk Bulk Delete -->
+        <form id="bulkDeleteForm" method="POST" action="{{ route('struks.bulk-delete') }}">
+            @csrf
+            @method('DELETE')
+            <input type="hidden" name="selected_ids" id="selectedIds">
+        </form>
+
+
         <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
                 <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
             </div>
             <div class="flex flex-wrap gap-2">
+                <!-- Existing Export Button -->
                 <div class="relative group">
                     <button class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,6 +40,25 @@
                         <a href="{{ route('struks.export.excel') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format Excel</a>
                         <a href="{{ route('struks.export.csv') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format CSV</a>
                     </div>
+                </div>
+
+                <!-- Perbaikan pada Bulk Actions Container -->
+                <div id="bulkActionsContainer" class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
+                    <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0 dipilih</span>
+                    <button onclick="confirmBulkDelete()"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Hapus
+                    </button>
+                    <button onclick="clearSelection()"
+                        class="p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
+                        title="Batal">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -73,6 +101,9 @@
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
                         <tr>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-10">
+                                <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk</th>
@@ -93,7 +124,13 @@
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
-                            <td class="px-6 py-4 whitespace-nowrap text-center">{{ $struks->firstItem() + $index }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <input type="checkbox" name="selected_ids[]" value="{{ $struk->id }}"
+                                    class="row-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            </td>
+                            {{-- This is the added 'No.' column --}}
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ $index + 1 }}</td>
+                            {{-- End of added 'No.' column --}}
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium text-gray-900">{{ $struk->nama_toko }}</div>
                             </td>
@@ -145,7 +182,6 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
                                     </a>
-                                    <!-- Ganti tombol edit menjadi tombol modal -->
                                     <button type="button" onclick="openEditModal({{ $struk->id }})"
                                         class="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 px-3 py-1 rounded-md transition-colors"
                                         title="Edit">
@@ -172,7 +208,7 @@
 
                         @if (request('edit') == $struk->id)
                         <tr class="bg-indigo-50 animate-fadeIn">
-                            <td colspan="9" class="px-0 py-4">
+                            <td colspan="10" class="px-0 py-4"> {{-- Adjusted colspan to 10 --}}
                                 <div class="px-6 max-w-5xl ml-auto">
                                     <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}" class="space-y-4">
                                         @csrf
@@ -214,7 +250,6 @@
                                             @endforeach
                                         </div>
 
-                                        <!-- Tambah Item -->
                                         <div class="flex items-center space-x-4 item-row border-2 border-dashed border-indigo-200 rounded-lg p-3 bg-indigo-25">
                                             <select class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" id="newItemNama" style="min-width:0">
                                                 <option value="" disabled selected>Pilih Barang</option>
@@ -232,7 +267,6 @@
                                             </button>
                                         </div>
 
-                                        <!-- Tombol -->
                                         <div class="flex justify-end space-x-3 pt-2">
                                             <a href="{{ route('struks.index', ['search' => request('search')]) }}"
                                                 class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">Batal</a>
@@ -248,7 +282,7 @@
                         @endif
                         @empty
                         <tr class="animate-fadeIn">
-                            <td colspan="9" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
+                            <td colspan="10" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td> {{-- Adjusted colspan to 10 --}}
                         </tr>
                         @endforelse
                     </tbody>
@@ -346,6 +380,8 @@
                 </button>
             </div>
         </div>
+
+
         <!-- Modal Body -->
         <div class="px-6 py-4">
             <form method="POST" action="" id="editItemsForm">
@@ -465,6 +501,84 @@
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elemen yang diperlukan
+        const selectAll = document.getElementById('selectAll');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const bulkActions = document.getElementById('bulkActionsContainer');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectedIdsInput = document.getElementById('selectedIds');
+
+        // Fungsi untuk update bulk actions
+        function updateBulkActions() {
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+
+            if (selectedCheckboxes.length > 0) {
+                bulkActions.classList.remove('hidden');
+                selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
+                selectedIdsInput.value = selectedIds.join(',');
+
+                // Update select all checkbox
+                if (selectAll) {
+                    selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
+                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
+                }
+            } else {
+                bulkActions.classList.add('hidden');
+                selectedIdsInput.value = '';
+                if (selectAll) selectAll.checked = false;
+            }
+        }
+
+        // Select all checkbox
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                const isChecked = this.checked;
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+                updateBulkActions();
+            });
+        }
+
+        // Individual row checkbox
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateBulkActions);
+        });
+
+        // Event delegation untuk checkbox yang mungkin ditambahkan dinamis
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('row-checkbox')) {
+                updateBulkActions();
+            }
+        });
+    });
+
+    // Fungsi untuk clear selection
+    function clearSelection() {
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        document.getElementById('selectAll').checked = false;
+        document.getElementById('bulkActionsContainer').classList.add('hidden');
+        document.getElementById('selectedIds').value = '';
+    }
+
+    // Fungsi untuk konfirmasi bulk delete
+    function confirmBulkDelete() {
+        const selectedIds = document.getElementById('selectedIds').value;
+        if (!selectedIds) {
+            alert('Pilih setidaknya satu struk untuk dihapus');
+            return;
+        }
+
+        const count = selectedIds.split(',').length;
+        if (confirm(`Apakah Anda yakin ingin menghapus ${count} struk yang dipilih?`)) {
+            document.getElementById('bulkDeleteForm').submit();
+        }
+    }
+
     // Delete modal functions
     function openDeleteModal(formAction) {
         document.getElementById('deleteForm').action = formAction;
@@ -810,8 +924,7 @@
     }
 
     // Auto-hide success message after 5 seconds
-    @if(session('success'))
-    setTimeout(() => {
+    @if(session('success')) setTimeout(() => {
         const successMessage = document.querySelector('.fixed.top-4.right-4');
         if (successMessage) {
             successMessage.style.transform = 'translateX(100%)';

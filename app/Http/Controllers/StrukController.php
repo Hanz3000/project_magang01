@@ -312,4 +312,29 @@ class StrukController extends Controller
         $struk = Struk::findOrFail($id);
         return response()->json(json_decode($struk->items, true));
     }
+
+    public function bulkDelete(Request $request)
+    {
+        // Ambil data dari request
+        $selectedIds = $request->input('selected_ids');
+
+        // Jika selectedIds dikirim dalam bentuk string (misal: "1,2,3"), ubah ke array
+        if (is_string($selectedIds)) {
+            $selectedIds = explode(',', $selectedIds);
+            // Update nilai request agar validasi bisa diproses sebagai array
+            $request->merge(['selected_ids' => $selectedIds]);
+        }
+
+        // Validasi setelah data sudah berbentuk array
+        $request->validate([
+            'selected_ids' => 'required|array',
+            'selected_ids.*' => 'exists:struks,id'
+        ]);
+
+        // Hapus data
+        \App\Models\Struk::whereIn('id', $selectedIds)->delete();
+
+        return redirect()->route('struks.index')
+            ->with('success', count($selectedIds) . ' struk berhasil dihapus');
+    }
 }

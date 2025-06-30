@@ -48,7 +48,9 @@ Route::middleware('auth')->group(function () {
 
 
     // ------------------- STRUK -------------------
+    Route::delete('/struks/bulk-delete', [StrukController::class, 'bulkDelete'])->name('struks.bulk-delete');
     Route::resource('struks', StrukController::class)->except(['index', 'show']);
+
 
     // Khusus Index dan Show dibuat manual agar tidak tertimpa
     Route::get('/struks', [StrukController::class, 'index'])->name('struks.index');
