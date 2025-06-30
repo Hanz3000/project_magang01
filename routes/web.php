@@ -7,6 +7,8 @@ use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StrukController;
 use App\Http\Controllers\MasterBarangController;
 use App\Http\Controllers\PegawaiController; // Master Pegawai
+use App\Http\Controllers\PengeluaranController;
+
 
 // ------------------- AUTH ROUTES -------------------
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -72,3 +74,19 @@ Route::delete('/struks/{struk}/item/{index}', [StrukController::class, 'deleteIt
 
 Route::get('/struks/autocomplete-items', [StrukController::class, 'autocompleteItems'])->name('struks.autocomplete-items');
 Route::get('/struks/search-barang', [StrukController::class, 'searchBarang'])->name('struks.search-barang');
+
+
+Route::prefix('pengeluarans')->name('pengeluarans.')->group(function () {
+    // Export routes
+    Route::get('/export/excel', [PengeluaranController::class, 'exportExcel'])->name('export.excel');
+    Route::get('/export/csv', [PengeluaranController::class, 'exportCSV'])->name('export.csv');
+
+    // Resource routes
+    Route::get('/', [PengeluaranController::class, 'index'])->name('index');
+    Route::get('/create', [PengeluaranController::class, 'create'])->name('create');
+    Route::post('/', [PengeluaranController::class, 'store'])->name('store');
+    Route::get('/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->whereNumber('pengeluaran')->name('edit');
+    Route::get('/{pengeluaran}', [PengeluaranController::class, 'show'])->whereNumber('pengeluaran')->name('show');
+    Route::put('/{pengeluaran}', [PengeluaranController::class, 'update'])->whereNumber('pengeluaran')->name('update');
+    Route::delete('/{pengeluaran}', [PengeluaranController::class, 'destroy'])->whereNumber('pengeluaran')->name('destroy');
+});
