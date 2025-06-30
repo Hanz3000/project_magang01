@@ -162,7 +162,8 @@
 
     <div class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 animate-scaleIn">
         <div class="text-center mb-8 animate-fadeIn" style="animation-delay: 0.2s;">
-            <div class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
+            <div
+                class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <i class="fas fa-box-open text-primary-600 text-3xl"></i>
             </div>
             <h2 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang</h2>
@@ -170,16 +171,17 @@
         </div>
 
         @if ($errors->any())
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm animate-fadeIn" style="animation-delay: 0.3s;">
-            <div class="flex items-center">
-                <i class="fas fa-exclamation-circle mr-2"></i>
-                <div>
-                    @foreach ($errors->all() as $error)
-                    <p>{{ $error }}</p>
-                    @endforeach
+            <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm animate-fadeIn"
+                style="animation-delay: 0.3s;">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i>
+                    <div>
+                        @foreach ($errors->all() as $error)
+                            <p>{{ $error }}</p>
+                        @endforeach
+                    </div>
                 </div>
             </div>
-        </div>
         @endif
 
         <form method="POST" action="{{ route('login') }}" class="space-y-5">
@@ -193,8 +195,7 @@
                     </div>
                     <input type="email" id="email" name="email"
                         class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl input-field focus:border-primary-500 focus:ring-primary-500"
-                        placeholder="Masukan alamat email"
-                        value="{{ old('email') }}" required autofocus>
+                        placeholder="Masukan alamat email" value="{{ old('email') }}" required autofocus>
                 </div>
             </div>
 
@@ -206,9 +207,9 @@
                     </div>
                     <input type="password" id="password" name="password"
                         class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl input-field focus:border-primary-500 focus:ring-primary-500"
-                        placeholder="••••••••"
-                        required>
-                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" id="togglePassword">
+                        placeholder="••••••••" required>
+                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        id="togglePassword">
                         <i class="fas fa-eye text-slate-400 hover:text-primary-500 cursor-pointer"></i>
                     </button>
                 </div>
@@ -216,14 +217,17 @@
 
             <div class="flex items-center justify-between text-sm animate-fadeIn" style="animation-delay: 0.6s;">
                 <label class="inline-flex items-center">
-                    <input type="checkbox" name="remember" class="h-4 w-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
+                    <input type="checkbox" name="remember"
+                        class="h-4 w-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
                     <span class="ml-2 text-slate-600">Ingat saya</span>
                 </label>
-                <a href="{{ route('password.request') }}" class="text-primary-600 hover:text-primary-800 hover:underline">Lupa kata sandi?</a>
+                <a href="{{ route('password.request') }}"
+                    class="text-primary-600 hover:text-primary-800 hover:underline">Lupa kata sandi?</a>
             </div>
 
             <button type="submit"
-                class="w-full bg-primary-600 text-white py-3 px-4 rounded-xl btn-primary font-semibold animate-fadeIn" style="animation-delay: 0.7s;">
+                class="w-full bg-primary-600 text-white py-3 px-4 rounded-xl btn-primary font-semibold animate-fadeIn"
+                style="animation-delay: 0.7s;">
                 Masuk
                 <i class="fas fa-arrow-right ml-2"></i>
             </button>

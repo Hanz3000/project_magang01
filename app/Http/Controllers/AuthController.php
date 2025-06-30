@@ -17,22 +17,28 @@ class AuthController extends Controller
     // Proses login
     public function login(Request $request)
     {
+        // Validasi form login
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+        ], [
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        if (Auth::attempt($credentials)) {
+        // Coba login
+        $remember = $request->has('remember');
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
-            $request->session()->put('show_welcome', true); // <-- Tambahkan baris ini
+            $request->session()->put('show_welcome', true);
             return redirect()->intended('/');
         }
 
-        return redirect()->route('dashboard');
-
+        // Jika gagal login, kembali dengan error
         return back()->withErrors([
             'email' => 'Email atau password salah.',
-        ]);
+        ])->withInput(); // agar input email tetap muncul di form
     }
 
     // Menampilkan form registrasi
