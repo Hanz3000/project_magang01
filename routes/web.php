@@ -103,6 +103,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/from-struk/{struk}', [PengeluaranController::class, 'storeByStruk'])
             ->name('pengeluarans.store-by-struk');
     });
+
     Route::get('pengeluarans/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
     Route::get('pengeluarans/export/csv', [PengeluaranController::class, 'exportCsv'])->name('pengeluarans.export.csv');
 });
