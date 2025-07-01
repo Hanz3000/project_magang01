@@ -101,18 +101,12 @@ Route::middleware('auth')->group(function () {
         Route::get('/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
         Route::get('/export/csv', [PengeluaranController::class, 'exportCSV'])->name('pengeluarans.export.csv');
     });
-<<<<<<< HEAD
-});
-=======
     // routes/web.php
-/// Route untuk pengeluaran dari struk
-Route::get('/struks/{struk}/pengeluarans', [PengeluaranController::class, 'indexByStruk'])
-     ->name('struks.pengeluaran.index');
+    /// Route untuk pengeluaran dari struk
+    Route::get('/struks/{struk}/pengeluarans', [PengeluaranController::class, 'indexByStruk'])
+        ->name('struks.pengeluaran.index');
 
-// Route untuk menyimpan pengeluaran dari transaksi
-Route::post('/transaksi/pengeluaran', [TransaksiController::class, 'storePengeluaran'])
-     ->name('transaksi.store.pengeluaran');
-     
-    
-    });
->>>>>>> 5ae08cd297205b1350ea266ce725da3616048a16
+    // Route untuk menyimpan pengeluaran dari transaksi
+    Route::post('/transaksi/pengeluaran', [TransaksiController::class, 'storePengeluaran'])
+        ->name('transaksi.store.pengeluaran');
+});
