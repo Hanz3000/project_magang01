@@ -75,4 +75,18 @@ class AuthController extends Controller
 
         return redirect('/login');
     }
+
+    protected function authenticated(Request $request, $user)
+    {
+        session(['show_welcome' => true]);
+    }
+
+    public function index()
+    {
+        if (session('show_welcome')) {
+            session()->forget('show_welcome');
+        }
+        // ...logic lain...
+        return view('dashboard');
+    }
 }
