@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
 
     // ------------------- STRUK (PEMASUKAN) -------------------
     Route::prefix('struks')->group(function () {
+        Route::delete('/bulk-delete', [StrukController::class, 'bulkDelete'])->name('struks.bulk-delete');
         Route::get('/', [StrukController::class, 'index'])->name('struks.index');
         Route::get('/create', [StrukController::class, 'create'])->name('struks.create');
         Route::post('/', [StrukController::class, 'store'])->name('struks.store');
@@ -69,7 +70,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{struk}/edit', [StrukController::class, 'edit'])->name('struks.edit');
         Route::put('/{struk}', [StrukController::class, 'update'])->name('struks.update');
         Route::delete('/{struk}', [StrukController::class, 'destroy'])->name('struks.destroy');
-        Route::delete('/bulk-delete', [StrukController::class, 'bulkDelete'])->name('struks.bulk-delete');
+
 
         // Item routes
         Route::get('/{struk}/items', [StrukController::class, 'items']);
@@ -90,7 +91,7 @@ Route::middleware('auth')->group(function () {
     // ------------------- PENGELUARAN -------------------
     Route::prefix('pengeluarans')->group(function () {
         Route::get('/', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
-        Route::get('/create', [PengeluaranController::class, 'create'])->name('pengeluarans.create');
+
         Route::post('/', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
         Route::get('/{pengeluaran}', [PengeluaranController::class, 'show'])->name('pengeluarans.show');
         Route::get('/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->name('pengeluarans.edit');
@@ -103,7 +104,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/from-struk/{struk}', [PengeluaranController::class, 'storeByStruk'])
             ->name('pengeluarans.store-by-struk');
     });
-
     Route::get('pengeluarans/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
     Route::get('pengeluarans/export/csv', [PengeluaranController::class, 'exportCsv'])->name('pengeluarans.export.csv');
+    Route::put('/pengeluarans/{id}', [PengeluaranController::class, 'update'])->name('pengeluarans.update');
 });

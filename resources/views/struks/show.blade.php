@@ -81,6 +81,7 @@
                             @php
                             $items = [];
                             $rawItems = $struk->items;
+
                             if (is_string($rawItems)) {
                             $decoded = json_decode($rawItems, true);
                             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
@@ -94,20 +95,27 @@
                             @endphp
 
                             @forelse ($items as $item)
+                            @php
+                            $nama = $item['nama'] ?? 'N/A';
+                            $jumlah = (int) ($item['jumlah'] ?? 0);
+                            $harga = (int) ($item['harga'] ?? 0);
+                            $subtotal = $jumlah * $harga;
+                            @endphp
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $item['nama'] ?? 'N/A' }}</td>
-                                <td class="px-6 py-4 text-sm text-center text-gray-500">{{ $item['jumlah'] ?? '0' }}</td>
-                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600">Rp{{ number_format($item['harga'] ?? 0, 0, ',', '.') }}</td>
-                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600">
-                                    Rp{{ number_format(($item['jumlah'] ?? 0) * ($item['harga'] ?? 0), 0, ',', '.') }}
-                                </td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $nama }}</td>
+                                <td class="px-6 py-4 text-sm text-center text-gray-500">{{ $jumlah }}</td>
+                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600">Rp{{ number_format($harga, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600">Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">Tidak ada barang</td>
+                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                                    Tidak ada barang
+                                </td>
                             </tr>
                             @endforelse
                         </tbody>
+
                     </table>
                 </div>
             </div>

@@ -3,7 +3,7 @@
 @section('content')
 <div x-data="{ showModal: false }" class="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-10">
     <div class="max-w-5xl mx-auto bg-white shadow-2xl rounded-3xl p-8">
-        
+
         <!-- Judul -->
         <h1 class="text-3xl font-bold text-blue-700 mb-6 border-b pb-4">Detail Pengeluaran</h1>
 
@@ -27,13 +27,13 @@
                 <div>
                     <span class="font-semibold text-gray-700 block mb-2">Bukti Pembayaran:</span>
                     @if ($pengeluaran->bukti_pembayaran)
-                        <img 
-                            src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}" 
-                            alt="Bukti Pembayaran"
-                            class="w-44 h-44 object-cover rounded-xl border cursor-pointer hover:opacity-80 transition"
-                            @click="showModal = true">
+                    <img
+                        src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}"
+                        alt="Bukti Pembayaran"
+                        class="w-44 h-44 object-cover rounded-xl border cursor-pointer hover:opacity-80 transition"
+                        @click="showModal = true">
                     @else
-                        <span class="italic text-gray-500">Tidak ada bukti</span>
+                    <span class="italic text-gray-500">Tidak ada bukti</span>
                     @endif
                 </div>
             </div>
@@ -63,7 +63,7 @@
                                 Rp{{ number_format($item['harga'], 0, ',', '.') }}
                             </td>
                             <td class="px-4 py-2 border text-right">
-                                Rp{{ number_format($item['subtotal'], 0, ',', '.') }}
+                                Rp{{ number_format(($item['jumlah'] ?? 0) * ($item['harga'] ?? 0), 0, ',', '.') }}
                             </td>
                         </tr>
                         @endforeach
@@ -74,8 +74,8 @@
 
         <!-- Tombol -->
         <div class="mt-10">
-            <a href="{{ route('pengeluarans.index') }}" 
-               class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-xl shadow">
+            <a href="{{ route('pengeluarans.index') }}"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-xl shadow">
                 Kembali
             </a>
         </div>
@@ -83,21 +83,21 @@
 
     <!-- Modal Bukti Pembayaran -->
     @if ($pengeluaran->bukti_pembayaran)
-    <div 
-        x-show="showModal" 
+    <div
+        x-show="showModal"
         class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50"
         x-transition
         x-cloak>
         <div class="bg-white rounded-3xl p-6 max-w-3xl w-full relative">
-            <button 
-                @click="showModal = false" 
+            <button
+                @click="showModal = false"
                 class="absolute top-3 right-3 text-gray-600 hover:text-black text-3xl">
                 &times;
             </button>
             <h2 class="text-xl font-semibold mb-4">Bukti Pembayaran</h2>
-            <img 
-                src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}" 
-                alt="Bukti Pembayaran" 
+            <img
+                src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}"
+                alt="Bukti Pembayaran"
                 class="w-full rounded-xl object-contain">
         </div>
     </div>
