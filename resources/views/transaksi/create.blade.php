@@ -527,6 +527,7 @@
                             </div>
                         </div>
 
+<<<<<<< HEAD
                         <div class="input-group">
                             <label for="pegawai_id">
                                 <i class="fas fa-user-tie mr-1"></i>
@@ -538,6 +539,16 @@
                                 <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
                                 @endforeach
                             </select>
+=======
+                        <div class="file-preview" id="file-preview">
+                            <img id="preview-image" src="#" alt="Preview Foto Struk" class="hidden">
+                            <div class="file-info">
+                                <span id="file-name"></span>
+                                <button type="button" onclick="removePhoto()" class="remove-file-btn">
+                                    <i class="fas fa-trash mr-1"></i>Hapus
+                                </button>
+                            </div>
+>>>>>>> e24fa435ed4b7505f78154af85022f5631b651b3
                         </div>
 
                         <div class="button-group">
@@ -803,102 +814,106 @@
 <script>
     $(document).ready(function() {
         // Initialize Select2
-        $('.select-barang').select2({
-            placeholder: "Pilih barang...",
-            width: '100%'
-        });
+        function initSelect2() {
+            $('.select-barang').select2({
+                placeholder: "Pilih barang...",
+                width: '100%'
+            });
 
-        $('#struk_id').select2({
-            placeholder: "Pilih struk...",
-            width: '100%'
-        });
+            $('#struk_id').select2({
+                placeholder: "Pilih struk...",
+                width: '100%'
+            });
 
-        $('#pegawai_id, #from_income_pegawai_id').select2({
-            placeholder: "Pilih pegawai...",
-            width: '100%'
-        });
+            $('#pegawai_id, #from_income_pegawai_id').select2({
+                placeholder: "Pilih pegawai...",
+                width: '100%'
+            });
+        }
+        initSelect2();
 
         // Tab switching
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
+        $('.tab-button').click(function() {
+            const tabId = $(this).data('tab');
 
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
+            // Update active tab button
+            $('.tab-button').removeClass('active');
+            $(this).addClass('active');
 
+<<<<<<< HEAD
             document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
             document.getElementById(`${tabName}-form`).classList.add('active');
         }
+=======
+            // Update active tab content
+            $('.tab-content').removeClass('active');
+            $('#' + tabId).addClass('active');
+        });
 
-        // Update active tab button
-        $('.tab-button').removeClass('active');
-        $(this).addClass('active');
+        // Expense type switching
+        $('.expense-type-btn').click(function() {
+            const expenseType = $(this).data('expense-type');
 
-        // Update active tab content
-        $('.tab-content').removeClass('active');
-        $(`#${tabId}`).addClass('active');
-    });
+            // Update active button
+            $('.expense-type-btn').removeClass('active');
+            $(this).addClass('active');
 
-    // Expense type switching
-    $('.expense-type-btn').click(function() {
-        const expenseType = $(this).data('expense-type');
+            // Show corresponding form
+            $('.expense-form').addClass('hidden');
+            $(`#${expenseType}-expense`).removeClass('hidden');
+        });
+>>>>>>> e24fa435ed4b7505f78154af85022f5631b651b3
 
-        // Update active button
-        $('.expense-type-btn').removeClass('active');
-        $(this).addClass('active');
+        // Update total when struk is selected
+        $('#struk_id').on('change', function() {
+            const selectedOption = $(this).find('option:selected');
+            const total = selectedOption.data('total');
+            const strukId = selectedOption.val();
 
-        // Show corresponding form
-        $('.expense-form').addClass('hidden');
-        $(`#${expenseType}-expense`).removeClass('hidden');
-    });
+            if (total) {
+                $('#from_income_total').val(formatRupiah(total));
 
-    // Update total when struk is selected
-    $('#struk_id').on('change', function() {
-        const selectedOption = $(this).find('option:selected');
-        const total = selectedOption.data('total');
-        const strukId = selectedOption.val();
-
-        if (total) {
-            $('#from_income_total').val(formatRupiah(total));
-
-            // Fetch and display items
-            if (strukId) {
-                fetchStrukItems(strukId);
+                // Fetch and display items
+                if (strukId) {
+                    fetchStrukItems(strukId);
+                }
+            } else {
+                $('#from_income_total').val('');
+                $('#income-items-preview').html(
+                    '<p class="text-gray-500">Pilih struk untuk melihat daftar barang</p>');
             }
-        } else {
-            $('#from_income_total').val('');
-            $('#income-items-preview').html(
-                '<p class="text-gray-500">Pilih struk untuk melihat daftar barang</p>');
-        }
-    });
+        });
 
-    // File upload preview for income
-    $('#foto_struk').change(function(e) {
-        previewImage(e, '#preview-image', '#file-name', '#file-preview');
-    });
+        // File upload preview for income
+        $('#foto_struk').change(function(e) {
+            previewImage(e, '#preview-image', '#file-name', '#file-preview');
+        });
 
-    // File upload preview for expense
-    $('#bukti_pembayaran').change(function(e) {
-        previewImage(e, '#expense-preview-image', '#expense-file-name', '#expense-file-preview');
-    });
+        // File upload preview for expense
+        $('#bukti_pembayaran').change(function(e) {
+            previewImage(e, '#expense-preview-image', '#expense-file-name', '#expense-file-preview');
+        });
 
-    // Initialize event listeners for existing rows
-    $('.item-row').each(function() {
-    const row = $(this);
-    row.find('.jumlah, .harga').on('input', function() {
-        updateIncomeSubtotal(row);
-    });
+        // Initialize event listeners for existing income rows
+        $('#income-items-container .item-row').each(function() {
+            const row = $(this);
+            row.find('.jumlah, .harga').on('input', function() {
+                updateIncomeSubtotal(row);
+            });
+        });
 
-    row.find('.expense-jumlah, .expense-harga').on('input', function() {
-        updateExpenseSubtotal(row);
-    });
-    });
+        // Initialize event listeners for existing expense rows
+        $('#expense-items-container .item-row').each(function() {
+            const row = $(this);
+            row.find('.expense-jumlah, .expense-harga').on('input', function() {
+                updateExpenseSubtotal(row);
+            });
+        });
     });
 
     // Format currency
     function formatRupiah(angka) {
+        if (!angka) return 'Rp 0';
         return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
@@ -944,8 +959,7 @@
             success: function(items) {
                 if (items.length > 0) {
                     let html = '<table class="item-table">';
-                    html +=
-                        '<thead><tr><th>Nama Barang</th><th>Jumlah</th><th>Harga Satuan</th><th>Subtotal</th></tr></thead>';
+                    html += '<thead><tr><th>Nama Barang</th><th>Jumlah</th><th>Harga Satuan</th><th>Subtotal</th></tr></thead>';
                     html += '<tbody>';
 
                     items.forEach(item => {
@@ -976,19 +990,14 @@
     // Income items management
     let incomeItemIndex = 1;
 
-    $(document).ready(function() {
-                // File upload preview
-                $('#pengeluaran_bukti_pembayaran').change(function(e) {
-                    handleFileUpload(
-                        e,
-                        '#pengeluaran-preview-image',
-                        '#pengeluaran-file-name',
-                        '#pengeluaran-upload-container',
-                        '#pengeluaran-file-preview'
-                    );
-                });
+    function addIncomeItem() {
+        const container = $('#income-items-container');
 
+<<<<<<< HEAD
                 const newRow = $(`
+=======
+        const newRow = $(`
+>>>>>>> e24fa435ed4b7505f78154af85022f5631b651b3
             <tr class="item-row" data-item="${incomeItemIndex}">
                 <td>
                     <div class="input-group">
@@ -1022,54 +1031,59 @@
             </tr>
         `);
 
-                container.append(newRow);
-                $('.select-barang').select2();
+        container.append(newRow);
 
-                // Initialize event listeners for the new row
-                newRow.find('.jumlah, .harga').on('input', function() {
-                    updateIncomeSubtotal(newRow);
-                });
+        // Reinitialize Select2 for new elements
+        $('.select-barang').select2({
+            placeholder: "Pilih barang...",
+            width: '100%'
+        });
 
-                incomeItemIndex++;
-            }
+        // Initialize event listeners for the new row
+        newRow.find('.jumlah, .harga').on('input', function() {
+            updateIncomeSubtotal(newRow);
+        });
 
-            function removeIncomeItem(button) {
-                const row = $(button).closest('.item-row');
-                row.fadeOut(300, function() {
-                    row.remove();
-                    updateIncomeTotal();
-                });
-            }
+        incomeItemIndex++;
+    }
 
-            function updateIncomeSubtotal(row) {
-                const itemId = row.data('item');
-                const quantity = parseFloat(row.find('.jumlah').val()) || 0;
-                const price = parseFloat(row.find('.harga').val()) || 0;
-                const subtotal = quantity * price;
+    function removeIncomeItem(button) {
+        const row = $(button).closest('.item-row');
+        row.fadeOut(300, function() {
+            row.remove();
+            updateIncomeTotal();
+        });
+    }
 
-                $(`#subtotal-${itemId}`).text(formatRupiah(subtotal));
-                row.find('.subtotal').val(subtotal);
+    function updateIncomeSubtotal(row) {
+        const itemId = row.data('item');
+        const quantity = parseFloat(row.find('.jumlah').val()) || 0;
+        const price = parseFloat(row.find('.harga').val()) || 0;
+        const subtotal = quantity * price;
 
-                updateIncomeTotal();
-            }
+        $(`#subtotal-${itemId}`).text(formatRupiah(subtotal));
+        row.find('.subtotal').val(subtotal);
 
-            function updateIncomeTotal() {
-                let total = 0;
-                $('.subtotal').each(function() {
-                    total += parseFloat($(this).val()) || 0;
-                });
+        updateIncomeTotal();
+    }
 
-                $('#total_harga').val(total);
-                $('#income-total').text(formatRupiah(total));
-            }
+    function updateIncomeTotal() {
+        let total = 0;
+        $('.subtotal').each(function() {
+            total += parseFloat($(this).val()) || 0;
+        });
 
-            // Expense items management
-            let expenseItemIndex = 1;
+        $('#total_harga').val(total);
+        $('#income-total').text(formatRupiah(total));
+    }
 
-            function addExpenseItem() {
-                const container = $('#expense-items-container');
+    // Expense items management
+    let expenseItemIndex = 1;
 
-                const newRow = $(`
+    function addExpenseItem() {
+        const container = $('#expense-items-container');
+
+        const newRow = $(`
             <tr class="item-row" data-item="${expenseItemIndex}">
                 <td>
                     <div class="input-group">
@@ -1098,44 +1112,44 @@
             </tr>
         `);
 
-                container.append(newRow);
+        container.append(newRow);
 
-                // Initialize event listeners for the new row
-                newRow.find('.expense-jumlah, .expense-harga').on('input', function() {
-                    updateExpenseSubtotal(newRow);
-                });
+        // Initialize event listeners for the new row
+        newRow.find('.expense-jumlah, .expense-harga').on('input', function() {
+            updateExpenseSubtotal(newRow);
+        });
 
-                expenseItemIndex++;
-            }
+        expenseItemIndex++;
+    }
 
-            function removeExpenseItem(button) {
-                const row = $(button).closest('.item-row');
-                row.fadeOut(300, function() {
-                    row.remove();
-                    updateExpenseTotal();
-                });
-            }
+    function removeExpenseItem(button) {
+        const row = $(button).closest('.item-row');
+        row.fadeOut(300, function() {
+            row.remove();
+            updateExpenseTotal();
+        });
+    }
 
-            function updateExpenseSubtotal(row) {
-                const itemId = row.data('item');
-                const quantity = parseFloat(row.find('.expense-jumlah').val()) || 0;
-                const price = parseFloat(row.find('.expense-harga').val()) || 0;
-                const subtotal = quantity * price;
+    function updateExpenseSubtotal(row) {
+        const itemId = row.data('item');
+        const quantity = parseFloat(row.find('.expense-jumlah').val()) || 0;
+        const price = parseFloat(row.find('.expense-harga').val()) || 0;
+        const subtotal = quantity * price;
 
-                $(`#expense-subtotal-${itemId}`).text(formatRupiah(subtotal));
-                row.find('.expense-subtotal').val(subtotal);
+        $(`#expense-subtotal-${itemId}`).text(formatRupiah(subtotal));
+        row.find('.expense-subtotal').val(subtotal);
 
-                updateExpenseTotal();
-            }
+        updateExpenseTotal();
+    }
 
-            function updateExpenseTotal() {
-                let total = 0;
-                $('.expense-subtotal').each(function() {
-                    total += parseFloat($(this).val()) || 0;
-                });
+    function updateExpenseTotal() {
+        let total = 0;
+        $('.expense-subtotal').each(function() {
+            total += parseFloat($(this).val()) || 0;
+        });
 
-                $('#expense_total').val(total);
-                $('#expense-total').text(formatRupiah(total));
-            }
+        $('#expense_total').val(total);
+        $('#expense-total').text(formatRupiah(total));
+    }
 </script>
 @endsection

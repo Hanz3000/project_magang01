@@ -19,10 +19,10 @@ class PengeluaranController extends Controller
 
     // Nested Index
     public function indexByStruk(Struk $struk)
-{
-    $pengeluarans = $struk->pengeluarans()->with('pegawai')->latest()->get();
-    return view('struks.pengeluaran.index', compact('pengeluarans', 'struk'));
-}
+    {
+        $pengeluarans = $struk->pengeluarans()->with('pegawai')->latest()->get();
+        return view('struks.pengeluaran.index', compact('pengeluarans', 'struk'));
+    }
 
     // Standalone Create
     public function create()
