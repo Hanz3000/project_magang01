@@ -7,9 +7,20 @@ use App\Models\Pegawai;
 
 class PegawaiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pegawais = Pegawai::all();
+        $query = \App\Models\Pegawai::query();
+
+        if ($request->filled('q')) {
+            $q = $request->q;
+            $query->where(function($sub) use ($q) {
+                $sub->where('nama', 'like', "%$q%")
+                    ->orWhere('nip', 'like', "%$q%");
+            });
+        }
+
+        $pegawais = $query->get();
+
         return view('pegawai.index', compact('pegawais'));
     }
 

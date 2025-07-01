@@ -64,7 +64,7 @@
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
                 <input type="email" name="email" id="email" value="{{ old('email') }}" required
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                    placeholder="you@example.com">
+                    placeholder="Masukan email Anda">
             </div>
 
             <div>

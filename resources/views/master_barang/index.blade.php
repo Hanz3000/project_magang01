@@ -38,6 +38,25 @@
                 </button>
             </div>
 
+            <div class="flex justify-end mb-4">
+                <form method="GET" action="{{ route('master-barang.index') }}" class="flex items-center space-x-2">
+                    <input
+                        type="text"
+                        name="q"
+                        value="{{ request('q') }}"
+                        placeholder="Cari nama barang..."
+                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button
+                        type="submit"
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+                        Cari
+                    </button>
+                    @if(request('q'))
+                    <a href="{{ route('master-barang.index') }}" class="ml-2 text-sm text-gray-500 hover:underline">Reset</a>
+                    @endif
+                </form>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">

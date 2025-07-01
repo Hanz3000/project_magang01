@@ -7,9 +7,16 @@ use App\Models\Barang;
 
 class MasterBarangController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $barangs = Barang::all();
+        $query = \App\Models\Barang::query();
+
+        if ($request->filled('q')) {
+            $query->where('nama_barang', 'like', '%' . $request->q . '%');
+        }
+
+        $barangs = $query->get();
+
         return view('master_barang.index', compact('barangs'));
     }
 
