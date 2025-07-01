@@ -527,19 +527,6 @@
                             </div>
                         </div>
 
-<<<<<<< HEAD
-                        <div class="input-group">
-                            <label for="pegawai_id">
-                                <i class="fas fa-user-tie mr-1"></i>
-                                Pegawai
-                            </label>
-                            <select name="pegawai_id" id="pegawai_id" class="w-full" required>
-                                <option value="">-- Pilih Pegawai --</option>
-                                @foreach ($pegawais as $pegawai)
-                                <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
-                                @endforeach
-                            </select>
-=======
                         <div class="file-preview" id="file-preview">
                             <img id="preview-image" src="#" alt="Preview Foto Struk" class="hidden">
                             <div class="file-info">
@@ -548,7 +535,6 @@
                                     <i class="fas fa-trash mr-1"></i>Hapus
                                 </button>
                             </div>
->>>>>>> e24fa435ed4b7505f78154af85022f5631b651b3
                         </div>
 
                         <div class="button-group">
@@ -840,11 +826,6 @@
             $('.tab-button').removeClass('active');
             $(this).addClass('active');
 
-<<<<<<< HEAD
-            document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}-form`).classList.add('active');
-        }
-=======
             // Update active tab content
             $('.tab-content').removeClass('active');
             $('#' + tabId).addClass('active');
@@ -862,7 +843,6 @@
             $('.expense-form').addClass('hidden');
             $(`#${expenseType}-expense`).removeClass('hidden');
         });
->>>>>>> e24fa435ed4b7505f78154af85022f5631b651b3
 
         // Update total when struk is selected
         $('#struk_id').on('change', function() {
@@ -993,11 +973,7 @@
     function addIncomeItem() {
         const container = $('#income-items-container');
 
-<<<<<<< HEAD
-                const newRow = $(`
-=======
         const newRow = $(`
->>>>>>> e24fa435ed4b7505f78154af85022f5631b651b3
             <tr class="item-row" data-item="${incomeItemIndex}">
                 <td>
                     <div class="input-group">
