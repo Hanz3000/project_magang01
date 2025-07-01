@@ -13,7 +13,7 @@ class PegawaiController extends Controller
 
         if ($request->filled('q')) {
             $q = $request->q;
-            $query->where(function($sub) use ($q) {
+            $query->where(function ($sub) use ($q) {
                 $sub->where('nama', 'like', "%$q%")
                     ->orWhere('nip', 'like', "%$q%");
             });

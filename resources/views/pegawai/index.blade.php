@@ -32,16 +32,14 @@
                         name="q"
                         value="{{ request('q') }}"
                         placeholder="Cari nama pegawai atau NIP..."
-                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
+                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700"
-                    >
+                        class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
                         Cari
                     </button>
                     @if(request('q'))
-                        <a href="{{ route('pegawai.index') }}" class="ml-2 text-sm text-gray-500 hover:underline">Reset</a>
+                    <a href="{{ route('pegawai.index') }}" class="ml-2 text-sm text-gray-500 hover:underline">Reset</a>
                     @endif
                 </form>
             </div>
