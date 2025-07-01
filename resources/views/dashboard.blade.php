@@ -98,9 +98,19 @@
                         <span>{{ $latestStruk->tanggal_struk }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Total:</span>
-                        <span class="font-medium">Rp *******</span>
+                        <span class="w-24 text-gray-500">Nama Barang:</span>
+                        <span class="font-medium">
+                            @php
+                            $items = is_string($latestStruk->items ?? null) ? json_decode($latestStruk->items, true) : ($latestStruk->items ?? []);
+                            @endphp
+                            @if(!empty($items))
+                            {{ implode(', ', array_column($items, 'nama')) }}
+                            @else
+                            -
+                            @endif
+                        </span>
                     </div>
+
                 </div>
                 @else
                 <div class="text-center py-6">
@@ -139,9 +149,22 @@
                         <span>{{ $latestPengeluaranStruk->tanggal ?? '-' }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Total:</span>
-                        <span class="font-medium">Rp *******</span>
+                        <span class="w-24 text-gray-500">Barang Keluar:</span>
+                        <span class="font-medium">
+                            @php
+                            $itemsKeluar = is_string($latestPengeluaranStruk->daftar_barang ?? null)
+                            ? json_decode($latestPengeluaranStruk->daftar_barang, true)
+                            : ($latestPengeluaranStruk->daftar_barang ?? []);
+                            @endphp
+
+                            @if(!empty($itemsKeluar))
+                            {{ implode(', ', array_column($itemsKeluar, 'nama')) }}
+                            @else
+                            -
+                            @endif
+                        </span>
                     </div>
+
                 </div>
                 @else
                 <div class="text-center py-6">
@@ -163,18 +186,31 @@
                     </svg>
                     Daftar Pemasukan Barang
                 </h2>
-                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex">
+                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex space-x-2">
+                    <!-- Pencarian -->
                     <input type="text" name="search" value="{{ request('search') }}"
-                        class="flex-grow md:w-64 border border-gray-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent text-sm"
+                        class="flex-grow md:w-64 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent text-sm"
                         placeholder="Cari nama barang...">
+
+                    <!-- Sortir -->
+                    <select name="sort" class="border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        <option value="">Sortir berdasarkan</option>
+                        <option value="tanggal_desc" {{ request('sort') == 'tanggal_desc' ? 'selected' : '' }}>Tanggal Terbaru</option>
+                        <option value="tanggal_asc" {{ request('sort') == 'tanggal_asc' ? 'selected' : '' }}>Tanggal Terlama</option>
+                        <option value="nama_asc" {{ request('sort') == 'nama_asc' ? 'selected' : '' }}>Nama A-Z</option>
+                        <option value="nama_desc" {{ request('sort') == 'nama_desc' ? 'selected' : '' }}>Nama Z-A</option>
+                    </select>
+
+                    <!-- Tombol -->
                     <button type="submit"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 text-sm flex items-center justify-center">
+                        class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         Cari
                     </button>
                 </form>
+
             </div>
 
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
@@ -209,6 +245,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                     </svg>
                                     <p class="mt-2">Tidak ada data barang ditemukan.</p>
+                                    <p class="text-xs text-gray-400">Silakan ubah pencarian atau periksa kembali data pemasukan.</p>
                                 </div>
                             </td>
                         </tr>
@@ -222,6 +259,7 @@
                     Menampilkan {{ $barangList->firstItem() }} sampai {{ $barangList->lastItem() }} dari {{ $barangList->total() }} hasil
                 </div>
             </div>
+
         </div>
 
         <!-- Item Pengeluaran Terbaru -->
@@ -233,17 +271,28 @@
                     </svg>
                     Daftar Pengeluaran Barang
                 </h2>
-                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex">
+                <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex space-x-2">
+
                     <input type="text" name="search_pengeluaran" value="{{ request('search_pengeluaran') }}"
-                        class="flex-grow md:w-64 border border-red-300 px-4 py-2 rounded-l-md focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-sm"
+                        class="flex-grow md:w-64 border border-red-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-sm"
                         placeholder="Cari nama barang pengeluaran...">
+
+                    <select name="sort_pengeluaran" class="border border-red-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                        <option value="">Sortir berdasarkan</option>
+                        <option value="tanggal_desc" {{ request('sort_pengeluaran') == 'tanggal_desc' ? 'selected' : '' }}>Tanggal Terbaru</option>
+                        <option value="tanggal_asc" {{ request('sort_pengeluaran') == 'tanggal_asc' ? 'selected' : '' }}>Tanggal Terlama</option>
+                        <option value="nama_asc" {{ request('sort_pengeluaran') == 'nama_asc' ? 'selected' : '' }}>Nama A-Z</option>
+                        <option value="nama_desc" {{ request('sort_pengeluaran') == 'nama_desc' ? 'selected' : '' }}>Nama Z-A</option>
+                    </select>
+
                     <button type="submit"
-                        class="bg-red-600 text-white px-4 py-2 rounded-r-md hover:bg-red-700 text-sm flex items-center justify-center">
+                        class="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 text-sm flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
                         Cari
                     </button>
+
                 </form>
             </div>
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
@@ -258,31 +307,38 @@
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @php $no = 1; @endphp
-                        @forelse ($latestPengeluaranItems as $pengeluaran)
-                        @foreach($pengeluaran->daftar_barang as $item)
+                        @forelse ($pengeluaranBarangList as $index => $item)
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $no++ }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item['nama'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item['nama_barang'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $pengeluaran->nomor_struk }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">{{ $item['nomor_struk'] }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $pengeluaran->tanggal ? \Carbon\Carbon::parse($pengeluaran->tanggal)->format('d-m-Y') : '-' }}
+                                {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
                             </td>
                         </tr>
-                        @endforeach
                         @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">Belum ada item pengeluaran.</td>
+                            <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="mt-3 text-gray-600 font-medium">Tidak ada item pengeluaran ditemukan.</p>
+                                    <p class="text-xs text-gray-400">Silakan ubah pencarian atau periksa kembali data pengeluaran.</p>
+                                </div>
+                            </td>
                         </tr>
+
                         @endforelse
                     </tbody>
+
                 </table>
             </div>
             <div class="mt-4">
-                {{ $latestPengeluaranItems->links('vendor.pagination.custom') }}
+                {{ $pengeluaranBarangList->links('vendor.pagination.custom') }}
                 <div class="showing-results mt-2 text-sm text-gray-600 text-center">
-                    Menampilkan {{ $latestPengeluaranItems->firstItem() }} sampai {{ $latestPengeluaranItems->lastItem() }} dari {{ $latestPengeluaranItems->total() }} hasil
+                    Menampilkan {{ $pengeluaranBarangList->firstItem() }} sampai {{ $pengeluaranBarangList->lastItem() }} dari {{ $pengeluaranBarangList->total() }} hasil
                 </div>
             </div>
         </div>

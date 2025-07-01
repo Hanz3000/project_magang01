@@ -41,26 +41,78 @@ class DashboardController extends Controller
         }, 0);
 
         // Proses list barang masuk
-        $barangList = $this->processBarangList(Struk::all(), $request->input('search'));
+        $barangList = $this->processBarangList(
+            Struk::all(),
+            $request->input('search'),
+            $request->input('sort')
+        );
 
-        // Barang keluar untuk tabel pengeluaran
-        $latestPengeluaranItems = Pengeluaran::query()
-            ->when($request->has('search'), function ($query) use ($request) {
-                $search = strtolower($request->search);
-                $query->where(function ($q) use ($search) {
-                    $q->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
-                        ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"])
-                        ->orWhereRaw('LOWER(daftar_barang::text) like ?', ["%{$search}%"]);
+        // Proses list barang keluar
+        $pengeluaranBarangList = collect();
+
+        foreach (Pengeluaran::all() as $pengeluaran) {
+            $items = is_string($pengeluaran->daftar_barang) ? json_decode($pengeluaran->daftar_barang, true) : $pengeluaran->daftar_barang;
+
+            foreach ($items as $item) {
+                $pengeluaranBarangList->push([
+                    'nama_barang' => $item['nama'],
+                    'jumlah' => $item['jumlah'],
+                    'nomor_struk' => $pengeluaran->nomor_struk,
+                    'tanggal' => $pengeluaran->tanggal,
+                ]);
+            }
+        }
+
+        // Filter
+        if ($request->filled('search_pengeluaran')) {
+            $search = strtolower($request->search_pengeluaran);
+            $pengeluaranBarangList = $pengeluaranBarangList->filter(function ($item) use ($search) {
+                return str_contains(strtolower($item['nama_barang']), $search) ||
+                    str_contains(strtolower($item['nomor_struk']), $search);
+            });
+        }
+
+        // Sort
+        switch ($request->sort_pengeluaran) {
+            case 'nama_asc':
+                $pengeluaranBarangList = $pengeluaranBarangList->sortBy(function ($item) {
+                    return strtolower($item['nama_barang']);
                 });
-            })
-            ->latest()
-            ->paginate(10, ['*'], 'pengeluaran_page');
+                break;
+            case 'nama_desc':
+                $pengeluaranBarangList = $pengeluaranBarangList->sortByDesc(function ($item) {
+                    return strtolower($item['nama_barang']);
+                });
+                break;
+
+            case 'tanggal_asc':
+                $pengeluaranBarangList = $pengeluaranBarangList->sortBy('tanggal');
+                break;
+            case 'tanggal_desc':
+            default:
+                $pengeluaranBarangList = $pengeluaranBarangList->sortByDesc('tanggal');
+                break;
+        }
+
+        // Paginate
+        $perPage = 10;
+        $currentPage = LengthAwarePaginator::resolveCurrentPage(); // default pakai 'page'
+
+        $currentItems = $pengeluaranBarangList->slice(($currentPage - 1) * $perPage, $perPage)->values();
+
+        $pengeluaranBarangList = new LengthAwarePaginator(
+            $currentItems,
+            $pengeluaranBarangList->count(),
+            $perPage,
+            $currentPage,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
 
         return view('dashboard', [
             'barangList' => $barangList,
+            'pengeluaranBarangList' => $pengeluaranBarangList,
             'totalStruk' => $totalStruk,
             'latestStruk' => $latestStruk,
-            'latestPengeluaranItems' => $latestPengeluaranItems,
             'latestPengeluaranStruk' => $latestPengeluaranStruk,
             'totalPemasukan' => $totalStrukPemasukan,
             'totalPengeluaran' => $totalStrukPengeluaran,
@@ -69,8 +121,7 @@ class DashboardController extends Controller
         ]);
     }
 
-
-    protected function processBarangList($struks, $search = null)
+    protected function processBarangList($struks, $search = null, $sort = null)
     {
         $barangList = [];
 
@@ -89,7 +140,6 @@ class DashboardController extends Controller
                         ];
                     } else {
                         $barangList[$nama]['jumlah'] += $item['jumlah'];
-                        // Update only if newer struk
                         if ($struk->tanggal_struk > $barangList[$nama]['tanggal']) {
                             $barangList[$nama]['nomor_struk'] = $struk->nomor_struk;
                             $barangList[$nama]['tanggal'] = $struk->tanggal_struk;
@@ -99,7 +149,6 @@ class DashboardController extends Controller
             }
         }
 
-        // Apply search filter if provided
         if ($search) {
             $barangList = collect($barangList)
                 ->filter(function ($item, $nama) use ($search) {
@@ -109,14 +158,36 @@ class DashboardController extends Controller
                 ->toArray();
         }
 
-        // Paginate the results
+        $barangList = collect($barangList);
+
+        switch ($sort) {
+            case 'nama_asc':
+                $barangList = $barangList->sortKeysUsing(function ($a, $b) {
+                    return strcasecmp($a, $b); // case-insensitive comparison
+                });
+                break;
+            case 'nama_desc':
+                $barangList = $barangList->sortKeysUsing(function ($a, $b) {
+                    return strcasecmp($b, $a); // reverse case-insensitive comparison
+                });
+                break;
+
+            case 'nama_desc':
+                $barangList = $barangList->sortKeysDesc();
+                break;
+            case 'tanggal_desc':
+            default:
+                $barangList = $barangList->sortByDesc('tanggal');
+                break;
+        }
+
         $perPage = 10;
         $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = collect($barangList)->slice(($currentPage - 1) * $perPage, $perPage)->all();
+        $currentItems = $barangList->slice(($currentPage - 1) * $perPage, $perPage)->all();
 
         return new LengthAwarePaginator(
             $currentItems,
-            count($barangList),
+            $barangList->count(),
             $perPage,
             $currentPage,
             ['path' => request()->url(), 'query' => request()->query()]

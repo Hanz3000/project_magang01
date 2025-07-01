@@ -14,7 +14,7 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Proses login
+
     public function login(Request $request)
     {
         // Validasi form login
@@ -76,17 +76,9 @@ class AuthController extends Controller
         return redirect('/login');
     }
 
-    protected function authenticated(Request $request, $user)
-    {
-        session(['show_welcome' => true]);
-    }
-
     public function index()
     {
-        if (session('show_welcome')) {
-            session()->forget('show_welcome');
-        }
-        // ...logic lain...
-        return view('dashboard');
+        $showWelcome = session()->pull('show_welcome', false);
+        return view('dashboard', compact('showWelcome'));
     }
 }
