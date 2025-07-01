@@ -96,13 +96,11 @@ class TransaksiController extends Controller
             'daftar_barang' => $struk->items,
             'total' => $struk->total_harga,
             'jumlah_item' => count(json_decode($struk->items, true)),
-            'bukti_pembayaran' => $struk->foto_struk
+            'bukti_pembayaran' => $struk->foto_struk,
+            'from_income' => $struk->id // Tambahkan ini untuk relasi ke income
         ]);
 
-        // Pilih salah satu redirect berikut:
-        return redirect()->route('struks.pengeluarans.index') // Jika ingin ke daftar pengeluaran umum
-            // atau
-            // return redirect()->route('struks.show', $struk->id) // Jika ingin kembali ke detail struk
+        return redirect()->route('struks.pengeluarans.index')
             ->with('success', 'Pengeluaran berhasil dibuat dari pemasukan.');
     }
 
@@ -142,12 +140,16 @@ class TransaksiController extends Controller
         return response()->json($barangs);
     }
 
-    /**
-     * Get items from struk for edit modal
-     */
     public function getStrukItems($id)
     {
         $struk = Struk::findOrFail($id);
-        return response()->json(json_decode($struk->items, true));
+
+        // Decode JSON items
+        $items = json_decode($struk->items, true);
+
+        return response()->json([
+            'items' => $items ?: [],
+            'photo_url' => $struk->foto_struk ? asset('storage/' . $struk->foto_struk) : null
+        ]);
     }
 }

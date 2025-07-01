@@ -143,28 +143,55 @@
                             <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-red-600">
                                 Rp{{ number_format($pengeluaran->total, 0, ',', '.') }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                @if ($pengeluaran->bukti_pembayaran)
-                                @php
-                                $imagePath =
-                                strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
-                                ? $pengeluaran->bukti_pembayaran
-                                : 'storage/' . $pengeluaran->bukti_pembayaran;
-                                @endphp
-                                <button onclick="openModal('{{ asset($imagePath) }}')"
-                                    class="text-indigo-600 hover:text-indigo-900">
-                                    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                        </path>
-                                    </svg>
-                                    <span class="text-xs text-gray-500">Lihat</span>
-                                </button>
-                                @else
-                                <span class="text-gray-400 italic text-xs">-</span>
-                                @endif
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="flex flex-col items-center">
+
+
+                                    @php
+                                    $imagePath = null;
+                                    $source = null;
+
+                                    // Cek bukti pembayaran pengeluaran
+                                    if ($pengeluaran->bukti_pembayaran) {
+                                    $imagePath = strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
+                                    ? $pengeluaran->bukti_pembayaran
+                                    : 'storage/' . $pengeluaran->bukti_pembayaran;
+                                    $source = 'pengeluaran';
+                                    }
+                                    // Cek bukti pembayaran dari income jika ada relasi
+                                    elseif ($pengeluaran->income && $pengeluaran->income->bukti_pembayaran) {
+                                    $imagePath = strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
+                                    ? $pengeluaran->income->bukti_pembayaran
+                                    : 'storage/' . $pengeluaran->income->bukti_pembayaran;
+                                    $source = 'income';
+                                    }
+                                    @endphp
+
+                                    {{-- Tampilkan gambar jika ada --}}
+                                    @if ($imagePath)
+                                    <img src="{{ asset($imagePath) }}" alt="Bukti Pembayaran"
+                                        class="w-24 h-24 object-cover rounded shadow mb-2 cursor-pointer hover:opacity-90"
+                                        onclick="openModal('{{ asset($imagePath) }}')">
+
+                                    <span class="text-xs text-gray-500 mb-1">
+                                        Lihat {{ $source === 'income' ? '(Dari Pemasukan)' : '' }}
+                                    </span>
+                                    @else
+                                    <span class="text-gray-400 italic text-xs mb-2">Tidak ada bukti</span>
+                                    @endif
+
+                                    {{-- Informasi income --}}
+                                    @if($pengeluaran->income)
+                                    <div class="text-xs text-center bg-green-50 p-2 rounded-lg">
+                                        <p class="font-semibold text-green-700">Info Pemasukan:</p>
+                                        <p>Tanggal: {{ $pengeluaran->income->tanggal ?? '-' }}</p>
+                                        <p>Total: Rp {{ number_format($pengeluaran->income->total_harga ?? 0, 0, ',', '.') }}</p>
+                                        <p>Barang: {{ $pengeluaran->income->items ? count(json_decode($pengeluaran->income->items, true)) : 0 }} item</p>
+                                    </div>
+                                    @endif
+                                </div>
                             </td>
+
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex justify-center space-x-2">
                                     <a href="{{ route('pengeluarans.show', $pengeluaran->id) }}"

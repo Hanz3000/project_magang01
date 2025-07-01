@@ -265,4 +265,14 @@ class StrukController extends Controller
         return redirect()->route('struks.index')
             ->with('success', count($selectedIds) . ' struk berhasil dihapus');
     }
+
+
+    public function getItems(Struk $struk)
+    {
+        $items = json_decode($struk->items, true);
+        return response()->json([
+            'items' => $items,
+            'foto_struk' => $struk->foto_struk
+        ]);
+    }
 }

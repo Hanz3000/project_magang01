@@ -12,7 +12,7 @@ class PengeluaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengeluaran::with('pegawai');
+        $query = Pengeluaran::with(['pegawai', 'income']); // Tambahkan 'income'
 
         if ($request->has('search') && $request->search != '') {
             $query->where('nama_toko', 'like', '%' . $request->search . '%')

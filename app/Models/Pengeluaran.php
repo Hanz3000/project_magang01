@@ -58,4 +58,9 @@ class Pengeluaran extends Model
     {
         return static::sum('jumlah_item');
     }
+
+    public function income()
+    {
+        return $this->belongsTo(Income::class, 'from_income'); // Sesuaikan dengan nama kolom foreign key Anda
+    }
 }
