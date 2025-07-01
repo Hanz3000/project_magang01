@@ -713,7 +713,8 @@
                         <form action="{{ route('pengeluarans.store') }}" method="POST">
                             @csrf
                             <input type="hidden" name="from_income" value="1">
-
+                            {{-- Tambahkan input hidden items agar validasi tidak error --}}
+                            <input type="hidden" name="items[]" value="">
                             <div class="section-title">
                                 <i class="fas fa-money-bill-wave"></i>
                                 <span>Buat Pengeluaran dari Pemasukan</span>
