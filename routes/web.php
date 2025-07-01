@@ -97,16 +97,12 @@ Route::middleware('auth')->group(function () {
         Route::put('/{pengeluaran}', [PengeluaranController::class, 'update'])->name('pengeluarans.update');
         Route::delete('/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluarans.destroy');
 
-        // Export routes
-        Route::get('/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
-        Route::get('/export/csv', [PengeluaranController::class, 'exportCSV'])->name('pengeluarans.export.csv');
+        // Route khusus untuk pengeluaran dari struk
+        Route::get('/from-struk/{struk}', [PengeluaranController::class, 'createByStruk'])
+            ->name('pengeluarans.create-by-struk');
+        Route::post('/from-struk/{struk}', [PengeluaranController::class, 'storeByStruk'])
+            ->name('pengeluarans.store-by-struk');
     });
-    // routes/web.php
-    /// Route untuk pengeluaran dari struk
-    Route::get('/struks/{struk}/pengeluarans', [PengeluaranController::class, 'indexByStruk'])
-        ->name('struks.pengeluaran.index');
-
-    // Route untuk menyimpan pengeluaran dari transaksi
-    Route::post('/transaksi/pengeluaran', [TransaksiController::class, 'storePengeluaran'])
-        ->name('transaksi.store.pengeluaran');
+    Route::get('pengeluarans/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
+    Route::get('pengeluarans/export/csv', [PengeluaranController::class, 'exportCsv'])->name('pengeluarans.export.csv');
 });
