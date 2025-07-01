@@ -527,6 +527,7 @@
                             </div>
                         </div>
 
+<<<<<<< HEAD
                         <div class="input-group">
                             <label for="pegawai_id">
                                 <i class="fas fa-user-tie mr-1"></i>
@@ -538,6 +539,16 @@
                                 <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
                                 @endforeach
                             </select>
+=======
+                        <div class="file-preview" id="file-preview">
+                            <img id="preview-image" src="#" alt="Preview Foto Struk" class="hidden">
+                            <div class="file-info">
+                                <span id="file-name"></span>
+                                <button type="button" onclick="removePhoto()" class="remove-file-btn">
+                                    <i class="fas fa-trash mr-1"></i>Hapus
+                                </button>
+                            </div>
+>>>>>>> 5ae08cd297205b1350ea266ce725da3616048a16
                         </div>
 
                         <div class="button-group">
@@ -801,6 +812,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+<<<<<<< HEAD
     $(document).ready(function() {
         // Initialize Select2
         $('.select-barang').select2({
@@ -831,6 +843,28 @@
             document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
             document.getElementById(`${tabName}-form`).classList.add('active');
         }
+=======
+$(document).ready(function() {
+    // Initialize Select2
+    $('.select-barang').select2({
+        placeholder: "Pilih barang...",
+        width: '100%'
+    });
+
+    $('#struk_id').select2({
+        placeholder: "Pilih struk...",
+        width: '100%'
+    });
+
+    $('#pegawai_id, #from_income_pegawai_id').select2({
+        placeholder: "Pilih pegawai...",
+        width: '100%'
+    });
+
+    // Tab switching
+    $('.tab-button').click(function() {
+        const tabId = $(this).data('tab');
+>>>>>>> 5ae08cd297205b1350ea266ce725da3616048a16
 
         // Update active tab button
         $('.tab-button').removeClass('active');
@@ -988,7 +1022,30 @@
                     );
                 });
 
+<<<<<<< HEAD
                 const newRow = $(`
+=======
+                html += '</tbody></table>';
+                $('#income-items-preview').html(html);
+            } else {
+                $('#income-items-preview').html(
+                    '<p class="text-gray-500">Tidak ada barang dalam struk ini</p>');
+            }
+        },
+        error: function() {
+            $('#income-items-preview').html('<p class="text-red-500">Gagal memuat daftar barang</p>');
+        }
+    });
+}
+
+// Income items management
+let incomeItemIndex = 1;
+
+function addIncomeItem() {
+    const container = $('#income-items-container');
+
+    const newRow = $(`
+>>>>>>> 5ae08cd297205b1350ea266ce725da3616048a16
             <tr class="item-row" data-item="${incomeItemIndex}">
                 <td>
                     <div class="input-group">
