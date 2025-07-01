@@ -30,53 +30,43 @@ class PengeluaranController extends Controller
                     ->orWhere('nomor_struk', 'like', "%{$search}%")
                     ->orWhereJsonContains('daftar_barang', ['nama' => $search]);
             })
-            ->orderBy('tanggal', 'desc')
+            ->orderBy('tanggal', 'desc') // Newest first by date
             ->paginate(self::ITEMS_PER_PAGE);
 
-        return view('struks.pengeluaran.index', compact('pengeluarans', 'search'));
+        $totalPengeluaran = Pengeluaran::sum('total');
+
+        return view('struks.pengeluaran.index', compact('pengeluarans', 'search', 'totalPengeluaran'));
     }
 
     public function create()
     {
         $pegawais = Pegawai::all();
-        return view('struks.pengeluaran.create', compact('pegawais'));
+        $struks = \App\Models\Struk::all(); // ambil semua pemasukan (struk)
+        return view('struks.pengeluaran.create', compact('pegawais', 'struks'));
     }
 
     public function store(Request $request)
     {
-        $validated = $this->validatePengeluaran($request);
+        $validated = $request->validate([
+            'struk_id' => 'required|exists:struks,id',
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'tanggal' => 'required|date',
+        ]);
 
-        try {
-            $processedItems = $this->processItems($validated['items']);
-            $total = $this->calculateTotal($processedItems);
-            $fotoPath = $this->handleFileUpload($request->file('bukti_pembayaran'));
+        $struk = \App\Models\Struk::findOrFail($validated['struk_id']);
 
-            $pengeluaran = Pengeluaran::create([
-                'nama_toko' => $validated['nama_toko'],
-                'nomor_struk' => $validated['nomor_struk'],
-                'tanggal' => $validated['tanggal'],
-                'pegawai_id' => $validated['pegawai_id'],
-                'daftar_barang' => $processedItems,
-                'total' => $total,
-                'jumlah_item' => count($processedItems),
-                'bukti_pembayaran' => $fotoPath,
-            ]);
+        $pengeluaran = Pengeluaran::create([
+            'nama_toko' => $struk->nama_toko,
+            'nomor_struk' => $struk->nomor_struk,
+            'tanggal' => $validated['tanggal'],
+            'pegawai_id' => $validated['pegawai_id'],
+            'daftar_barang' => json_decode($struk->items, true),
+            'total' => $struk->total_harga,
+            'jumlah_item' => count(json_decode($struk->items, true)),
+            'bukti_pembayaran' => $struk->foto_struk, // Use the same image path
+        ]);
 
-            Log::info('Pengeluaran created', ['id' => $pengeluaran->id]);
-
-            return redirect()
-                ->route('pengeluarans.index')
-                ->with('success', 'Data pengeluaran berhasil disimpan.');
-        } catch (\Exception $e) {
-            Log::error('Error saving pengeluaran', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return back()
-                ->with('error', 'Gagal menyimpan data: ' . $e->getMessage())
-                ->withInput();
-        }
+        return redirect()->route('pengeluarans.index')->with('success', 'Data pengeluaran berhasil dibuat dari pemasukan.');
     }
 
     public function show(Pengeluaran $pengeluaran)
@@ -87,40 +77,44 @@ class PengeluaranController extends Controller
     public function edit(Pengeluaran $pengeluaran)
     {
         $pegawais = Pegawai::all();
+
+        // Ensure all items have subtotal calculated
+        $items = is_array($pengeluaran->daftar_barang)
+            ? $pengeluaran->daftar_barang
+            : json_decode($pengeluaran->daftar_barang, true);
+
+        $items = array_map(function($item) {
+            if (!isset($item['subtotal'])) {
+                $item['subtotal'] = $item['jumlah'] * $item['harga'];
+            }
+            return $item;
+        }, $items);
+
+        $pengeluaran->daftar_barang = $items;
+
         return view('struks.pengeluaran.edit', compact('pengeluaran', 'pegawais'));
     }
 
     public function update(Request $request, Pengeluaran $pengeluaran)
     {
-        $validated = $this->validatePengeluaran($request, $pengeluaran);
+        $validated = $request->validate([
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'tanggal' => 'required|date',
+            // Hapus validasi untuk bukti_pembayaran karena tidak bisa diubah
+        ]);
 
         try {
-            $processedItems = $this->processItems($validated['items']);
-            $total = $this->calculateTotal($processedItems);
-            $fotoPath = $this->handleFileUpload($request->file('bukti_pembayaran'), $pengeluaran->bukti_pembayaran);
-
+            // Hanya update pegawai_id dan tanggal
             $pengeluaran->update([
-                'nama_toko' => $validated['nama_toko'],
-                'nomor_struk' => $validated['nomor_struk'],
-                'tanggal' => $validated['tanggal'],
                 'pegawai_id' => $validated['pegawai_id'],
-                'daftar_barang' => $processedItems,
-                'total' => $total,
-                'jumlah_item' => count($processedItems),
-                'bukti_pembayaran' => $fotoPath ?? $pengeluaran->bukti_pembayaran,
+                'tanggal' => $validated['tanggal'],
+                // Tidak update bukti_pembayaran
             ]);
-
-            Log::info('Pengeluaran updated', ['id' => $pengeluaran->id]);
 
             return redirect()
                 ->route('pengeluarans.index')
                 ->with('success', 'Data berhasil diperbarui.');
         } catch (\Exception $e) {
-            Log::error('Error updating pengeluaran', [
-                'id' => $pengeluaran->id,
-                'error' => $e->getMessage()
-            ]);
-
             return back()
                 ->with('error', 'Gagal memperbarui data: ' . $e->getMessage())
                 ->withInput();
