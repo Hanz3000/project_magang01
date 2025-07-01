@@ -3,509 +3,383 @@
 @section('content')
 {{-- Select2 CSS --}}
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-{{-- Font Awesome untuk ikon --}}
+{{-- Font Awesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <style>
-    /* === FONT CONSISTENCY === */
-    * {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
+/* === GLOBAL STYLES === */
+* {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-sizing: border-box;
+}
 
-    /* Base font sizes */
-    :root {
-        --font-xs: 0.75rem;
-        --font-sm: 0.875rem;
-        --font-base: 1rem;
-        --font-lg: 1.125rem;
-        --font-xl: 1.25rem;
-        --font-2xl: 1.5rem;
-    }
+:root {
+    --font-xs: 0.75rem;
+    /* 12px */
+    --font-sm: 0.875rem;
+    /* 14px */
+    --font-base: 1rem;
+    /* 16px */
+    --font-lg: 1.125rem;
+    /* 18px */
+    --font-xl: 1.25rem;
+    /* 20px */
+    --font-2xl: 1.5rem;
+    /* 24px */
 
-    .form-card {
-        background: white;
-        border-radius: 16px;
-        padding: 2px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e2e8f0;
-    }
+    --primary: #5a67d8;
+    --primary-hover: #4c51bf;
+    --secondary: #718096;
+    --secondary-hover: #4a5568;
+    --danger: #e53e3e;
+    --danger-hover: #c53030;
+    --success: #48bb78;
+    --error: #e53e3e;
+    --border: #e2e8f0;
+    --bg-light: #f8fafc;
+}
 
+/* === FORM CONTAINER === */
+.form-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.form-card {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border);
+    overflow: hidden;
+}
+
+.form-inner {
+    padding: 2.5rem;
+}
+
+/* === FORM ELEMENTS === */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: var(--font-xl);
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #edf2f7;
+}
+
+.section-title i {
+    font-size: var(--font-lg);
+    color: var(--primary);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.input-group label {
+    position: absolute;
+    top: -0.5rem;
+    left: 0.75rem;
+    background: white;
+    padding: 0 0.5rem;
+    font-size: var(--font-sm);
+    font-weight: 600;
+    color: #4a5568;
+    z-index: 10;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    font-size: var(--font-base);
+    background: var(--bg-light);
+    transition: all 0.2s ease;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: white;
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
+}
+
+/* === BUTTONS === */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 2rem;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    font-size: var(--font-base);
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--secondary);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: var(--secondary-hover);
+}
+
+/* === ALERTS === */
+.alert {
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid;
+    font-size: var(--font-base);
+}
+
+.alert-success {
+    background: #f0fff4;
+    color: #22543d;
+    border-left-color: var(--success);
+}
+
+.alert-error {
+    background: #fed7d7;
+    color: #742a2a;
+    border-left-color: var(--error);
+}
+
+.alert ul {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+/* === SELECT2 CUSTOMIZATION === */
+.select2-container--default .select2-selection--single {
+    border: 1px solid var(--border) !important;
+    border-radius: 0.75rem !important;
+    padding: 0.75rem !important;
+    height: auto !important;
+    background: var(--bg-light) !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 100% !important;
+    right: 0.75rem !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1) !important;
+}
+
+/* === TAB STYLES === */
+.tab-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tab-header {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.tab-button {
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--secondary);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-button:hover {
+    color: var(--primary);
+}
+
+.tab-button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.tab-content {
+    display: none;
+    flex: 1;
+    padding: 1rem 0;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* === EXPENSE TYPE SELECTOR === */
+.expense-type-selector {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.expense-type-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.expense-type-btn:hover {
+    background: #edf2f7;
+}
+
+.expense-type-btn.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* === ITEM TABLE STYLES === */
+.item-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+}
+
+.item-table th {
+    text-align: left;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-bottom: 2px solid var(--border);
+}
+
+.item-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.item-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* === FILE UPLOAD STYLES === */
+.file-upload-container {
+    border: 2px dashed var(--border);
+    border-radius: 0.75rem;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 1rem;
+}
+
+.file-upload-container:hover {
+    border-color: var(--primary);
+    background: rgba(90, 103, 216, 0.05);
+}
+
+.file-upload-container i {
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.file-preview {
+    display: none;
+    margin-top: 1rem;
+}
+
+.file-preview img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.remove-file-btn {
+    color: var(--danger);
+    cursor: pointer;
+}
+
+.remove-file-btn:hover {
+    color: var(--danger-hover);
+}
+
+/* === RESPONSIVE ADJUSTMENTS === */
+@media (max-width: 768px) {
     .form-inner {
-        background: white;
-        border-radius: 14px;
-        padding: 2.5rem;
+        padding: 1.5rem;
     }
 
-    .input-group {
-        position: relative;
-        margin-bottom: 1.5rem;
+    .form-grid {
+        grid-template-columns: 1fr;
     }
 
-    .input-group input,
-    .input-group select {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: var(--font-base);
-        font-weight: 400;
-        transition: all 0.2s ease;
-        background: #f8fafc;
-    }
-
-    .input-group input:focus,
-    .input-group select:focus {
-        outline: none;
-        border-color: #5a67d8;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1);
-    }
-
-    .input-group label {
-        position: absolute;
-        top: -8px;
-        left: 12px;
-        background: white;
-        padding: 0 8px;
-        font-size: var(--font-sm);
-        font-weight: 600;
-        color: #4a5568;
-    }
-
-    .section-title {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: var(--font-xl);
-        font-weight: 700;
-        color: #2d3748;
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
-        border-bottom: 2px solid #edf2f7;
-    }
-
-    .item-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0 12px;
-    }
-
-    .item-table thead th {
-        background: #f7fafc;
-        padding: 12px 16px;
-        text-align: left;
-        font-weight: 600;
-        font-size: var(--font-sm);
-        color: #4a5568;
-        border-bottom: 2px solid #e2e8f0;
-    }
-
-    .item-row {
-        background: white;
-        border-radius: 10px;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-        transition: all 0.2s ease;
-    }
-
-    .item-row:hover {
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .item-row td {
-        padding: 16px;
-        vertical-align: middle;
-        border-top: 1px solid #edf2f7;
-        border-bottom: 1px solid #edf2f7;
-        font-size: var(--font-base);
-    }
-
-    .item-row td:first-child {
-        border-left: 1px solid #edf2f7;
-        border-top-left-radius: 10px;
-        border-bottom-left-radius: 10px;
-    }
-
-    .item-row td:last-child {
-        border-right: 1px solid #edf2f7;
-        border-top-right-radius: 10px;
-        border-bottom-right-radius: 10px;
+    .button-group {
+        flex-direction: column-reverse;
+        gap: 0.75rem;
     }
 
     .btn {
-        padding: 10px 20px;
-        border-radius: 10px;
-        font-weight: 600;
-        font-size: var(--font-sm);
-        transition: all 0.2s ease;
-        border: none;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-primary {
-        background: #5a67d8;
-        color: white;
-        font-size: var(--font-base);
-        padding: 12px 24px;
-    }
-
-    .btn-primary:hover {
-        background: #4c51bf;
-        transform: translateY(-1px);
-    }
-
-    .btn-secondary {
-        background: #718096;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #4a5568;
-    }
-
-    .btn-danger {
-        background: #e53e3e;
-        color: white;
-        padding: 8px 12px;
-        font-size: var(--font-sm);
-        border-radius: 8px;
-    }
-
-    .btn-danger:hover {
-        background: #c53030;
-    }
-
-    .file-upload-container {
-        border: 2px dashed #cbd5e0;
-        border-radius: 12px;
-        padding: 2rem;
-        text-align: center;
-        transition: all 0.2s ease;
-        cursor: pointer;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .file-upload-container:hover {
-        border-color: #5a67d8;
-        background: #f8fafc;
-    }
-
-    .file-upload-container input {
-        display: none;
-    }
-
-    .file-upload-container p:first-of-type {
-        font-size: var(--font-lg);
-        font-weight: 600;
-        color: #4a5568;
-    }
-
-    .file-upload-container p:last-of-type {
-        font-size: var(--font-sm);
-        color: #718096;
-        margin-top: 0.5rem;
-    }
-
-    .file-preview {
-        margin-top: 1.5rem;
-        display: none;
-    }
-
-    .file-preview img {
-        max-width: 100%;
-        max-height: 300px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-    }
-
-    .file-preview .mt-3 span {
-        font-size: var(--font-sm);
-        color: #4a5568;
-    }
-
-    .file-preview .mt-3 button {
-        font-size: var(--font-sm);
-        color: #e53e3e;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-
-    .file-preview .mt-3 button:hover {
-        color: #c53030;
-    }
-
-    .alert {
-        padding: 1rem 1.5rem;
-        border-radius: 10px;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid;
-        font-size: var(--font-base);
-    }
-
-    .alert-success {
-        background: #f0fff4;
-        color: #22543d;
-        border-left-color: #48bb78;
-    }
-
-    .alert-error {
-        background: #fed7d7;
-        color: #742a2a;
-        border-left-color: #e53e3e;
-    }
-
-    .alert ul {
-        margin-top: 0.5rem;
-        font-size: var(--font-sm);
-    }
-
-    .currency-input {
-        position: relative;
-    }
-
-    .currency-input span {
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #718096;
-        font-size: var(--font-base);
-        font-weight: 500;
-    }
-
-    .currency-input input {
-        padding-left: 30px !important;
-    }
-
-    .subtotal-display {
-        font-weight: 600;
-        font-size: var(--font-base);
-        color: #2d3748;
-    }
-
-    .select2-container--default .select2-selection--single {
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 10px !important;
-        padding: 8px !important;
-        height: auto !important;
-        background: #f8fafc !important;
-        font-size: var(--font-base) !important;
-    }
-
-    .select2-container--default .select2-selection--single .select2-selection__rendered {
-        font-size: var(--font-base) !important;
-        color: #4a5568 !important;
-        font-weight: 400 !important;
-    }
-
-    .select2-container--default.select2-container--focus .select2-selection--single {
-        border-color: #5a67d8 !important;
-        box-shadow: 0 0 0 3px rgba(90, 103, 216, 0.1) !important;
-    }
-
-    .select2-container--default .select2-search--dropdown .select2-search__field {
-        border: 1px solid #e2e8f0 !important;
-        border-radius: 6px !important;
-        padding: 8px !important;
-        font-size: var(--font-base) !important;
-    }
-
-    .select2-container--default .select2-results__option--highlighted[aria-selected] {
-        background-color: #5a67d8 !important;
-    }
-
-    .select2-container--default .select2-results__option {
-        padding: 8px 12px;
-        position: relative;
-        padding-left: 35px;
-        font-size: var(--font-base) !important;
-    }
-
-    .select2-container--default .select2-results__option:before {
-        content: "";
-        position: absolute;
-        left: 12px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 16px;
-        height: 16px;
-        border: 1px solid #e2e8f0;
-        border-radius: 3px;
-        background: white;
-    }
-
-    .select2-container--default .select2-results__option[aria-selected=true]:before,
-    .select2-container--default .select2-results__option--highlighted[aria-selected]:before {
-        content: "✓";
-        color: white;
-        background-color: #5a67d8;
-        border-color: #5a67d8;
-        display: flex;
-        align-items: center;
+        width: 100%;
         justify-content: center;
-        font-size: var(--font-xs);
     }
 
-    .select2-container--open .select2-dropdown {
-        top: 0;
-        bottom: auto;
-        border-radius: 0 0 10px 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        border: 1px solid #e2e8f0;
-        border-top: none;
+    .expense-type-selector {
+        flex-direction: column;
     }
-
-    .total-display {
-        font-size: var(--font-2xl);
-        font-weight: 700;
-        color: #2d3748;
-        padding: 1rem;
-        background: #f7fafc;
-        border-radius: 10px;
-        text-align: right;
-        margin: 1.5rem 0;
-    }
-
-    /* Tabs styling */
-    .tabs {
-        display: flex;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .tab {
-        padding: 0.75rem 1.5rem;
-        cursor: pointer;
-        font-weight: 600;
-        color: #718096;
-        border-bottom: 3px solid transparent;
-        transition: all 0.2s ease;
-    }
-
-    .tab.active {
-        color: #5a67d8;
-        border-bottom-color: #5a67d8;
-    }
-
-    .tab-content {
-        display: none;
-    }
-
-    .tab-content.active {
-        display: block;
-    }
-
-    /* Icon sizes consistency */
-    .section-title i {
-        font-size: var(--font-lg);
-    }
-
-    .btn i {
-        font-size: var(--font-sm);
-    }
-
-    .file-upload-container i {
-        font-size: 2.5rem;
-        color: #cbd5e0;
-        margin-bottom: 1rem;
-    }
-
-    .alert i {
-        font-size: var(--font-base);
-    }
-
-    .currency-input i,
-    .input-group label i {
-        font-size: var(--font-xs);
-    }
-
-    @media (max-width: 768px) {
-        .form-inner {
-            padding: 1.5rem;
-        }
-
-        .section-title {
-            font-size: var(--font-lg);
-        }
-
-        .item-table thead {
-            display: none;
-        }
-
-        .item-row td {
-            display: block;
-            text-align: right;
-            padding: 12px 16px;
-            border: none !important;
-            border-bottom: 1px solid #edf2f7 !important;
-            font-size: var(--font-base);
-        }
-
-        .item-row td:before {
-            content: attr(data-label);
-            float: left;
-            font-weight: 600;
-            font-size: var(--font-sm);
-            color: #4a5568;
-        }
-
-        .item-row td:first-child {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-            padding-top: 16px;
-        }
-
-        .item-row td:last-child {
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-            padding-bottom: 16px;
-            border-bottom: none !important;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-            font-size: var(--font-base);
-        }
-
-        .total-display {
-            font-size: var(--font-xl);
-            text-align: center;
-        }
-
-        .file-upload-container p:first-of-type {
-            font-size: var(--font-base);
-        }
-
-        .file-upload-container p:last-of-type {
-            font-size: var(--font-xs);
-        }
-
-        .tabs {
-            flex-direction: column;
-        }
-
-        .tab {
-            border-bottom: none;
-            border-left: 3px solid transparent;
-        }
-
-        .tab.active {
-            border-bottom: none;
-            border-left-color: #5a67d8;
-        }
-    }
+}
 </style>
 
-<div class="max-w-6xl mx-auto p-4 mt-8">
+<div class="form-container">
     <div class="form-card">
         <div class="form-inner">
-            {{-- Notifikasi --}}
+            {{-- Notifications --}}
             @if (session('success'))
             <div class="alert alert-success">
                 <i class="fas fa-check-circle mr-2"></i>
@@ -513,12 +387,11 @@
             </div>
             @endif
 
-            {{-- Error --}}
             @if ($errors->any())
             <div class="alert alert-error">
                 <i class="fas fa-exclamation-triangle mr-2"></i>
                 <strong>Terjadi kesalahan:</strong>
-                <ul class="list-disc list-inside mt-2">
+                <ul>
                     @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                     @endforeach
@@ -526,681 +399,721 @@
             </div>
             @endif
 
-            {{-- Tabs --}}
-            <div class="tabs">
-                <div class="tab active" onclick="switchTab('pemasukan')">
-                    <i class="fas fa-sign-in-alt mr-2"></i>Pemasukan
+            {{-- Tab Container --}}
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="income-tab">
+                        <i class="fas fa-sign-in-alt"></i> Pemasukan
+                    </button>
+                    <button class="tab-button" data-tab="expense-tab">
+                        <i class="fas fa-sign-out-alt"></i> Pengeluaran
+                    </button>
                 </div>
-                <div class="tab" onclick="switchTab('pengeluaran')">
-                    <i class="fas fa-sign-out-alt mr-2"></i>Pengeluaran
-                </div>
-            </div>
 
-            {{-- Form Pemasukan --}}
-            <div id="pemasukan-form" class="tab-content active">
-                <form action="{{ route('struks.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+                {{-- Income Tab Content --}}
+                <div id="income-tab" class="tab-content active">
+                    <form action="{{ route('struks.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
 
-                    {{-- Info Umum --}}
-                    <div class="section-title">
-                        <i class="fas fa-store"></i>
-                        Informasi Toko
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="input-group">
-                            <label for="nama_toko">
-                                <i class="fas fa-store-alt mr-1"></i>
-                                Nama Toko
-                            </label>
-                            <input type="text" id="nama_toko" name="nama_toko" placeholder="Masukkan nama toko"
-                                value="{{ old('nama_toko') }}" required>
+                        <div class="section-title">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Buat Pemasukan Baru</span>
                         </div>
 
-                        <div class="input-group">
-                            <label for="nomor_struk">
-                                <i class="fas fa-hashtag mr-1"></i>
-                                Nomor Struk
-                            </label>
-                            <input type="text" id="nomor_struk" name="nomor_struk" placeholder="Masukkan nomor struk"
-                                value="{{ old('nomor_struk') }}" required>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="nama_toko">
+                                    <i class="fas fa-store mr-1"></i>
+                                    Nama Toko
+                                </label>
+                                <input type="text" name="nama_toko" id="nama_toko" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="nomor_struk">
+                                    <i class="fas fa-receipt mr-1"></i>
+                                    Nomor Struk
+                                </label>
+                                <input type="text" name="nomor_struk" id="nomor_struk" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="tanggal_struk">
+                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                    Tanggal Struk
+                                </label>
+                                <input type="date" name="tanggal_struk" id="tanggal_struk" required
+                                    value="{{ old('tanggal_struk', date('Y-m-d')) }}">
+                            </div>
                         </div>
 
-                        <div class="input-group">
-                            <label for="tanggal_struk">
-                                <i class="fas fa-calendar mr-1"></i>
-                                Tanggal Struk
-                            </label>
-                            <input type="date" id="tanggal_struk" name="tanggal_struk"
-                                value="{{ old('tanggal_struk', date('Y-m-d')) }}" required>
+                        {{-- Items --}}
+                        <div class="section-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Daftar Barang</span>
                         </div>
-                    </div>
 
-                    {{-- Items --}}
-                    <div class="section-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        Daftar Barang
-                    </div>
-
-                    <div class="overflow-x-auto mb-6">
                         <table class="item-table">
                             <thead>
                                 <tr>
-                                    <th width="40%">Nama Barang</th>
-                                    <th width="15%">Jumlah</th>
-                                    <th width="20%">Harga Satuan</th>
-                                    <th width="20%">Subtotal</th>
-                                    <th width="5%"></th>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Harga Satuan</th>
+                                    <th>Subtotal</th>
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="items-container">
+                            <tbody id="income-items-container">
                                 <tr class="item-row" data-item="0">
-                                    <td data-label="Nama Barang">
+                                    <td>
                                         <div class="input-group">
                                             <select name="items[0][nama]" class="select-barang" required>
-                                                <option value="" disabled selected>Pilih Barang</option>
-                                                @foreach ($barangList as $barang)
+                                                <option value="">Pilih Barang</option>
+                                                @foreach($barangList as $barang)
                                                 <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}
                                                 </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                     </td>
-                                    <td data-label="Jumlah">
+                                    <td>
                                         <div class="input-group">
-                                            <input type="number" name="items[0][jumlah]" placeholder="0" class="jumlah"
-                                                min="1" oninput="updateTotal(this)" required>
+                                            <input type="number" name="items[0][jumlah]" class="jumlah" min="1"
+                                                value="1" required>
                                         </div>
                                     </td>
-                                    <td data-label="Harga Satuan">
-                                        <div class="input-group currency-input">
-                                            <span>Rp</span>
-                                            <input type="number" name="items[0][harga]" placeholder="0" class="harga"
-                                                min="0" oninput="updateTotal(this)" required>
+                                    <td>
+                                        <div class="input-group">
+                                            <input type="number" name="items[0][harga]" class="harga" min="0" required>
                                         </div>
                                     </td>
-                                    <td data-label="Subtotal">
+                                    <td>
                                         <div class="subtotal-display" id="subtotal-0">Rp 0</div>
                                         <input type="hidden" name="items[0][subtotal]" class="subtotal" value="0">
                                     </td>
                                     <td>
-                                        <button type="button" onclick="hapusBarang(this)" class="btn btn-danger">
+                                        <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
 
-                    <div class="text-center mb-6">
-                        <button type="button" onclick="tambahBarang()" class="btn btn-secondary">
-                            <i class="fas fa-plus"></i>
-                            Tambah Barang Lain
-                        </button>
-                    </div>
-
-                    {{-- Total --}}
-                    <div class="total-display" style="text-align: left;">
-                        Total Harga: <span id="total-display">Rp 0</span>
-                        <input type="hidden" name="total_harga" id="total_harga" value="0">
-                    </div>
-
-                    {{-- Upload Foto --}}
-                    <div class="section-title">
-                        <i class="fas fa-camera"></i>
-                        Upload Foto Struk
-                    </div>
-
-                    <div class="file-upload-container" onclick="document.getElementById('foto_struk').click()"
-                        id="upload-container">
-                        <input type="file" id="foto_struk" name="foto_struk" accept="image/*">
-                        <div>
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Klik untuk upload foto struk</p>
-                            <p>Maksimal 5MB • JPG, PNG</p>
-                        </div>
-                    </div>
-
-                    <div class="file-preview" id="file-preview">
-                        <img id="preview-image" src="#" alt="Preview Foto Struk" style="display: none;">
-                        <div class="mt-3 flex justify-between items-center">
-                            <span id="file-name"></span>
-                            <button type="button" onclick="hapusFoto()">
-                                <i class="fas fa-times"></i> Hapus
+                        <div class="text-center mb-6">
+                            <button type="button" onclick="addIncomeItem()" class="btn btn-secondary">
+                                <i class="fas fa-plus mr-2"></i>Tambah Barang
                             </button>
                         </div>
-                    </div>
 
-                    {{-- Submit Button --}}
-                    <div class="text-center mt-8">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i>
-                            Simpan Struk
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            {{-- Form Pengeluaran --}}
-            <div id="pengeluaran-form" class="tab-content">
-                <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
-                    {{-- Info Umum --}}
-                    <div class="section-title">
-                        <i class="fas fa-store"></i>
-                        Informasi Pengeluaran
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="input-group">
-                            <label for="pengeluaran_nama_toko">
-                                <i class="fas fa-store-alt mr-1"></i>
-                                Nama Toko
-                            </label>
-                            <input type="text" id="pengeluaran_nama_toko" name="nama_toko" placeholder="Masukkan nama toko"
-                                value="{{ old('nama_toko') }}" required>
+                        <div class="total-display">
+                            <strong>Total Pemasukan:</strong> <span id="income-total">Rp 0</span>
+                            <input type="hidden" name="total_harga" id="total_harga" value="0">
                         </div>
 
-                        <div class="input-group">
-                            <label for="pengeluaran_nomor_struk">
-                                <i class="fas fa-hashtag mr-1"></i>
-                                Nomor Struk
-                            </label>
-                            <input type="text" id="pengeluaran_nomor_struk" name="nomor_struk" placeholder="Masukkan nomor struk"
-                                value="{{ old('nomor_struk') }}" required>
+                        {{-- Receipt Photo --}}
+                        <div class="section-title">
+                            <i class="fas fa-camera"></i>
+                            <span>Foto Struk</span>
                         </div>
 
-                        <div class="input-group">
-                            <label for="pengeluaran_tanggal">
-                                <i class="fas fa-calendar mr-1"></i>
-                                Tanggal Pembelian
-                            </label>
-                            <input type="date" id="pengeluaran_tanggal" name="tanggal"
-                                value="{{ old('tanggal', date('Y-m-d')) }}" required>
+                        <div class="file-upload-container" onclick="document.getElementById('foto_struk').click()">
+                            <input type="file" name="foto_struk" id="foto_struk" accept="image/*"
+                                style="display: none;">
+                            <div>
+                                <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+                                <p>Klik untuk upload foto struk</p>
+                                <p>Format: JPG, PNG (Maks. 2MB)</p>
+                            </div>
                         </div>
 
-                        <div class="input-group">
-                            <label for="pegawai_id">
-                                <i class="fas fa-user-tie mr-1"></i>
-                                Pegawai
-                            </label>
-                            <select name="pegawai_id" id="pegawai_id" class="w-full" required>
-                                <option value="">-- Pilih Pegawai --</option>
-                                @foreach ($pegawais as $pegawai)
-                                    <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
-                                @endforeach
-                            </select>
+                        <div class="file-preview" id="file-preview">
+                            <img id="preview-image" src="#" alt="Preview Foto Struk" class="hidden">
+                            <div class="file-info">
+                                <span id="file-name"></span>
+                                <button type="button" onclick="removePhoto()" class="remove-file-btn">
+                                    <i class="fas fa-trash mr-1"></i>Hapus
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    {{-- Items --}}
-                    <div class="section-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        Daftar Barang
-                    </div>
-
-                    <div class="overflow-x-auto mb-6">
-                        <table class="item-table">
-                            <thead>
-                                <tr>
-                                    <th width="40%">Nama Barang</th>
-                                    <th width="15%">Jumlah</th>
-                                    <th width="20%">Harga Satuan</th>
-                                    <th width="20%">Subtotal</th>
-                                    <th width="5%"></th>
-                                </tr>
-                            </thead>
-                            <tbody id="pengeluaran-items-container">
-                                <tr class="item-row" data-item="0">
-                                    <td data-label="Nama Barang">
-                                        <div class="input-group">
-                                            <input type="text" name="items[0][nama]" placeholder="Nama Barang" required>
-                                        </div>
-                                    </td>
-                                    <td data-label="Jumlah">
-                                        <div class="input-group">
-                                            <input type="number" name="items[0][jumlah]" placeholder="0" class="pengeluaran-jumlah"
-                                                min="1" oninput="updatePengeluaranTotal(this)" required>
-                                        </div>
-                                    </td>
-                                    <td data-label="Harga Satuan">
-                                        <div class="input-group currency-input">
-                                            <span>Rp</span>
-                                            <input type="number" name="items[0][harga]" placeholder="0" class="pengeluaran-harga"
-                                                min="0" oninput="updatePengeluaranTotal(this)" required>
-                                        </div>
-                                    </td>
-                                    <td data-label="Subtotal">
-                                        <div class="subtotal-display" id="pengeluaran-subtotal-0">Rp 0</div>
-                                        <input type="hidden" name="items[0][subtotal]" class="pengeluaran-subtotal" value="0">
-                                    </td>
-                                    <td>
-                                        <button type="button" onclick="hapusPengeluaranBarang(this)" class="btn btn-danger">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="text-center mb-6">
-                        <button type="button" onclick="tambahPengeluaranBarang()" class="btn btn-secondary">
-                            <i class="fas fa-plus"></i>
-                            Tambah Barang Lain
-                        </button>
-                    </div>
-
-                    {{-- Total --}}
-                    <div class="total-display" style="text-align: left;">
-                        Total Pengeluaran: <span id="pengeluaran-total-display">Rp 0</span>
-                        <input type="hidden" name="total" id="pengeluaran-total" value="0">
-                    </div>
-
-                    {{-- Upload Foto --}}
-                    <div class="section-title">
-                        <i class="fas fa-camera"></i>
-                        Upload Bukti Pembayaran
-                    </div>
-
-                    <div class="file-upload-container" onclick="document.getElementById('pengeluaran_bukti_pembayaran').click()"
-                        id="pengeluaran-upload-container">
-                        <input type="file" id="pengeluaran_bukti_pembayaran" name="bukti_pembayaran" accept="image/*">
-                        <div>
-                            <i class="fas fa-cloud-upload-alt"></i>
-                            <p>Klik untuk upload bukti pembayaran</p>
-                            <p>Maksimal 5MB • JPG, PNG</p>
-                        </div>
-                    </div>
-
-                    <div class="file-preview" id="pengeluaran-file-preview">
-                        <img id="pengeluaran-preview-image" src="#" alt="Preview Bukti Pembayaran" style="display: none;">
-                        <div class="mt-3 flex justify-between items-center">
-                            <span id="pengeluaran-file-name"></span>
-                            <button type="button" onclick="hapusPengeluaranFoto()">
-                                <i class="fas fa-times"></i> Hapus
+                        <div class="button-group">
+                            <a href="{{ route('struks.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Simpan Pemasukan
                             </button>
                         </div>
-                    </div>
+                    </form>
+                </div>
 
-                    {{-- Submit Button --}}
-                    <div class="text-center mt-8">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i>
-                            Simpan Pengeluaran
+                {{-- Expense Tab Content --}}
+                <div id="expense-tab" class="tab-content">
+                    <div class="expense-type-selector">
+                        <button type="button" class="expense-type-btn active" data-expense-type="manual">
+                            <i class="fas fa-edit mr-2"></i>Input Manual
+                        </button>
+                        <button type="button" class="expense-type-btn" data-expense-type="from-income">
+                            <i class="fas fa-exchange-alt mr-2"></i>Dari Pemasukan
                         </button>
                     </div>
-                </form>
+
+                    {{-- Manual Expense Form --}}
+                    <div id="manual-expense" class="expense-form">
+                        <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
+
+                            <div class="section-title">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Buat Pengeluaran Manual</span>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="expense_nama_toko">
+                                        <i class="fas fa-store mr-1"></i>
+                                        Nama Toko
+                                    </label>
+                                    <input type="text" name="nama_toko" id="expense_nama_toko" required>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="expense_nomor_struk">
+                                        <i class="fas fa-receipt mr-1"></i>
+                                        Nomor Struk
+                                    </label>
+                                    <input type="text" name="nomor_struk" id="expense_nomor_struk" required>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="expense_tanggal">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Tanggal Pengeluaran
+                                    </label>
+                                    <input type="date" name="tanggal" id="expense_tanggal" required
+                                        value="{{ old('tanggal', date('Y-m-d')) }}">
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="pegawai_id">
+                                        <i class="fas fa-user-tie mr-1"></i>
+                                        Pegawai
+                                    </label>
+                                    <select name="pegawai_id" id="pegawai_id" required>
+                                        <option value="">Pilih Pegawai</option>
+                                        @foreach($pegawais as $pegawai)
+                                        <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            {{-- Items --}}
+                            <div class="section-title">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Daftar Barang</span>
+                            </div>
+
+                            <table class="item-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Harga Satuan</th>
+                                        <th>Subtotal</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expense-items-container">
+                                    <tr class="item-row" data-item="0">
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="text" name="items[0][nama]" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" name="items[0][jumlah]" class="expense-jumlah"
+                                                    min="1" value="1" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" name="items[0][harga]" class="expense-harga"
+                                                    min="0" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="subtotal-display" id="expense-subtotal-0">Rp 0</div>
+                                            <input type="hidden" name="items[0][subtotal]" class="expense-subtotal"
+                                                value="0">
+                                        </td>
+                                        <td>
+                                            <button type="button" onclick="removeExpenseItem(this)"
+                                                class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="text-center mb-6">
+                                <button type="button" onclick="addExpenseItem()" class="btn btn-secondary">
+                                    <i class="fas fa-plus mr-2"></i>Tambah Barang
+                                </button>
+                            </div>
+
+                            <div class="total-display">
+                                <strong>Total Pengeluaran:</strong> <span id="expense-total">Rp 0</span>
+                                <input type="hidden" name="total" id="expense_total" value="0">
+                            </div>
+
+                            {{-- Payment Proof --}}
+                            <div class="section-title">
+                                <i class="fas fa-camera"></i>
+                                <span>Bukti Pembayaran</span>
+                            </div>
+
+                            <div class="file-upload-container"
+                                onclick="document.getElementById('bukti_pembayaran').click()">
+                                <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*"
+                                    style="display: none;">
+                                <div>
+                                    <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+                                    <p>Klik untuk upload bukti pembayaran</p>
+                                    <p>Format: JPG, PNG (Maks. 2MB)</p>
+                                </div>
+                            </div>
+
+                            <div class="file-preview" id="expense-file-preview">
+                                <img id="expense-preview-image" src="#" alt="Preview Bukti Pembayaran" class="hidden">
+                                <div class="file-info">
+                                    <span id="expense-file-name"></span>
+                                    <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
+                                        <i class="fas fa-trash mr-1"></i>Hapus
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="button-group">
+                                <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>Simpan Pengeluaran
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    {{-- Expense From Income Form --}}
+                    <div id="from-income-expense" class="expense-form hidden">
+                        <form action="{{ route('pengeluarans.store') }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="from_income" value="1">
+
+                            <div class="section-title">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Buat Pengeluaran dari Pemasukan</span>
+                            </div>
+
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="struk_id">
+                                        <i class="fas fa-receipt mr-1"></i>
+                                        Pilih Struk Pemasukan
+                                    </label>
+                                    <select name="struk_id" id="struk_id" required>
+                                        <option value="">Pilih Struk</option>
+                                        @foreach($struks as $struk)
+                                        <option value="{{ $struk->id }}" data-total="{{ $struk->total_harga }}">
+                                            {{ $struk->nama_toko }} - {{ $struk->nomor_struk }}
+                                            (Rp{{ number_format($struk->total_harga, 0, ',', '.') }})
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="from_income_pegawai_id">
+                                        <i class="fas fa-user-tie mr-1"></i>
+                                        Pegawai
+                                    </label>
+                                    <select name="pegawai_id" id="from_income_pegawai_id" required>
+                                        <option value="">Pilih Pegawai</option>
+                                        @foreach($pegawais as $pegawai)
+                                        <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="from_income_tanggal">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Tanggal Pengeluaran
+                                    </label>
+                                    <input type="date" name="tanggal" id="from_income_tanggal" required
+                                        value="{{ old('tanggal', date('Y-m-d')) }}">
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="from_income_total">
+                                        <i class="fas fa-coins mr-1"></i>
+                                        Total Pemasukan
+                                    </label>
+                                    <input type="text" id="from_income_total" readonly>
+                                </div>
+                            </div>
+
+                            {{-- Items Preview --}}
+                            <div class="section-title">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Daftar Barang</span>
+                            </div>
+
+                            <div id="income-items-preview" class="mb-6">
+                                <p class="text-gray-500">Pilih struk untuk melihat daftar barang</p>
+                            </div>
+
+                            <div class="button-group">
+                                <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>Buat Pengeluaran
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-{{-- Scripts --}}
+{{-- JavaScript --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+$(document).ready(function() {
+    // Initialize Select2
+    $('.select-barang').select2({
+        placeholder: "Pilih barang...",
+        width: '100%'
+    });
+
+    $('#struk_id').select2({
+        placeholder: "Pilih struk...",
+        width: '100%'
+    });
+
+    $('#pegawai_id, #from_income_pegawai_id').select2({
+        placeholder: "Pilih pegawai...",
+        width: '100%'
+    });
+
     // Tab switching
-    function switchTab(tabName) {
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-        
-        document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        document.getElementById(`${tabName}-form`).classList.add('active');
-    }
+    $('.tab-button').click(function() {
+        const tabId = $(this).data('tab');
 
-    // ========== Pemasukan Scripts ==========
-    $(document).ready(function() {
-        // Inisialisasi Select2
-        initializeSelect2();
+        // Update active tab button
+        $('.tab-button').removeClass('active');
+        $(this).addClass('active');
 
-        // File upload preview
-        $('#foto_struk').change(function(e) {
-            handleFileUpload(e, '#preview-image', '#file-name', '#upload-container', '#file-preview');
-        });
-
-        // Format angka saat pertama kali load
-        updateGrandTotal();
+        // Update active tab content
+        $('.tab-content').removeClass('active');
+        $(`#${tabId}`).addClass('active');
     });
 
-    function initializeSelect2(element = '.select-barang') {
-        $(element).each(function() {
-            $(this).select2({
-                placeholder: "Cari atau pilih barang...",
-                width: '100%',
-                dropdownParent: $(this).closest('td'),
-                dropdownPosition: 'below',
-                language: {
-                    noResults: function() {
-                        return "Barang tidak ditemukan";
-                    },
-                    searching: function() {
-                        return "Mencari...";
-                    }
-                }
-            });
-        });
-    }
+    // Expense type switching
+    $('.expense-type-btn').click(function() {
+        const expenseType = $(this).data('expense-type');
 
-    let itemIndex = 1;
-    const barangOptions = @json($barangList);
+        // Update active button
+        $('.expense-type-btn').removeClass('active');
+        $(this).addClass('active');
 
-    function tambahBarang() {
-        const container = $('#items-container');
+        // Show corresponding form
+        $('.expense-form').addClass('hidden');
+        $(`#${expenseType}-expense`).removeClass('hidden');
+    });
 
-        let selectHtml = `<select name="items[${itemIndex}][nama]" class="select-barang" required>
-                            <option value="" disabled selected>Pilih Barang</option>`;
-        barangOptions.forEach(item => {
-            selectHtml += `<option value="${item.nama_barang}">${item.nama_barang}</option>`;
-        });
-        selectHtml += `</select>`;
+    // Update total when struk is selected
+    $('#struk_id').on('change', function() {
+        const selectedOption = $(this).find('option:selected');
+        const total = selectedOption.data('total');
+        const strukId = selectedOption.val();
 
-        const newRow = $(`
-            <tr class="item-row" data-item="${itemIndex}">
-                <td data-label="Nama Barang">
-                    <div class="input-group">
-                        ${selectHtml}
-                    </div>
-                </td>
-                <td data-label="Jumlah">
-                    <div class="input-group">
-                        <input type="number" 
-                               name="items[${itemIndex}][jumlah]" 
-                               placeholder="0"
-                               class="jumlah" 
-                               min="1"
-                               oninput="updateTotal(this)"
-                               required>
-                    </div>
-                </td>
-                <td data-label="Harga Satuan">
-                    <div class="input-group currency-input">
-                        <span>Rp</span>
-                        <input type="number" 
-                               name="items[${itemIndex}][harga]" 
-                               placeholder="0"
-                               class="harga" 
-                               min="0"
-                               oninput="updateTotal(this)"
-                               required>
-                    </div>
-                </td>
-                <td data-label="Subtotal">
-                    <div class="subtotal-display" id="subtotal-${itemIndex}">Rp 0</div>
-                    <input type="hidden" 
-                           name="items[${itemIndex}][subtotal]" 
-                           class="subtotal" 
-                           value="0">
-                </td>
-                <td>
-                    <button type="button" 
-                            onclick="hapusBarang(this)" 
-                            class="btn btn-danger">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-        `);
+        if (total) {
+            $('#from_income_total').val(formatRupiah(total));
 
-        newRow.hide();
-        container.append(newRow);
-        newRow.fadeIn(300);
-
-        initializeSelect2(newRow.find('.select-barang'));
-        itemIndex++;
-    }
-
-    function hapusBarang(button) {
-        const row = $(button).closest('.item-row');
-        row.fadeOut(300, function() {
-            row.remove();
-            updateGrandTotal();
-        });
-    }
-
-    function formatRupiah(angka) {
-        return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
-
-    function updateTotal(el) {
-        const row = $(el).closest('.item-row');
-        const itemId = row.data('item');
-        const jumlah = parseFloat(row.find('.jumlah').val()) || 0;
-        const harga = parseFloat(row.find('.harga').val()) || 0;
-        const subtotal = jumlah * harga;
-
-        $('#subtotal-' + itemId).text(formatRupiah(subtotal));
-        row.find('.subtotal').val(subtotal);
-
-        $('#subtotal-' + itemId).css({
-            'color': '#5a67d8',
-            'font-weight': 'bold',
-            'transition': 'all 0.3s ease'
-        });
-
-        setTimeout(() => {
-            $('#subtotal-' + itemId).css({
-                'color': '#2d3748',
-                'font-weight': '600'
-            });
-        }, 500);
-
-        updateGrandTotal();
-    }
-
-    function updateGrandTotal() {
-        let total = 0;
-        $('.subtotal').each(function() {
-            total += parseFloat($(this).val()) || 0;
-        });
-
-        $('#total_harga').val(total);
-        $('#total-display').text(formatRupiah(total));
-
-        $('#total-display').css({
-            'transform': 'scale(1.05)',
-            'display': 'inline-block',
-            'color': '#5a67d8'
-        });
-
-        setTimeout(() => {
-            $('#total-display').css({
-                'transform': 'scale(1)',
-                'color': '#2d3748'
-            });
-        }, 300);
-    }
-
-    function handleFileUpload(e, previewId, fileNameId, containerId, previewContainerId) {
-        const file = e.target.files[0];
-        if (file) {
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Ukuran file maksimal 5MB');
-                return;
+            // Fetch and display items
+            if (strukId) {
+                fetchStrukItems(strukId);
             }
+        } else {
+            $('#from_income_total').val('');
+            $('#income-items-preview').html(
+                '<p class="text-gray-500">Pilih struk untuk melihat daftar barang</p>');
+        }
+    });
 
+    // File upload preview for income
+    $('#foto_struk').change(function(e) {
+        previewImage(e, '#preview-image', '#file-name', '#file-preview');
+    });
+
+    // File upload preview for expense
+    $('#bukti_pembayaran').change(function(e) {
+        previewImage(e, '#expense-preview-image', '#expense-file-name', '#expense-file-preview');
+    });
+
+    // Initialize event listeners for existing rows
+    $('.item-row').each(function() {
+        const row = $(this);
+        row.find('.jumlah, .harga').on('input', function() {
+            updateIncomeSubtotal(row);
+        });
+
+        row.find('.expense-jumlah, .expense-harga').on('input', function() {
+            updateExpenseSubtotal(row);
+        });
+    });
+});
+
+// Format currency
+function formatRupiah(angka) {
+    return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+
+// Image preview
+function previewImage(event, previewId, fileNameId, previewContainerId) {
+    const input = event.target;
+    const file = input.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            $(previewId).attr('src', e.target.result).removeClass('hidden');
             $(fileNameId).text(file.name);
-            $(containerId).hide();
-
-            const reader = new FileReader();
-            reader.onload = function(event) {
-                $(previewId).attr('src', event.target.result).show();
-            }
-            reader.readAsDataURL(file);
-
-            $(previewContainerId).show();
+            $(previewContainerId).removeClass('hidden');
         }
-    }
 
-    function hapusFoto() {
-        $('#foto_struk').val('');
-        $('#preview-image').attr('src', '#').hide();
-        $('#file-name').text('');
-        $('#file-preview').hide();
-        $('#upload-container').show();
+        reader.readAsDataURL(file);
     }
+}
 
-    // Auto-focus ke field berikutnya
-    $(document).on('keypress', 'input[type="number"]', function(e) {
-        if (e.which === 13) { // Enter key
-            const inputs = $('input[type="number"]:visible');
-            const index = inputs.index(this);
-            if (index < inputs.length - 1) {
-                inputs.eq(index + 1).focus();
+// Remove photo
+function removePhoto() {
+    $('#foto_struk').val('');
+    $('#preview-image').attr('src', '#').addClass('hidden');
+    $('#file-name').text('');
+    $('#file-preview').addClass('hidden');
+}
+
+function removeExpensePhoto() {
+    $('#bukti_pembayaran').val('');
+    $('#expense-preview-image').attr('src', '#').addClass('hidden');
+    $('#expense-file-name').text('');
+    $('#expense-file-preview').addClass('hidden');
+}
+
+// Fetch struk items for preview
+function fetchStrukItems(strukId) {
+    $.ajax({
+        url: `/struks/${strukId}/items`,
+        method: 'GET',
+        dataType: 'json',
+        success: function(items) {
+            if (items.length > 0) {
+                let html = '<table class="item-table">';
+                html +=
+                    '<thead><tr><th>Nama Barang</th><th>Jumlah</th><th>Harga Satuan</th><th>Subtotal</th></tr></thead>';
+                html += '<tbody>';
+
+                items.forEach(item => {
+                    const subtotal = item.jumlah * item.harga;
+                    html += `
+                            <tr>
+                                <td>${item.nama}</td>
+                                <td>${item.jumlah}</td>
+                                <td>${formatRupiah(item.harga)}</td>
+                                <td>${formatRupiah(subtotal)}</td>
+                            </tr>
+                        `;
+                });
+
+                html += '</tbody></table>';
+                $('#income-items-preview').html(html);
+            } else {
+                $('#income-items-preview').html(
+                    '<p class="text-gray-500">Tidak ada barang dalam struk ini</p>');
             }
+        },
+        error: function() {
+            $('#income-items-preview').html('<p class="text-red-500">Gagal memuat daftar barang</p>');
         }
     });
+}
 
-    // ========== Pengeluaran Scripts ==========
-    let pengeluaranItemIndex = 1;
+// Income items management
+let incomeItemIndex = 1;
 
-    $(document).ready(function() {
-        // File upload preview
-        $('#pengeluaran_bukti_pembayaran').change(function(e) {
-            handleFileUpload(
-                e, 
-                '#pengeluaran-preview-image', 
-                '#pengeluaran-file-name', 
-                '#pengeluaran-upload-container', 
-                '#pengeluaran-file-preview'
-            );
-        });
+function addIncomeItem() {
+    const container = $('#income-items-container');
 
-        // Format angka saat pertama kali load
-        updatePengeluaranGrandTotal();
-    });
-
-    function tambahPengeluaranBarang() {
-        const container = $('#pengeluaran-items-container');
-
-        const newRow = $(`
-            <tr class="item-row" data-item="${pengeluaranItemIndex}">
-                <td data-label="Nama Barang">
+    const newRow = $(`
+            <tr class="item-row" data-item="${incomeItemIndex}">
+                <td>
                     <div class="input-group">
-                        <input type="text" 
-                               name="items[${pengeluaranItemIndex}][nama]" 
-                               placeholder="Nama Barang"
-                               required>
+                        <select name="items[${incomeItemIndex}][nama]" class="select-barang" required>
+                            <option value="">Pilih Barang</option>
+                            @foreach($barangList as $barang)
+                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                            @endforeach
+                        </select>
                     </div>
-                </td>
-                <td data-label="Jumlah">
-                    <div class="input-group">
-                        <input type="number" 
-                               name="items[${pengeluaranItemIndex}][jumlah]" 
-                               placeholder="0"
-                               class="pengeluaran-jumlah" 
-                               min="1"
-                               oninput="updatePengeluaranTotal(this)"
-                               required>
-                    </div>
-                </td>
-                <td data-label="Harga Satuan">
-                    <div class="input-group currency-input">
-                        <span>Rp</span>
-                        <input type="number" 
-                               name="items[${pengeluaranItemIndex}][harga]" 
-                               placeholder="0"
-                               class="pengeluaran-harga" 
-                               min="0"
-                               oninput="updatePengeluaranTotal(this)"
-                               required>
-                    </div>
-                </td>
-                <td data-label="Subtotal">
-                    <div class="subtotal-display" id="pengeluaran-subtotal-${pengeluaranItemIndex}">Rp 0</div>
-                    <input type="hidden" 
-                           name="items[${pengeluaranItemIndex}][subtotal]" 
-                           class="pengeluaran-subtotal" 
-                           value="0">
                 </td>
                 <td>
-                    <button type="button" 
-                            onclick="hapusPengeluaranBarang(this)" 
-                            class="btn btn-danger">
+                    <div class="input-group">
+                        <input type="number" name="items[${incomeItemIndex}][jumlah]" class="jumlah" min="1" value="1" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${incomeItemIndex}][harga]" class="harga" min="0" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="subtotal-display" id="subtotal-${incomeItemIndex}">Rp 0</div>
+                    <input type="hidden" name="items[${incomeItemIndex}][subtotal]" class="subtotal" value="0">
+                </td>
+                <td>
+                    <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
             </tr>
         `);
 
-        newRow.hide();
-        container.append(newRow);
-        newRow.fadeIn(300);
+    container.append(newRow);
+    $('.select-barang').select2();
 
-        pengeluaranItemIndex++;
-    }
+    // Initialize event listeners for the new row
+    newRow.find('.jumlah, .harga').on('input', function() {
+        updateIncomeSubtotal(newRow);
+    });
 
-    function hapusPengeluaranBarang(button) {
-        const row = $(button).closest('.item-row');
-        row.fadeOut(300, function() {
-            row.remove();
-            updatePengeluaranGrandTotal();
-        });
-    }
+    incomeItemIndex++;
+}
 
-    function updatePengeluaranTotal(el) {
-        const row = $(el).closest('.item-row');
-        const itemId = row.data('item');
-        const jumlah = parseFloat(row.find('.pengeluaran-jumlah').val()) || 0;
-        const harga = parseFloat(row.find('.pengeluaran-harga').val()) || 0;
-        const subtotal = jumlah * harga;
+function removeIncomeItem(button) {
+    const row = $(button).closest('.item-row');
+    row.fadeOut(300, function() {
+        row.remove();
+        updateIncomeTotal();
+    });
+}
 
-        $('#pengeluaran-subtotal-' + itemId).text(formatRupiah(subtotal));
-        row.find('.pengeluaran-subtotal').val(subtotal);
+function updateIncomeSubtotal(row) {
+    const itemId = row.data('item');
+    const quantity = parseFloat(row.find('.jumlah').val()) || 0;
+    const price = parseFloat(row.find('.harga').val()) || 0;
+    const subtotal = quantity * price;
 
-        $('#pengeluaran-subtotal-' + itemId).css({
-            'color': '#5a67d8',
-            'font-weight': 'bold',
-            'transition': 'all 0.3s ease'
-        });
+    $(`#subtotal-${itemId}`).text(formatRupiah(subtotal));
+    row.find('.subtotal').val(subtotal);
 
-        setTimeout(() => {
-            $('#pengeluaran-subtotal-' + itemId).css({
-                'color': '#2d3748',
-                'font-weight': '600'
-            });
-        }, 500);
+    updateIncomeTotal();
+}
 
-        updatePengeluaranGrandTotal();
-    }
+function updateIncomeTotal() {
+    let total = 0;
+    $('.subtotal').each(function() {
+        total += parseFloat($(this).val()) || 0;
+    });
 
-    function updatePengeluaranGrandTotal() {
-        let total = 0;
-        $('.pengeluaran-subtotal').each(function() {
-            total += parseFloat($(this).val()) || 0;
-        });
+    $('#total_harga').val(total);
+    $('#income-total').text(formatRupiah(total));
+}
 
-        $('#pengeluaran-total').val(total);
-        $('#pengeluaran-total-display').text(formatRupiah(total));
+// Expense items management
+let expenseItemIndex = 1;
 
-        $('#pengeluaran-total-display').css({
-            'transform': 'scale(1.05)',
-            'display': 'inline-block',
-            'color': '#5a67d8'
-        });
+function addExpenseItem() {
+    const container = $('#expense-items-container');
 
-        setTimeout(() => {
-            $('#pengeluaran-total-display').css({
-                'transform': 'scale(1)',
-                'color': '#2d3748'
-            });
-        }, 300);
-    }
+    const newRow = $(`
+            <tr class="item-row" data-item="${expenseItemIndex}">
+                <td>
+                    <div class="input-group">
+                        <input type="text" name="items[${expenseItemIndex}][nama]" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${expenseItemIndex}][jumlah]" class="expense-jumlah" min="1" value="1" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${expenseItemIndex}][harga]" class="expense-harga" min="0" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="subtotal-display" id="expense-subtotal-${expenseItemIndex}">Rp 0</div>
+                    <input type="hidden" name="items[${expenseItemIndex}][subtotal]" class="expense-subtotal" value="0">
+                </td>
+                <td>
+                    <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
 
-    function hapusPengeluaranFoto() {
-        $('#pengeluaran_bukti_pembayaran').val('');
-        $('#pengeluaran-preview-image').attr('src', '#').hide();
-        $('#pengeluaran-file-name').text('');
-        $('#pengeluaran-file-preview').hide();
-        $('#pengeluaran-upload-container').show();
-    }
+    container.append(newRow);
+
+    // Initialize event listeners for the new row
+    newRow.find('.expense-jumlah, .expense-harga').on('input', function() {
+        updateExpenseSubtotal(newRow);
+    });
+
+    expenseItemIndex++;
+}
+
+function removeExpenseItem(button) {
+    const row = $(button).closest('.item-row');
+    row.fadeOut(300, function() {
+        row.remove();
+        updateExpenseTotal();
+    });
+}
+
+function updateExpenseSubtotal(row) {
+    const itemId = row.data('item');
+    const quantity = parseFloat(row.find('.expense-jumlah').val()) || 0;
+    const price = parseFloat(row.find('.expense-harga').val()) || 0;
+    const subtotal = quantity * price;
+
+    $(`#expense-subtotal-${itemId}`).text(formatRupiah(subtotal));
+    row.find('.expense-subtotal').val(subtotal);
+
+    updateExpenseTotal();
+}
+
+function updateExpenseTotal() {
+    let total = 0;
+    $('.expense-subtotal').each(function() {
+        total += parseFloat($(this).val()) || 0;
+    });
+
+    $('#expense_total').val(total);
+    $('#expense-total').text(formatRupiah(total));
+}
 </script>
 @endsection
