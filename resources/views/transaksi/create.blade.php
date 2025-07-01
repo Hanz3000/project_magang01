@@ -527,19 +527,6 @@
                             </div>
                         </div>
 
-<<<<<<< HEAD
-                        <div class="input-group">
-                            <label for="pegawai_id">
-                                <i class="fas fa-user-tie mr-1"></i>
-                                Pegawai
-                            </label>
-                            <select name="pegawai_id" id="pegawai_id" class="w-full" required>
-                                <option value="">-- Pilih Pegawai --</option>
-                                @foreach ($pegawais as $pegawai)
-                                <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
-                                @endforeach
-                            </select>
-=======
                         <div class="file-preview" id="file-preview">
                             <img id="preview-image" src="#" alt="Preview Foto Struk" class="hidden">
                             <div class="file-info">
@@ -548,7 +535,6 @@
                                     <i class="fas fa-trash mr-1"></i>Hapus
                                 </button>
                             </div>
->>>>>>> fb85eba69d63b9e9eddd635f9c89769f15b42c69
                         </div>
 
                         <div class="button-group">
@@ -830,23 +816,8 @@ $(document).ready(function() {
     });
 
     // Tab switching
-<<<<<<< HEAD
-    function switchTab(tabName) {
-        document.querySelectorAll('.tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-
-        document.querySelectorAll('.tab-content').forEach(content => {
-            content.classList.remove('active');
-        });
-
-        document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
-        document.getElementById(`${tabName}-form`).classList.add('active');
-    }
-=======
     $('.tab-button').click(function() {
         const tabId = $(this).data('tab');
->>>>>>> fb85eba69d63b9e9eddd635f9c89769f15b42c69
 
         // Update active tab button
         $('.tab-button').removeClass('active');
@@ -992,22 +963,8 @@ function fetchStrukItems(strukId) {
 // Income items management
 let incomeItemIndex = 1;
 
-<<<<<<< HEAD
-    $(document).ready(function() {
-        // File upload preview
-        $('#pengeluaran_bukti_pembayaran').change(function(e) {
-            handleFileUpload(
-                e,
-                '#pengeluaran-preview-image',
-                '#pengeluaran-file-name',
-                '#pengeluaran-upload-container',
-                '#pengeluaran-file-preview'
-            );
-        });
-=======
 function addIncomeItem() {
     const container = $('#income-items-container');
->>>>>>> fb85eba69d63b9e9eddd635f9c89769f15b42c69
 
     const newRow = $(`
             <tr class="item-row" data-item="${incomeItemIndex}">
