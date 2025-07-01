@@ -17,32 +17,32 @@
             </a>
         </div>
 
-        @if (session('success'))
-        <div class="bg-green-50 border-l-4 border-green-400 text-green-700 p-4 mx-6 mt-4 rounded">
-            <p class="text-sm font-medium">{{ session('success') }}</p>
-        </div>
-        @endif
-
         <div class="px-6 py-4">
             <!-- Search bar -->
             <div class="flex justify-end mb-4">
-                <form method="GET" action="{{ route('pegawai.index') }}" class="flex items-center space-x-2">
-                    <input
-                        type="text"
-                        name="q"
-                        value="{{ request('q') }}"
-                        placeholder="Cari nama pegawai atau NIP..."
-                        class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <form method="GET" action="{{ route('pegawai.index') }}" class="flex items-center gap-2">
+                    <div class="relative">
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ request('q') }}"
+                            placeholder="Cari nama pegawai atau NIP..."
+                            class="pl-3 pr-10 py-2 text-sm border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200">
+                        @if(request('q'))
+                        <a href="{{ route('pegawai.index') }}" class="absolute inset-y-0 right-2 flex items-center text-gray-400 hover:text-red-500" title="Reset pencarian">
+                            &times;
+                        </a>
+                        @endif
+                    </div>
+
                     <button
                         type="submit"
-                        class="px-4 py-2 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700">
+                        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-200">
                         Cari
                     </button>
-                    @if(request('q'))
-                    <a href="{{ route('pegawai.index') }}" class="ml-2 text-sm text-gray-500 hover:underline">Reset</a>
-                    @endif
                 </form>
             </div>
+
 
             <!-- Bulk actions bar -->
             <div id="bulk-actions" class="flex items-center justify-between mb-4 p-3 bg-red-50 border border-red-200 rounded-lg hidden">

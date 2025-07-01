@@ -70,18 +70,18 @@ Route::middleware('auth')->group(function () {
         Route::put('/{struk}', [StrukController::class, 'update'])->name('struks.update');
         Route::delete('/{struk}', [StrukController::class, 'destroy'])->name('struks.destroy');
         Route::delete('/bulk-delete', [StrukController::class, 'bulkDelete'])->name('struks.bulk-delete');
-        
+
         // Item routes
         Route::get('/{struk}/items', [StrukController::class, 'items']);
         Route::post('/{id}/item', [StrukController::class, 'addItem'])->name('struks.addItem');
         Route::put('/{struk}/item/{index}', [StrukController::class, 'updateItem'])->name('struks.updateItem');
         Route::put('/{struk}/update-items', [StrukController::class, 'updateItems'])->name('struks.updateItems');
         Route::delete('/{struk}/item/{index}', [StrukController::class, 'deleteItem'])->name('struks.deleteItem');
-        
+
         // Search routes
         Route::get('/autocomplete-items', [StrukController::class, 'autocompleteItems'])->name('struks.autocomplete-items');
         Route::get('/search-barang', [StrukController::class, 'searchBarang'])->name('struks.search-barang');
-        
+
         // Export routes
         Route::get('/export/excel', [StrukController::class, 'exportExcel'])->name('struks.export.excel');
         Route::get('/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
@@ -96,7 +96,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->name('pengeluarans.edit');
         Route::put('/{pengeluaran}', [PengeluaranController::class, 'update'])->name('pengeluarans.update');
         Route::delete('/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluarans.destroy');
-        
+
         // Export routes
         Route::get('/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
         Route::get('/export/csv', [PengeluaranController::class, 'exportCSV'])->name('pengeluarans.export.csv');

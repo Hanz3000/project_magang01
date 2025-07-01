@@ -729,7 +729,7 @@
                             <select name="pegawai_id" id="pegawai_id" class="w-full" required>
                                 <option value="">-- Pilih Pegawai --</option>
                                 @foreach ($pegawais as $pegawai)
-                                    <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
+                                <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -848,11 +848,11 @@
         document.querySelectorAll('.tab').forEach(tab => {
             tab.classList.remove('active');
         });
-        
+
         document.querySelectorAll('.tab-content').forEach(content => {
             content.classList.remove('active');
         });
-        
+
         document.querySelector(`.tab[onclick="switchTab('${tabName}')"]`).classList.add('active');
         document.getElementById(`${tabName}-form`).classList.add('active');
     }
@@ -1066,10 +1066,10 @@
         // File upload preview
         $('#pengeluaran_bukti_pembayaran').change(function(e) {
             handleFileUpload(
-                e, 
-                '#pengeluaran-preview-image', 
-                '#pengeluaran-file-name', 
-                '#pengeluaran-upload-container', 
+                e,
+                '#pengeluaran-preview-image',
+                '#pengeluaran-file-name',
+                '#pengeluaran-upload-container',
                 '#pengeluaran-file-preview'
             );
         });
