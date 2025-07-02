@@ -240,11 +240,7 @@ class StrukController extends Controller
         return redirect()->route('struks.index')->with('success', 'Item berhasil dihapus.');
     }
 
-    public function items($id)
-    {
-        $struk = Struk::findOrFail($id);
-        return response()->json(json_decode($struk->items, true));
-    }
+    
 
     public function bulkDelete(Request $request)
     {
