@@ -89,16 +89,16 @@ class TransaksiController extends Controller
         $struk = Struk::findOrFail($request->struk_id);
 
         $pengeluaran = Pengeluaran::create([
-            'nama_toko' => $struk->nama_toko,
-            'nomor_struk' => $struk->nomor_struk,
-            'tanggal' => $request->tanggal,
-            'pegawai_id' => $request->pegawai_id,
-            'daftar_barang' => $struk->items,
-            'total' => $struk->total_harga,
-            'jumlah_item' => count(json_decode($struk->items, true)),
-            'bukti_pembayaran' => $struk->foto_struk,
-            'from_income' => $struk->id // Tambahkan ini untuk relasi ke income
-        ]);
+        'nama_toko' => $struk->nama_toko,
+        'nomor_struk' => $struk->nomor_struk,
+        'tanggal' => $request->tanggal,
+        'pegawai_id' => $request->pegawai_id,
+        'daftar_barang' => $struk->items,
+        'total' => $struk->total_harga,
+        'jumlah_item' => count(json_decode($struk->items, true)),
+        'bukti_pembayaran' => $struk->foto_struk, // Pastikan ini disimpan
+        'struk_id' => $struk->id // Simpan struk_id
+    ]);
 
         return redirect()->route('struks.pengeluarans.index')
             ->with('success', 'Pengeluaran berhasil dibuat dari pemasukan.');
