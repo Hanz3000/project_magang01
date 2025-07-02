@@ -61,11 +61,6 @@ class Pengeluaran extends Model
 
     public function income()
     {
-        return $this->belongsTo(Income::class, 'from_income'); // Sesuaikan dengan nama kolom foreign key Anda
-    }
-
-    public function struk()
-    {
         return $this->belongsTo(Struk::class, 'struk_id');
     }
 }

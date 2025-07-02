@@ -601,7 +601,7 @@
                                         <i class="fas fa-calendar-alt mr-1"></i>
                                         Tanggal Pengeluaran
                                     </label>
-                                    <input type="date" name="tanggal" id="from_income_tanggal" required
+                                    <input type="date" name="tanggal" id="expense_tanggal" required
                                         value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
 
                                 </div>
@@ -813,9 +813,6 @@
                                     </table>
                                 </div>
                             </div>
-
-
-
                             <div class="file-preview" id="from-income-file-preview">
                                 <img id="from-income-preview-image" src="#" alt="Preview Bukti Pembayaran" class="hidden">
                                 <div class="file-info">
@@ -835,10 +832,26 @@
                                 </button>
                             </div>
                         </form>
+
+                        <script>
+                            document.addEventListener("DOMContentLoaded", function() {
+                                const strukSelect = document.getElementById("struk_id");
+                                const tanggalField = document.getElementById("from_income_tanggal");
+
+                                strukSelect.addEventListener("change", function() {
+                                    const selectedOption = this.options[this.selectedIndex];
+                                    const tanggalKeluar = selectedOption.getAttribute("data-keluar");
+
+                                    if (tanggalKeluar) {
+                                        tanggalField.value = tanggalKeluar;
+                                    } else {
+                                        tanggalField.value = ""; // Kosongkan jika tidak ada
+                                    }
+                                });
+                            });
+                        </script>
+
                     </div>
-
-
-
                 </div>
             </div>
         </div>
@@ -957,6 +970,7 @@
         $('#struk_id').on('change', function() {
             const selectedOption = $(this).find('option:selected');
             const tanggalKeluar = selectedOption.data('keluar');
+            console.log('Tanggal keluar:', tanggalKeluar); // Tambahkan ini untuk debug
             if (tanggalKeluar) {
                 $('#from_income_tanggal').val(tanggalKeluar);
             } else {
@@ -964,7 +978,6 @@
             }
         });
 
-        // Update total when struk is selected
         // Update total when struk is selected
         $('#struk_id').on('change', function() {
             const selectedOption = $(this).find('option:selected');
