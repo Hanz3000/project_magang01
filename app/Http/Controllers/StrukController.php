@@ -43,6 +43,7 @@ class StrukController extends Controller
             'nama_toko' => 'required|string|max:255',
             'nomor_struk' => 'required|string|max:255',
             'tanggal_struk' => 'required|date',
+            'tanggal_keluar' => 'nullable|date', // tambahkan ini
             'items' => 'required|array|min:1',
             'items.*.nama' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
@@ -58,12 +59,13 @@ class StrukController extends Controller
         }
 
         Struk::create([
-            'nama_toko' => $validatedData['nama_toko'],
-            'nomor_struk' => $validatedData['nomor_struk'],
-            'tanggal_struk' => $validatedData['tanggal_struk'],
-            'items' => json_encode($validatedData['items']),
-            'total_harga' => $validatedData['total_harga'],
-            'foto_struk' => $fotoFilename
+            'nama_toko'      => $validatedData['nama_toko'],
+            'nomor_struk'    => $validatedData['nomor_struk'],
+            'tanggal_struk'  => $validatedData['tanggal_struk'],
+            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null, // pastikan ini ada
+            'items'          => json_encode($validatedData['items']),
+            'total_harga'    => $validatedData['total_harga'],
+            'foto_struk'     => $fotoFilename
         ]);
 
         return redirect()->route('struks.index')->with('success', 'Struk berhasil disimpan!');
@@ -101,13 +103,15 @@ class StrukController extends Controller
         }
 
         $struk->update([
-            'nama_toko' => $validatedData['nama_toko'],
-            'nomor_struk' => $validatedData['nomor_struk'],
-            'tanggal_struk' => $validatedData['tanggal_struk'],
-            'items' => json_encode($validatedData['items']),
-            'total_harga' => $validatedData['total_harga'],
-            'foto_struk' => $validatedData['foto_struk'],
+            'nama_toko'      => $validatedData['nama_toko'],
+            'nomor_struk'    => $validatedData['nomor_struk'],
+            'tanggal_struk'  => $validatedData['tanggal_struk'],
+            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null, // ⬅️ ini juga
+            'items'          => json_encode($validatedData['items']),
+            'total_harga'    => $validatedData['total_harga'],
+            'foto_struk'     => $fotoFilename ?? $struk->foto_struk
         ]);
+
 
         return redirect()->route('struks.index')->with('success', 'Struk berhasil diperbarui!');
     }
@@ -240,7 +244,7 @@ class StrukController extends Controller
         return redirect()->route('struks.index')->with('success', 'Item berhasil dihapus.');
     }
 
-    
+
 
     public function bulkDelete(Request $request)
     {

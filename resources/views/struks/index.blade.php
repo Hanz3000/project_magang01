@@ -130,7 +130,9 @@
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
                             </th>
@@ -168,6 +170,15 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-gray-900">
+                                    @if($struk->tanggal_keluar)
+                                    {{ date('d M Y', strtotime($struk->tanggal_keluar)) }}
+                                    @else
+                                    <span class="text-gray-400 italic text-xs">-</span>
+                                    @endif
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="max-w-xs space-y-2">
@@ -584,188 +595,188 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Elemen yang diperlukan
-    const selectAll = document.getElementById('selectAll');
-    const rowCheckboxes = document.querySelectorAll('.row-checkbox');
-    const bulkActions = document.getElementById('bulkActionsContainer');
-    const selectedCount = document.getElementById('selectedCount');
-    const selectedIdsInput = document.getElementById('selectedIds');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elemen yang diperlukan
+        const selectAll = document.getElementById('selectAll');
+        const rowCheckboxes = document.querySelectorAll('.row-checkbox');
+        const bulkActions = document.getElementById('bulkActionsContainer');
+        const selectedCount = document.getElementById('selectedCount');
+        const selectedIdsInput = document.getElementById('selectedIds');
 
-    // Fungsi untuk update bulk actions
-    function updateBulkActions() {
-        const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
-        const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+        // Fungsi untuk update bulk actions
+        function updateBulkActions() {
+            const selectedCheckboxes = document.querySelectorAll('.row-checkbox:checked');
+            const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
 
-        if (selectedCheckboxes.length > 0) {
-            bulkActions.classList.remove('hidden');
-            selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
-            selectedIdsInput.value = selectedIds.join(',');
+            if (selectedCheckboxes.length > 0) {
+                bulkActions.classList.remove('hidden');
+                selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
+                selectedIdsInput.value = selectedIds.join(',');
 
-            // Update select all checkbox
-            if (selectAll) {
-                selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
-                selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length <
-                    rowCheckboxes.length;
-            }
-        } else {
-            bulkActions.classList.add('hidden');
-            selectedIdsInput.value = '';
-            if (selectAll) selectAll.checked = false;
-        }
-    }
-
-    // Select all checkbox
-    if (selectAll) {
-        selectAll.addEventListener('change', function() {
-            const isChecked = this.checked;
-            rowCheckboxes.forEach(checkbox => {
-                checkbox.checked = isChecked;
-            });
-            updateBulkActions();
-        });
-    }
-
-    // Individual row checkbox
-    rowCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateBulkActions);
-    });
-
-    // Event delegation untuk checkbox yang mungkin ditambahkan dinamis
-    document.addEventListener('change', function(e) {
-        if (e.target.classList.contains('row-checkbox')) {
-            updateBulkActions();
-        }
-    });
-});
-
-// Fungsi untuk clear selection
-function clearSelection() {
-    document.querySelectorAll('.row-checkbox').forEach(checkbox => {
-        checkbox.checked = false;
-    });
-    document.getElementById('selectAll').checked = false;
-    document.getElementById('bulkActionsContainer').classList.add('hidden');
-    document.getElementById('selectedIds').value = '';
-}
-
-// Fungsi untuk konfirmasi bulk delete
-function confirmBulkDelete() {
-    const selectedIds = document.getElementById('selectedIds').value;
-    if (!selectedIds) {
-        alert('Pilih setidaknya satu struk untuk dihapus');
-        return;
-    }
-
-    const count = selectedIds.split(',').length;
-    if (confirm(`Apakah Anda yakin ingin menghapus ${count} struk yang dipilih?`)) {
-        document.getElementById('bulkDeleteForm').submit();
-    }
-}
-
-// Delete modal functions
-function openDeleteModal(formAction) {
-    document.getElementById('deleteForm').action = formAction;
-    document.getElementById('deleteModal').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeDeleteModal() {
-    document.getElementById('deleteModal').classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-}
-
-// Close modal when clicking outside
-document.getElementById('deleteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeDeleteModal();
-    }
-});
-
-// Close modal with ESC key
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && !document.getElementById('deleteModal').classList.contains('hidden')) {
-        closeDeleteModal();
-    }
-});
-
-// Image modal functions
-function openModal(imageSrc) {
-    document.getElementById('modalImage').src = imageSrc;
-    document.getElementById('imageModal').classList.remove('hidden');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeModal() {
-    document.getElementById('imageModal').classList.add('hidden');
-    document.body.classList.remove('overflow-hidden');
-}
-
-// Modal Edit Struk
-let currentEditStrukId = null;
-
-function openEditModal(strukId) {
-    currentEditStrukId = strukId;
-    document.getElementById('editModal').classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    // Set form action
-    document.getElementById('editItemsForm').action = `/struks/${strukId}/update-items`;
-    // Load items
-    loadExistingItems(strukId);
-}
-
-function closeEditModal() {
-    document.getElementById('editModal').classList.add('hidden');
-    document.body.style.overflow = 'auto';
-    document.getElementById('modalItemsContainer').innerHTML = '';
-    clearNewItemFields();
-}
-
-function loadExistingItems(strukId) {
-    const container = document.getElementById('modalItemsContainer');
-    fetch(`/struks/${strukId}/items`)
-        .then(response => response.json())
-        .then(data => {
-            const items = data.items;
-            container.innerHTML = '';
-            items.forEach((item, index) => {
-                addItemRowToModal(item, index);
-            });
-
-            // Disable tombol hapus jika hanya ada satu item
-            if (items.length === 1) {
-                const deleteButton = container.querySelector('button[onclick="removeItemFromModal(this)"]');
-                if (deleteButton) {
-                    deleteButton.disabled = true;
-                    deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
-                    deleteButton.classList.remove('hover:text-red-700', 'hover:bg-red-50');
+                // Update select all checkbox
+                if (selectAll) {
+                    selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
+                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length <
+                        rowCheckboxes.length;
                 }
+            } else {
+                bulkActions.classList.add('hidden');
+                selectedIdsInput.value = '';
+                if (selectAll) selectAll.checked = false;
             }
-        })
+        }
 
-        .catch(error => {
-            container.innerHTML = '<div class="text-red-500">Gagal memuat data item.</div>';
+        // Select all checkbox
+        if (selectAll) {
+            selectAll.addEventListener('change', function() {
+                const isChecked = this.checked;
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = isChecked;
+                });
+                updateBulkActions();
+            });
+        }
+
+        // Individual row checkbox
+        rowCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', updateBulkActions);
         });
-}
 
-function addItemRowToModal(item = {}, index = null) {
-    const container = document.getElementById('modalItemsContainer');
-    const itemIndex = index !== null ? index : container.children.length;
-    // Build select options
-    let options = `<option value="" disabled ${!item.nama ? 'selected' : ''}>Pilih Barang</option>`;
-    @foreach($barangList as $barang)
-    options +=
-        `<option value="{{ $barang->nama_barang }}" ${item.nama === '{{ $barang->nama_barang }}' ? 'selected' : ''}>{{ $barang->nama_barang }}</option>`;
-    @endforeach
+        // Event delegation untuk checkbox yang mungkin ditambahkan dinamis
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('row-checkbox')) {
+                updateBulkActions();
+            }
+        });
+    });
 
-    // Check if this will be the only item
-    const willBeOnlyItem = container.children.length === 0;
-    const disableDelete = willBeOnlyItem;
+    // Fungsi untuk clear selection
+    function clearSelection() {
+        document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        document.getElementById('selectAll').checked = false;
+        document.getElementById('bulkActionsContainer').classList.add('hidden');
+        document.getElementById('selectedIds').value = '';
+    }
 
-    const itemRow = document.createElement('div');
-    itemRow.className =
-    'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
-    itemRow.innerHTML = `
+    // Fungsi untuk konfirmasi bulk delete
+    function confirmBulkDelete() {
+        const selectedIds = document.getElementById('selectedIds').value;
+        if (!selectedIds) {
+            alert('Pilih setidaknya satu struk untuk dihapus');
+            return;
+        }
+
+        const count = selectedIds.split(',').length;
+        if (confirm(`Apakah Anda yakin ingin menghapus ${count} struk yang dipilih?`)) {
+            document.getElementById('bulkDeleteForm').submit();
+        }
+    }
+
+    // Delete modal functions
+    function openDeleteModal(formAction) {
+        document.getElementById('deleteForm').action = formAction;
+        document.getElementById('deleteModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+
+    // Close modal with ESC key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('deleteModal').classList.contains('hidden')) {
+            closeDeleteModal();
+        }
+    });
+
+    // Image modal functions
+    function openModal(imageSrc) {
+        document.getElementById('modalImage').src = imageSrc;
+        document.getElementById('imageModal').classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeModal() {
+        document.getElementById('imageModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    // Modal Edit Struk
+    let currentEditStrukId = null;
+
+    function openEditModal(strukId) {
+        currentEditStrukId = strukId;
+        document.getElementById('editModal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        // Set form action
+        document.getElementById('editItemsForm').action = `/struks/${strukId}/update-items`;
+        // Load items
+        loadExistingItems(strukId);
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        document.getElementById('modalItemsContainer').innerHTML = '';
+        clearNewItemFields();
+    }
+
+    function loadExistingItems(strukId) {
+        const container = document.getElementById('modalItemsContainer');
+        fetch(`/struks/${strukId}/items`)
+            .then(response => response.json())
+            .then(data => {
+                const items = data.items;
+                container.innerHTML = '';
+                items.forEach((item, index) => {
+                    addItemRowToModal(item, index);
+                });
+
+                // Disable tombol hapus jika hanya ada satu item
+                if (items.length === 1) {
+                    const deleteButton = container.querySelector('button[onclick="removeItemFromModal(this)"]');
+                    if (deleteButton) {
+                        deleteButton.disabled = true;
+                        deleteButton.classList.add('opacity-50', 'cursor-not-allowed');
+                        deleteButton.classList.remove('hover:text-red-700', 'hover:bg-red-50');
+                    }
+                }
+            })
+
+            .catch(error => {
+                container.innerHTML = '<div class="text-red-500">Gagal memuat data item.</div>';
+            });
+    }
+
+    function addItemRowToModal(item = {}, index = null) {
+        const container = document.getElementById('modalItemsContainer');
+        const itemIndex = index !== null ? index : container.children.length;
+        // Build select options
+        let options = `<option value="" disabled ${!item.nama ? 'selected' : ''}>Pilih Barang</option>`;
+        @foreach($barangList as $barang)
+        options +=
+            `<option value="{{ $barang->nama_barang }}" ${item.nama === '{{ $barang->nama_barang }}' ? 'selected' : ''}>{{ $barang->nama_barang }}</option>`;
+        @endforeach
+
+        // Check if this will be the only item
+        const willBeOnlyItem = container.children.length === 0;
+        const disableDelete = willBeOnlyItem;
+
+        const itemRow = document.createElement('div');
+        itemRow.className =
+            'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
+        itemRow.innerHTML = `
         <input type="hidden" name="item_index[]" value="${itemIndex}">
         <div class="col-span-5">
             <select name="nama[]" class="item-select w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white">
@@ -796,191 +807,191 @@ function addItemRowToModal(item = {}, index = null) {
             </button>
         </div>
     `;
-    container.appendChild(itemRow);
+        container.appendChild(itemRow);
 
-    // If we're adding a second item, enable all delete buttons
-    if (container.children.length === 2) {
-        const deleteButtons = container.querySelectorAll('button[onclick="removeItemFromModal(this)"]');
-        deleteButtons.forEach(btn => {
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            btn.classList.add('hover:text-red-700', 'hover:bg-red-50');
-        });
-    }
-}
-
-function addNewItemToModal() {
-    const nama = document.getElementById('modalNewItemNama').value;
-    const jumlah = document.getElementById('modalNewItemJumlah').value;
-    const harga = document.getElementById('modalNewItemHarga').value;
-    if (!nama || !jumlah || !harga) {
-        alert('Mohon lengkapi semua field untuk item baru');
-        return;
-    }
-    const newItem = {
-        nama: nama,
-        jumlah: jumlah,
-        harga: harga
-    };
-    addItemRowToModal(newItem);
-    clearNewItemFields();
-}
-
-function clearNewItemFields() {
-    document.getElementById('modalNewItemNama').value = '';
-    document.getElementById('modalNewItemJumlah').value = '';
-    document.getElementById('modalNewItemHarga').value = '';
-}
-
-function removeItemFromModal(button) {
-    const container = document.getElementById('modalItemsContainer');
-    if (container.children.length > 1) {
-        button.closest('.item-row').remove();
-        // After removing, check if we're down to one item and disable delete buttons
-        if (container.children.length === 1) {
+        // If we're adding a second item, enable all delete buttons
+        if (container.children.length === 2) {
             const deleteButtons = container.querySelectorAll('button[onclick="removeItemFromModal(this)"]');
             deleteButtons.forEach(btn => {
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-                btn.classList.remove('hover:text-red-700', 'hover:bg-red-50');
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                btn.classList.add('hover:text-red-700', 'hover:bg-red-50');
             });
         }
-    } else {
-        alert('Tidak dapat menghapus item terakhir');
     }
-}
 
-function submitEditForm() {
-    const form = document.getElementById('editItemsForm');
-    const container = document.getElementById('modalItemsContainer');
-    if (container.children.length === 0) {
-        alert('Minimal harus ada satu item');
-        return;
-    }
-    // Validate all items have required fields
-    const itemRows = container.querySelectorAll('.item-row');
-    let isValid = true;
-    itemRows.forEach((row, index) => {
-        const nama = row.querySelector('select[name="nama[]"]').value;
-        const jumlah = row.querySelector('input[name="jumlah[]"]').value;
-        const harga = row.querySelector('input[name="harga[]"]').value;
+    function addNewItemToModal() {
+        const nama = document.getElementById('modalNewItemNama').value;
+        const jumlah = document.getElementById('modalNewItemJumlah').value;
+        const harga = document.getElementById('modalNewItemHarga').value;
         if (!nama || !jumlah || !harga) {
-            isValid = false;
-        }
-    });
-    if (!isValid) {
-        alert('Mohon lengkapi semua field yang diperlukan');
-        return;
-    }
-    form.submit();
-}
-document.getElementById('editModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeEditModal();
-    }
-});
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && !document.getElementById('editModal').classList.contains('hidden')) {
-        closeEditModal();
-    }
-});
-
-// Initialize autocomplete for item search
-function initAutocomplete(inputElement) {
-    const resultsContainer = inputElement.nextElementSibling;
-
-    inputElement.addEventListener('input', function(e) {
-        const searchTerm = e.target.value.trim();
-
-        if (searchTerm.length < 2) {
-            resultsContainer.classList.add('hidden');
+            alert('Mohon lengkapi semua field untuk item baru');
             return;
         }
+        const newItem = {
+            nama: nama,
+            jumlah: jumlah,
+            harga: harga
+        };
+        addItemRowToModal(newItem);
+        clearNewItemFields();
+    }
 
-        fetch(`/struks/search-items?term=${encodeURIComponent(searchTerm)}`)
-            .then(response => response.json())
-            .then(data => {
-                resultsContainer.innerHTML = '';
+    function clearNewItemFields() {
+        document.getElementById('modalNewItemNama').value = '';
+        document.getElementById('modalNewItemJumlah').value = '';
+        document.getElementById('modalNewItemHarga').value = '';
+    }
 
-                if (data.length === 0) {
-                    resultsContainer.classList.add('hidden');
-                    return;
-                }
-
-                data.forEach(item => {
-                    const option = document.createElement('div');
-                    option.className = 'px-4 py-2 hover:bg-indigo-50 cursor-pointer';
-                    option.textContent = item.nama;
-                    option.addEventListener('click', function() {
-                        inputElement.value = item.nama;
-                        const priceInput = inputElement.closest('.item-row').querySelector(
-                            'input[name*="harga"]');
-                        if (priceInput && (!priceInput.value || priceInput.value === '0')) {
-                            priceInput.value = item.harga;
-                        }
-                        resultsContainer.classList.add('hidden');
-                    });
-                    resultsContainer.appendChild(option);
+    function removeItemFromModal(button) {
+        const container = document.getElementById('modalItemsContainer');
+        if (container.children.length > 1) {
+            button.closest('.item-row').remove();
+            // After removing, check if we're down to one item and disable delete buttons
+            if (container.children.length === 1) {
+                const deleteButtons = container.querySelectorAll('button[onclick="removeItemFromModal(this)"]');
+                deleteButtons.forEach(btn => {
+                    btn.disabled = true;
+                    btn.classList.add('opacity-50', 'cursor-not-allowed');
+                    btn.classList.remove('hover:text-red-700', 'hover:bg-red-50');
                 });
-
-                resultsContainer.classList.remove('hidden');
-            })
-            .catch(error => {
-                console.error('Error fetching autocomplete data:', error);
-                resultsContainer.classList.add('hidden');
-            });
-    });
-
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.relative')) {
-            resultsContainer.classList.add('hidden');
+            }
+        } else {
+            alert('Tidak dapat menghapus item terakhir');
         }
-    });
-}
+    }
 
-// Initialize all autocomplete fields when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.item-search').forEach(input => {
-        initAutocomplete(input);
-    });
-});
-
-// Confirm item deletion
-function confirmDeleteItem(strukId, index) {
-    if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/struks/${strukId}/item/${index}`;
-
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-
-        const methodInput = document.createElement('input');
-        methodInput.type = 'hidden';
-        methodInput.name = '_method';
-        methodInput.value = 'DELETE';
-
-        form.appendChild(csrfToken);
-        form.appendChild(methodInput);
-        document.body.appendChild(form);
+    function submitEditForm() {
+        const form = document.getElementById('editItemsForm');
+        const container = document.getElementById('modalItemsContainer');
+        if (container.children.length === 0) {
+            alert('Minimal harus ada satu item');
+            return;
+        }
+        // Validate all items have required fields
+        const itemRows = container.querySelectorAll('.item-row');
+        let isValid = true;
+        itemRows.forEach((row, index) => {
+            const nama = row.querySelector('select[name="nama[]"]').value;
+            const jumlah = row.querySelector('input[name="jumlah[]"]').value;
+            const harga = row.querySelector('input[name="harga[]"]').value;
+            if (!nama || !jumlah || !harga) {
+                isValid = false;
+            }
+        });
+        if (!isValid) {
+            alert('Mohon lengkapi semua field yang diperlukan');
+            return;
+        }
         form.submit();
     }
-}
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('editModal').classList.contains('hidden')) {
+            closeEditModal();
+        }
+    });
 
-// Function to add new item fields
-function addNewItemField() {
-    const newItemNama = document.getElementById('newItemNama');
-    const newItemJumlah = document.getElementById('newItemJumlah');
-    const newItemHarga = document.getElementById('newItemHarga');
-    const itemsContainer = document.getElementById('itemsContainer');
+    // Initialize autocomplete for item search
+    function initAutocomplete(inputElement) {
+        const resultsContainer = inputElement.nextElementSibling;
 
-    if (newItemNama.value && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
-        const newItemRow = document.createElement('div');
-        newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
+        inputElement.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.trim();
 
-        newItemRow.innerHTML = `
+            if (searchTerm.length < 2) {
+                resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            fetch(`/struks/search-items?term=${encodeURIComponent(searchTerm)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsContainer.innerHTML = '';
+
+                    if (data.length === 0) {
+                        resultsContainer.classList.add('hidden');
+                        return;
+                    }
+
+                    data.forEach(item => {
+                        const option = document.createElement('div');
+                        option.className = 'px-4 py-2 hover:bg-indigo-50 cursor-pointer';
+                        option.textContent = item.nama;
+                        option.addEventListener('click', function() {
+                            inputElement.value = item.nama;
+                            const priceInput = inputElement.closest('.item-row').querySelector(
+                                'input[name*="harga"]');
+                            if (priceInput && (!priceInput.value || priceInput.value === '0')) {
+                                priceInput.value = item.harga;
+                            }
+                            resultsContainer.classList.add('hidden');
+                        });
+                        resultsContainer.appendChild(option);
+                    });
+
+                    resultsContainer.classList.remove('hidden');
+                })
+                .catch(error => {
+                    console.error('Error fetching autocomplete data:', error);
+                    resultsContainer.classList.add('hidden');
+                });
+        });
+
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.relative')) {
+                resultsContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // Initialize all autocomplete fields when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.item-search').forEach(input => {
+            initAutocomplete(input);
+        });
+    });
+
+    // Confirm item deletion
+    function confirmDeleteItem(strukId, index) {
+        if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/struks/${strukId}/item/${index}`;
+
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = '{{ csrf_token() }}';
+
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+
+            form.appendChild(csrfToken);
+            form.appendChild(methodInput);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+
+    // Function to add new item fields
+    function addNewItemField() {
+        const newItemNama = document.getElementById('newItemNama');
+        const newItemJumlah = document.getElementById('newItemJumlah');
+        const newItemHarga = document.getElementById('newItemHarga');
+        const itemsContainer = document.getElementById('itemsContainer');
+
+        if (newItemNama.value && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
+            const newItemRow = document.createElement('div');
+            newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
+
+            newItemRow.innerHTML = `
             <div class="flex-1 relative">
                 <input name="nama[]" value="${newItemNama.value}" 
                     class="item-search w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
@@ -999,253 +1010,253 @@ function addNewItemField() {
                 </svg>
             </button>
         `;
-        itemsContainer.appendChild(newItemRow);
+            itemsContainer.appendChild(newItemRow);
 
-        const newInput = newItemRow.querySelector('.item-search');
-        initAutocomplete(newInput);
+            const newInput = newItemRow.querySelector('.item-search');
+            initAutocomplete(newInput);
 
-        newItemNama.selectedIndex = 0;
-        newItemJumlah.value = '';
-        newItemHarga.value = '';
-    } else {
-        alert('Harap isi semua kolom untuk item baru (Nama, Jumlah, Harga).');
-    }
-}
-
-// Auto-hide success message after 5 seconds
-@if(session('success')) setTimeout(() => {
-    const successMessage = document.querySelector('.fixed.top-4.right-4');
-    if (successMessage) {
-        successMessage.style.transform = 'translateX(100%)';
-        setTimeout(() => {
-            successMessage.remove();
-        }, 300);
-    }
-}, 5000);
-@endif
-
-// Search functionality with cursor preservation
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const clearSearch = document.getElementById('clearSearch');
-    let searchTimeout;
-
-    // Live search as you type
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-
-        // Save current cursor position
-        const cursorPosition = this.selectionStart;
-        localStorage.setItem('searchCursorPosition', cursorPosition);
-
-        searchTimeout = setTimeout(() => {
-            const searchTerm = searchInput.value.trim();
-            const url = new URL(window.location.href);
-
-            if (searchTerm) {
-                url.searchParams.set('search', searchTerm);
-            } else {
-                url.searchParams.delete('search');
-            }
-
-            // Preserve edit parameter if exists
-            @if(request('edit'))
-            url.searchParams.set('edit', '{{ request('
-                edit ') }}');
-            @endif
-
-            window.location.href = url.toString();
-        }, 500);
-    });
-
-    // Prevent form submission on Enter key
-    searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
+            newItemNama.selectedIndex = 0;
+            newItemJumlah.value = '';
+            newItemHarga.value = '';
+        } else {
+            alert('Harap isi semua kolom untuk item baru (Nama, Jumlah, Harga).');
         }
-    });
+    }
 
-    // Clear search
-    if (clearSearch) {
-        clearSearch.addEventListener('click', function() {
-            localStorage.removeItem('searchCursorPosition');
-            const url = new URL(window.location.href);
-            url.searchParams.delete('search');
+    // Auto-hide success message after 5 seconds
+    @if(session('success')) setTimeout(() => {
+        const successMessage = document.querySelector('.fixed.top-4.right-4');
+        if (successMessage) {
+            successMessage.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                successMessage.remove();
+            }, 300);
+        }
+    }, 5000);
+    @endif
 
-            // Preserve edit parameter if exists
-            @if(request('edit'))
-            url.searchParams.set('edit', '{{ request('
-                edit ') }}');
-            @endif
+    // Search functionality with cursor preservation
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        let searchTimeout;
 
-            window.location.href = url.toString();
+        // Live search as you type
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+
+            // Save current cursor position
+            const cursorPosition = this.selectionStart;
+            localStorage.setItem('searchCursorPosition', cursorPosition);
+
+            searchTimeout = setTimeout(() => {
+                const searchTerm = searchInput.value.trim();
+                const url = new URL(window.location.href);
+
+                if (searchTerm) {
+                    url.searchParams.set('search', searchTerm);
+                } else {
+                    url.searchParams.delete('search');
+                }
+
+                // Preserve edit parameter if exists
+                @if(request('edit'))
+                url.searchParams.set('edit', '{{ request('
+                    edit ') }}');
+                @endif
+
+                window.location.href = url.toString();
+            }, 500);
         });
-    }
 
-    // Restore cursor position after page load
-    const savedCursorPosition = localStorage.getItem('searchCursorPosition');
-    if (searchInput.value && savedCursorPosition) {
-        // Delay slightly to ensure input is fully rendered
-        setTimeout(() => {
-            searchInput.focus();
-            searchInput.selectionStart = searchInput.selectionEnd = parseInt(savedCursorPosition);
-            localStorage.removeItem('searchCursorPosition');
-        }, 50);
-    }
+        // Prevent form submission on Enter key
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
 
-    // Add animation to table rows when page loads
-    document.querySelectorAll('tbody tr').forEach((row, index) => {
-        row.style.opacity = '0';
-        row.style.transform = 'translateY(10px)';
-        row.style.transition = 'all 0.3s ease-out';
-        row.style.transitionDelay = `${index * 0.05}s`;
+        // Clear search
+        if (clearSearch) {
+            clearSearch.addEventListener('click', function() {
+                localStorage.removeItem('searchCursorPosition');
+                const url = new URL(window.location.href);
+                url.searchParams.delete('search');
 
-        setTimeout(() => {
-            row.style.opacity = '1';
-            row.style.transform = 'translateY(0)';
-        }, 50);
+                // Preserve edit parameter if exists
+                @if(request('edit'))
+                url.searchParams.set('edit', '{{ request('
+                    edit ') }}');
+                @endif
+
+                window.location.href = url.toString();
+            });
+        }
+
+        // Restore cursor position after page load
+        const savedCursorPosition = localStorage.getItem('searchCursorPosition');
+        if (searchInput.value && savedCursorPosition) {
+            // Delay slightly to ensure input is fully rendered
+            setTimeout(() => {
+                searchInput.focus();
+                searchInput.selectionStart = searchInput.selectionEnd = parseInt(savedCursorPosition);
+                localStorage.removeItem('searchCursorPosition');
+            }, 50);
+        }
+
+        // Add animation to table rows when page loads
+        document.querySelectorAll('tbody tr').forEach((row, index) => {
+            row.style.opacity = '0';
+            row.style.transform = 'translateY(10px)';
+            row.style.transition = 'all 0.3s ease-out';
+            row.style.transitionDelay = `${index * 0.05}s`;
+
+            setTimeout(() => {
+                row.style.opacity = '1';
+                row.style.transform = 'translateY(0)';
+            }, 50);
+        });
     });
-});
 </script>
 
 <style>
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-slideIn {
-    animation: slideIn 0.3s ease-out forwards;
-}
-
-.animate-fadeIn {
-    animation: fadeIn 0.3s ease-out forwards;
-}
-
-.group:hover .group-hover\:block {
-    display: block;
-}
-
-.group:hover .group-hover\:opacity-100 {
-    opacity: 1;
-}
-
-.group:hover .group-hover\:visible {
-    visibility: visible;
-}
-
-.hover-scale {
-    transition: transform 0.2s ease;
-}
-
-.hover-scale:hover {
-    transform: scale(1.02);
-}
-
-/* Custom pagination styling */
-.pagination {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    padding: 0;
-}
-
-.pagination li {
-    margin: 0 4px;
-}
-
-.pagination a,
-.pagination span {
-    display: inline-block;
-    padding: 8px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-}
-
-.pagination a {
-    color: #4f46e5;
-    border: 1px solid #e5e7eb;
-}
-
-.pagination a:hover {
-    background-color: #f5f3ff;
-}
-
-.pagination .active span {
-    background-color: #4f46e5;
-    color: white;
-}
-
-.pagination .disabled span {
-    color: #9ca3af;
-    border-color: #e5e7eb;
-}
-
-.autocomplete-results {
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    background: white;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-}
-
-.autocomplete-results div {
-    padding: 8px 12px;
-    cursor: pointer;
-    border-bottom: 1px solid #f3f4f6;
-}
-
-.autocomplete-results div:last-child {
-    border-bottom: none;
-}
-
-.autocomplete-results div:hover {
-    background-color: #f3f4f6;
-}
-
-
-* {
-    transition: all 0.2s ease;
-}
-
-/* Loading animation */
-@keyframes pulse {
-    0% {
-        opacity: 0.6;
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
 
-    50% {
+    .animate-slideIn {
+        animation: slideIn 0.3s ease-out forwards;
+    }
+
+    .animate-fadeIn {
+        animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    .group:hover .group-hover\:block {
+        display: block;
+    }
+
+    .group:hover .group-hover\:opacity-100 {
         opacity: 1;
     }
 
-    100% {
-        opacity: 0.6;
+    .group:hover .group-hover\:visible {
+        visibility: visible;
     }
-}
 
-.loading-pulse {
-    animation: pulse 1.5s infinite;
-}
+    .hover-scale {
+        transition: transform 0.2s ease;
+    }
+
+    .hover-scale:hover {
+        transform: scale(1.02);
+    }
+
+    /* Custom pagination styling */
+    .pagination {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+    }
+
+    .pagination li {
+        margin: 0 4px;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-block;
+        padding: 8px 12px;
+        border-radius: 6px;
+        text-decoration: none;
+    }
+
+    .pagination a {
+        color: #4f46e5;
+        border: 1px solid #e5e7eb;
+    }
+
+    .pagination a:hover {
+        background-color: #f5f3ff;
+    }
+
+    .pagination .active span {
+        background-color: #4f46e5;
+        color: white;
+    }
+
+    .pagination .disabled span {
+        color: #9ca3af;
+        border-color: #e5e7eb;
+    }
+
+    .autocomplete-results {
+        z-index: 1000;
+        max-height: 200px;
+        overflow-y: auto;
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .autocomplete-results div {
+        padding: 8px 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .autocomplete-results div:last-child {
+        border-bottom: none;
+    }
+
+    .autocomplete-results div:hover {
+        background-color: #f3f4f6;
+    }
+
+
+    * {
+        transition: all 0.2s ease;
+    }
+
+    /* Loading animation */
+    @keyframes pulse {
+        0% {
+            opacity: 0.6;
+        }
+
+        50% {
+            opacity: 1;
+        }
+
+        100% {
+            opacity: 0.6;
+        }
+    }
+
+    .loading-pulse {
+        animation: pulse 1.5s infinite;
+    }
 </style>
 @endsection

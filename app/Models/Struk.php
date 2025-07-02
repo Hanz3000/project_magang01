@@ -10,6 +10,7 @@ class Struk extends Model
         'nama_toko',
         'nomor_struk',
         'tanggal_struk',
+        'tanggal_keluar', // ⬅️ tambahkan ini
         'items',
         'total_harga',
         'foto_struk'
