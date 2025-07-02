@@ -80,7 +80,16 @@ class PengeluaranController extends Controller
 
             Pengeluaran::create($pengeluaranData);
 
-            return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil dibuat dari pemasukan.');
+            if ($request->has('from_income') && $request->from_income == 1) {
+                // Hapus pemasukan (struk) yang dipilih
+                $struk = Struk::find($request->struk_id);
+                if ($struk) {
+                    $struk->delete();
+                }
+            }
+
+            // Redirect ke index pengeluaran
+            return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil disimpan!');
         }
 
         // Jika pengeluaran manual
