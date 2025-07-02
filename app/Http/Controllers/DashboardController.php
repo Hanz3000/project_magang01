@@ -5,13 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Struk;
 use App\Models\Pengeluaran;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Count records
+        // Count totals
         $totalStrukPemasukan = Struk::count();
         $totalStrukPengeluaran = Pengeluaran::count();
         $totalStruk = $totalStrukPemasukan + $totalStrukPengeluaran;
@@ -20,97 +21,31 @@ class DashboardController extends Controller
         $latestStruk = Struk::latest()->first();
         $latestPengeluaranStruk = Pengeluaran::latest()->first();
 
-        // Total jumlah barang masuk
-        $totalBarangMasuk = Struk::all()->reduce(function ($carry, $struk) {
-            $items = is_string($struk->items) ? json_decode($struk->items, true) : $struk->items;
+        // Calculate total barang masuk dan keluar
+        $totalBarangMasuk = $this->calculateTotalBarang(Struk::class, 'items');
+        $totalBarangKeluar = $this->calculateTotalBarang(Pengeluaran::class, 'daftar_barang');
 
-            foreach ($items as $item) {
-                $carry += isset($item['jumlah']) ? (int)$item['jumlah'] : 0;
-            }
-            return $carry;
-        }, 0);
-
-        // Total jumlah barang keluar
-        $totalBarangKeluar = Pengeluaran::all()->reduce(function ($carry, $pengeluaran) {
-            $items = is_string($pengeluaran->daftar_barang) ? json_decode($pengeluaran->daftar_barang, true) : $pengeluaran->daftar_barang;
-
-            foreach ($items as $item) {
-                $carry += isset($item['jumlah']) ? (int)$item['jumlah'] : 0;
-            }
-            return $carry;
-        }, 0);
-
-        // Proses list barang masuk
-        $barangList = $this->processBarangList(
-            Struk::all(),
-            $request->input('search'),
-            $request->input('sort')
+        // Process lists with proper pagination
+        $barangList = $this->processAndPaginateBarangList(
+            Struk::query(),
+            $request->only(['search', 'sort']),
+            'page_barang'
         );
 
-        // Proses list barang keluar
-        $pengeluaranBarangList = collect();
-
-        foreach (Pengeluaran::all() as $pengeluaran) {
-            $items = is_string($pengeluaran->daftar_barang) ? json_decode($pengeluaran->daftar_barang, true) : $pengeluaran->daftar_barang;
-
-            foreach ($items as $item) {
-                $pengeluaranBarangList->push([
-                    'nama_barang' => $item['nama'],
-                    'jumlah' => $item['jumlah'],
-                    'nomor_struk' => $pengeluaran->nomor_struk,
-                    'tanggal' => $pengeluaran->tanggal,
-                ]);
-            }
-        }
-
-        // Filter
-        if ($request->filled('search_pengeluaran')) {
-            $search = strtolower($request->search_pengeluaran);
-            $pengeluaranBarangList = $pengeluaranBarangList->filter(function ($item) use ($search) {
-                return str_contains(strtolower($item['nama_barang']), $search) ||
-                    str_contains(strtolower($item['nomor_struk']), $search);
-            });
-        }
-
-        // Sort
-        switch ($request->sort_pengeluaran) {
-            case 'nama_asc':
-                $pengeluaranBarangList = $pengeluaranBarangList->sortBy(function ($item) {
-                    return strtolower($item['nama_barang']);
-                });
-                break;
-            case 'nama_desc':
-                $pengeluaranBarangList = $pengeluaranBarangList->sortByDesc(function ($item) {
-                    return strtolower($item['nama_barang']);
-                });
-                break;
-
-            case 'tanggal_asc':
-                $pengeluaranBarangList = $pengeluaranBarangList->sortBy('tanggal');
-                break;
-            case 'tanggal_desc':
-            default:
-                $pengeluaranBarangList = $pengeluaranBarangList->sortByDesc('tanggal');
-                break;
-        }
-
-        // Paginate
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage(); // default pakai 'page'
-
-        $currentItems = $pengeluaranBarangList->slice(($currentPage - 1) * $perPage, $perPage)->values();
-
-        $pengeluaranBarangList = new LengthAwarePaginator(
-            $currentItems,
-            $pengeluaranBarangList->count(),
-            $perPage,
-            $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
+        $pengeluaranBarangList = $this->processAndPaginatePengeluaranList(
+            Pengeluaran::query(),
+            $request->only(['search_pengeluaran', 'sort_pengeluaran']),
+            'page_pengeluaran'
         );
 
+        // Generate and paginate history
+        $historyBarang = $this->generateAndPaginateHistoryBarang('page_history');
+
+        // Return dashboard view with data
         return view('dashboard', [
             'barangList' => $barangList,
             'pengeluaranBarangList' => $pengeluaranBarangList,
+            'historyBarang' => $historyBarang,
             'totalStruk' => $totalStruk,
             'latestStruk' => $latestStruk,
             'latestPengeluaranStruk' => $latestPengeluaranStruk,
@@ -121,76 +56,194 @@ class DashboardController extends Controller
         ]);
     }
 
-    protected function processBarangList($struks, $search = null, $sort = null)
+    protected function calculateTotalBarang(string $model, string $itemsField): int
     {
-        $barangList = [];
+        return $model::query()
+            ->get()
+            ->reduce(function ($carry, $record) use ($itemsField) {
+                $items = $this->parseItems($record->{$itemsField});
+                return $carry + collect($items)->sum('jumlah');
+            }, 0);
+    }
 
-        foreach ($struks as $struk) {
-            $items = json_decode($struk->items, true) ?? [];
+    protected function processAndPaginateBarangList($query, array $filters = [], string $pageName = 'page')
+    {
+        $barangList = $query->get()
+            ->flatMap(function ($struk) {
+                $items = $this->parseItems($struk->items);
 
-            foreach ($items as $item) {
-                if (isset($item['nama'], $item['jumlah'])) {
-                    $nama = $item['nama'];
-
-                    if (!isset($barangList[$nama])) {
-                        $barangList[$nama] = [
-                            'jumlah' => $item['jumlah'],
-                            'nomor_struk' => $struk->nomor_struk,
-                            'tanggal' => $struk->tanggal_struk
-                        ];
-                    } else {
-                        $barangList[$nama]['jumlah'] += $item['jumlah'];
-                        if ($struk->tanggal_struk > $barangList[$nama]['tanggal']) {
-                            $barangList[$nama]['nomor_struk'] = $struk->nomor_struk;
-                            $barangList[$nama]['tanggal'] = $struk->tanggal_struk;
-                        }
+                return collect($items)->map(function ($item) use ($struk) {
+                    // Skip invalid items
+                    if (!isset($item['nama']) || !isset($item['jumlah'])) {
+                        return null;
                     }
-                }
+                    return [
+                        'nama' => $item['nama'],
+                        'jumlah' => (int) ($item['jumlah'] ?? 0),
+                        'nomor_struk' => $struk->nomor_struk,
+                        'tanggal' => $struk->tanggal_struk,
+                    ];
+                })->filter(); // Remove null entries
+            })
+            ->groupBy('nama')
+            ->map(function ($items, $nama) {
+                $latest = $items->sortByDesc('tanggal')->first();
+                return [
+                    'nama' => $nama,
+                    'jumlah' => $items->sum('jumlah'),
+                    'nomor_struk' => $latest['nomor_struk'],
+                    'tanggal' => $latest['tanggal'],
+                ];
+            })
+            ->values();
+
+        // Apply filters
+        if (!empty($filters['search'])) {
+            $search = strtolower($filters['search']);
+            $barangList = $barangList->filter(function ($item) use ($search) {
+                return stripos($item['nama'], $search) !== false || 
+                       stripos($item['nomor_struk'], $search) !== false;
+            });
+        }
+
+        // Apply sorting
+        $barangList = $this->sortCollection($barangList, $filters['sort'] ?? null, [
+            'nama_asc' => fn($c) => $c->sortBy('nama'),
+            'nama_desc' => fn($c) => $c->sortByDesc('nama'),
+            'tanggal_asc' => fn($c) => $c->sortBy('tanggal'),
+            'tanggal_desc' => fn($c) => $c->sortByDesc('tanggal'),
+        ], 'tanggal_desc');
+
+        return $this->paginateCollection($barangList, 10, $pageName);
+    }
+
+    protected function processAndPaginatePengeluaranList($query, array $filters = [], string $pageName = 'page')
+    {
+        $pengeluaranList = $query->get()
+            ->flatMap(function ($pengeluaran) {
+                $items = $this->parseItems($pengeluaran->daftar_barang);
+
+                return collect($items)->map(function ($item) use ($pengeluaran) {
+                    if (!isset($item['nama']) || !isset($item['jumlah'])) {
+                        return null;
+                    }
+                    return [
+                        'nama_barang' => $item['nama'],
+                        'jumlah' => (int) ($item['jumlah'] ?? 0),
+                        'nomor_struk' => $pengeluaran->nomor_struk,
+                        'tanggal' => $pengeluaran->tanggal,
+                    ];
+                })->filter(); // Remove null entries
+            });
+
+        // Apply filters
+        if (!empty($filters['search_pengeluaran'])) {
+            $search = strtolower($filters['search_pengeluaran']);
+            $pengeluaranList = $pengeluaranList->filter(function ($item) use ($search) {
+                return stripos($item['nama_barang'], $search) !== false ||
+                       stripos($item['nomor_struk'], $search) !== false;
+            });
+        }
+
+        // Apply sorting
+        $pengeluaranList = $this->sortCollection($pengeluaranList, $filters['sort_pengeluaran'] ?? null, [
+            'nama_asc' => fn($c) => $c->sortBy('nama_barang'),
+            'nama_desc' => fn($c) => $c->sortByDesc('nama_barang'),
+            'tanggal_asc' => fn($c) => $c->sortBy('tanggal'),
+            'tanggal_desc' => fn($c) => $c->sortByDesc('tanggal'),
+        ], 'tanggal_desc');
+
+        return $this->paginateCollection($pengeluaranList, 10, $pageName);
+    }
+
+    protected function generateAndPaginateHistoryBarang(string $pageName = 'page')
+    {
+        $masuk = Struk::query()->get()
+            ->flatMap(function ($struk) {
+                return collect($this->parseItems($struk->items))
+                    ->map(function ($item) use ($struk) {
+                        if (!isset($item['nama']) || !isset($item['jumlah'])) {
+                            return null;
+                        }
+                        return [
+                            'tipe' => 'Masuk',
+                            'nama_barang' => $item['nama'],
+                            'jumlah' => (int) ($item['jumlah'] ?? 0),
+                            'nomor_struk' => $struk->nomor_struk,
+                            'tanggal' => $struk->tanggal_struk,
+                            'timestamp' => strtotime($struk->tanggal_struk),
+                        ];
+                    })->filter();
+            });
+
+        $keluar = Pengeluaran::query()->get()
+            ->flatMap(function ($pengeluaran) {
+                return collect($this->parseItems($pengeluaran->daftar_barang))
+                    ->map(function ($item) use ($pengeluaran) {
+                        if (!isset($item['nama']) || !isset($item['jumlah'])) {
+                            return null;
+                        }
+                        return [
+                            'tipe' => 'Keluar',
+                            'nama_barang' => $item['nama'],
+                            'jumlah' => (int) ($item['jumlah'] ?? 0),
+                            'nomor_struk' => $pengeluaran->nomor_struk,
+                            'tanggal' => $pengeluaran->tanggal,
+                            'timestamp' => strtotime($pengeluaran->tanggal),
+                        ];
+                    })->filter();
+            });
+
+        $history = $masuk->concat($keluar)
+            ->sortByDesc('timestamp')
+            ->values()
+            ->map(function ($item) {
+                unset($item['timestamp']);
+                return $item;
+            });
+
+        return $this->paginateCollection($history, 10, $pageName);
+    }
+
+    protected function parseItems($items): array
+    {
+        if (is_string($items)) {
+            $decoded = json_decode($items, true);
+            if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
+                return [];
             }
+            return array_filter($decoded, function ($item) {
+                return is_array($item) && isset($item['nama']) && isset($item['jumlah']);
+            });
         }
-
-        if ($search) {
-            $barangList = collect($barangList)
-                ->filter(function ($item, $nama) use ($search) {
-                    return stripos($nama, $search) !== false ||
-                        stripos($item['nomor_struk'], $search) !== false;
-                })
-                ->toArray();
+        if (is_array($items)) {
+            return array_filter($items, function ($item) {
+                return is_array($item) && isset($item['nama']) && isset($item['jumlah']);
+            });
         }
+        return [];
+    }
 
-        $barangList = collect($barangList);
+    protected function sortCollection(Collection $collection, ?string $sort, array $sortOptions, string $defaultSort): Collection
+    {
+        return ($sortOptions[$sort] ?? $sortOptions[$defaultSort])($collection);
+    }
 
-        switch ($sort) {
-            case 'nama_asc':
-                $barangList = $barangList->sortKeysUsing(function ($a, $b) {
-                    return strcasecmp($a, $b); // case-insensitive comparison
-                });
-                break;
-            case 'nama_desc':
-                $barangList = $barangList->sortKeysUsing(function ($a, $b) {
-                    return strcasecmp($b, $a); // reverse case-insensitive comparison
-                });
-                break;
-
-            case 'nama_desc':
-                $barangList = $barangList->sortKeysDesc();
-                break;
-            case 'tanggal_desc':
-            default:
-                $barangList = $barangList->sortByDesc('tanggal');
-                break;
-        }
-
-        $perPage = 10;
-        $currentPage = LengthAwarePaginator::resolveCurrentPage();
-        $currentItems = $barangList->slice(($currentPage - 1) * $perPage, $perPage)->all();
+    protected function paginateCollection(Collection $collection, int $perPage = 10, string $pageName = 'page'): LengthAwarePaginator
+    {
+        $currentPage = LengthAwarePaginator::resolveCurrentPage($pageName);
+        $currentItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();
 
         return new LengthAwarePaginator(
             $currentItems,
-            $barangList->count(),
+            $collection->count(),
             $perPage,
             $currentPage,
-            ['path' => request()->url(), 'query' => request()->query()]
+            [
+                'path' => request()->url(),
+                'pageName' => $pageName,
+                'query' => request()->query(),
+            ]
         );
     }
 }
