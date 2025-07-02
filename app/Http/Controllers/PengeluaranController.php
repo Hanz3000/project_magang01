@@ -26,11 +26,18 @@ class PengeluaranController extends Controller
         return view('struks.pengeluarans.index', compact('pengeluarans'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $struks = Struk::all();
         $pegawais = Pegawai::all();
-        return view('pengeluarans.create', compact('struks', 'pegawais'));
+        $income = null;
+
+        // Kalau ada income_id di query, ambil struk terkait
+        if ($request->has('income_id')) {
+            $income = Struk::find($request->income_id);
+        }
+
+        return view('pengeluarans.create', compact('struks', 'pegawais', 'income'));
     }
 
     public function store(Request $request)

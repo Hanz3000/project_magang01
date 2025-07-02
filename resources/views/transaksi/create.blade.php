@@ -451,7 +451,8 @@
                                     Tanggal Keluar
                                 </label>
                                 <input type="date" name="tanggal_keluar" id="tanggal_keluar"
-                                    value="{{ old('tanggal_keluar') }}">
+                                    value="{{ old('tanggal_keluar', date('Y-m-d')) }}">
+
                             </div>
                         </div>
 
@@ -594,13 +595,15 @@
                                     <input type="text" name="nomor_struk" id="expense_nomor_struk" required>
                                 </div>
 
+                                <!-- inputan tanggal di pemasukan -->
                                 <div class="input-group">
                                     <label for="expense_tanggal">
                                         <i class="fas fa-calendar-alt mr-1"></i>
                                         Tanggal Pengeluaran
                                     </label>
-                                    <input type="date" name="tanggal" id="expense_tanggal" required
-                                        value="{{ old('tanggal', date('Y-m-d')) }}">
+                                    <input type="date" name="tanggal" id="from_income_tanggal" required
+                                        value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
+
                                 </div>
 
                                 <div class="input-group">
@@ -741,10 +744,12 @@
                                             data-total="{{ collect(json_decode($struk->items, true))->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0)) }}"
                                             data-toko="{{ $struk->nama_toko }}"
                                             data-nomor="{{ $struk->nomor_struk }}"
-                                            data-tanggal="{{ $struk->tanggal_struk }}">
+                                            data-tanggal="{{ $struk->tanggal_struk }}"
+                                            data-keluar="{{ $struk->tanggal_keluar }}"> {{-- ✅ Tambahkan ini --}}
                                             {{ $struk->nama_toko }} - {{ $struk->nomor_struk }}
                                             (Rp{{ number_format(collect(json_decode($struk->items, true))->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0)), 0, ',', '.') }})
                                         </option>
+
                                         @endforeach
                                     </select>
                                 </div>
@@ -768,8 +773,10 @@
                                         Tanggal Pengeluaran
                                     </label>
                                     <input type="date" name="tanggal" id="from_income_tanggal" required
-                                        value="{{ old('tanggal', date('Y-m-d')) }}">
+                                        value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
+
                                 </div>
+
 
                                 <div class="input-group">
                                     <label for="from_income_total">
@@ -829,6 +836,9 @@
                             </div>
                         </form>
                     </div>
+
+
+
                 </div>
             </div>
         </div>
@@ -867,6 +877,22 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const strukSelect = document.getElementById('struk_id');
+        const tanggalInput = document.getElementById('from_income_tanggal');
+
+        strukSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const tanggalKeluar = selectedOption.getAttribute('data-keluar');
+            if (tanggalKeluar) {
+                tanggalInput.value = tanggalKeluar;
+            } else {
+                tanggalInput.value = '';
+            }
+        });
+    });
+
+
     // Image modal functions
     function openImageModal(imageUrl, title) {
         if (!imageUrl) return;
@@ -925,6 +951,17 @@
             // Show corresponding form
             $('.expense-form').addClass('hidden');
             $(`#${expenseType}-expense`).removeClass('hidden');
+        });
+
+        // Event listener setelah Select2 diinisialisasi
+        $('#struk_id').on('change', function() {
+            const selectedOption = $(this).find('option:selected');
+            const tanggalKeluar = selectedOption.data('keluar');
+            if (tanggalKeluar) {
+                $('#from_income_tanggal').val(tanggalKeluar);
+            } else {
+                $('#from_income_tanggal').val('');
+            }
         });
 
         // Update total when struk is selected

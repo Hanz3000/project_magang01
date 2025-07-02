@@ -84,6 +84,7 @@ class StrukController extends Controller
             'nama_toko' => 'required|string|max:255',
             'nomor_struk' => 'required|string|max:255',
             'tanggal_struk' => 'required|date',
+            'tanggal_keluar' => 'nullable|date', // ✅ Tambahkan ini
             'items' => 'required|array|min:1',
             'items.*.nama' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
@@ -106,15 +107,15 @@ class StrukController extends Controller
             'nama_toko'      => $validatedData['nama_toko'],
             'nomor_struk'    => $validatedData['nomor_struk'],
             'tanggal_struk'  => $validatedData['tanggal_struk'],
-            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null, // ⬅️ ini juga
+            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null, // ✅ Jangan lupa ini
             'items'          => json_encode($validatedData['items']),
             'total_harga'    => $validatedData['total_harga'],
-            'foto_struk'     => $fotoFilename ?? $struk->foto_struk
+            'foto_struk'     => $validatedData['foto_struk'] // ✅ gunakan yang disimpan
         ]);
-
 
         return redirect()->route('struks.index')->with('success', 'Struk berhasil diperbarui!');
     }
+
 
     public function destroy(Struk $struk)
     {
