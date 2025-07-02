@@ -1,398 +1,410 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        @if (session('success'))
-        <div class="fixed top-4 right-4 z-50">
-            <div
-                class="bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform transition-all duration-300 animate-slideIn">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span>{{ session('success') }}</span>
-            </div>
-        </div>
-        @endif
-
-        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Manajemen Pengeluaran</h1>
-                <div class="flex items-center gap-4 mt-2">
-                    <p class="text-gray-600">{{ $pengeluarans->total() }} pengeluaran ditemukan</p>
-                    @isset($totalPengeluaran)
-                    <div class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
-                        Total: Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
-                    </div>
-                    @endisset
-                </div>
-            </div>
-            <div class="flex flex-wrap gap-2">
-
-                <div class="relative group">
-                    <button
-                        class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
-                        Ekspor
-                    </button>
+    <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="fixed top-4 right-4 z-50">
                     <div
-                        class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
-                        <a href="{{ route('pengeluarans.export.excel') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
-                            Excel</a>
-                        <a href="{{ route('pengeluarans.export.csv') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
-                            CSV</a>
+                        class="bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform transition-all duration-300 animate-slideIn">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        <span>{{ session('success') }}</span>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <div
-            class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
-            <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <div class="p-2 bg-indigo-100 rounded-lg">
-                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002 2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                                </path>
-                            </svg>
-                        </div>
-                        <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Data Pengeluaran</h3>
-                        </div>
-                    </div>
-                    <div class="relative">
-                        <input type="text" name="search" id="searchInput" placeholder="Cari pengeluaran..."
-                            class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all"
-                            value="{{ request('search') }}" autocomplete="off">
-                        <button type="button" class="absolute left-3 top-2.5 text-gray-400">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                        </button>
-                        @if (request('search'))
-                        <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                            title="Bersihkan pencarian">
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                        </button>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b border-gray-200">
-                        <tr>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk
-                            </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                            </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
-                            </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
-                            </th>
-                            <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total
-                            </th>
-                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk
-                            </th>
-                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody class="divide-y divide-gray-200">
-                        @forelse ($pengeluarans as $index => $pengeluaran)
-                        <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                {{ $pengeluarans->firstItem() + $index }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="font-medium text-gray-900">{{ $pengeluaran->nama_toko ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                {{ $pengeluaran->nomor_struk ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-900">{{ $pengeluaran->tanggal->format('d M Y') }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-700">{{ $pengeluaran->pegawai->nama ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-gray-700 line-clamp-2"
-                                    title="@foreach ($pengeluaran->daftar_barang as $item){{ $item['nama'] }} (x{{ $item['jumlah'] }}) @endforeach">
-                                    @foreach ($pengeluaran->daftar_barang as $item)
-                                    {{ $item['nama'] }} (x{{ $item['jumlah'] }})<br>
-                                    @endforeach
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-red-600">
-                                Rp{{ number_format($pengeluaran->total, 0, ',', '.') }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="flex flex-col items-center">
-
-
-                                    @php
-                                    $imagePath = null;
-                                    $source = null;
-
-                                    // Cek bukti pembayaran pengeluaran
-                                    if ($pengeluaran->bukti_pembayaran) {
-                                    $imagePath = strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
-                                    ? $pengeluaran->bukti_pembayaran
-                                    : 'storage/' . $pengeluaran->bukti_pembayaran;
-                                    $source = 'pengeluaran';
-                                    }
-                                    // Cek bukti pembayaran dari income jika ada relasi
-                                    elseif ($pengeluaran->income && $pengeluaran->income->bukti_pembayaran) {
-                                    $imagePath = strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
-                                    ? $pengeluaran->income->bukti_pembayaran
-                                    : 'storage/' . $pengeluaran->income->bukti_pembayaran;
-                                    $source = 'income';
-                                    }
-                                    @endphp
-
-                                    {{-- Tampilkan gambar jika ada --}}
-                                    @if ($imagePath)
-                                    <img src="{{ asset($imagePath) }}" alt="Bukti Pembayaran"
-                                        class="w-24 h-24 object-cover rounded shadow mb-2 cursor-pointer hover:opacity-90"
-                                        onclick="openModal('{{ asset($imagePath) }}')">
-
-                                    <span class="text-xs text-gray-500 mb-1">
-                                        Lihat {{ $source === 'income' ? '(Dari Pemasukan)' : '' }}
-                                    </span>
-                                    @else
-                                    <span class="text-gray-400 italic text-xs mb-2">Tidak ada bukti</span>
-                                    @endif
-
-                                    {{-- Informasi income --}}
-                                    @if($pengeluaran->income)
-                                    <div class="text-xs text-center bg-green-50 p-2 rounded-lg">
-                                        <p class="font-semibold text-green-700">Info Pemasukan:</p>
-                                        <p>Tanggal: {{ $pengeluaran->income->tanggal ?? '-' }}</p>
-                                        <p>Total: Rp {{ number_format($pengeluaran->income->total_harga ?? 0, 0, ',', '.') }}</p>
-                                        <p>Barang: {{ $pengeluaran->income->items ? count(json_decode($pengeluaran->income->items, true)) : 0 }} item</p>
-                                    </div>
-                                    @endif
-                                </div>
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <div class="flex justify-center space-x-2">
-                                    <a href="{{ route('pengeluarans.show', $pengeluaran->id) }}"
-                                        class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
-                                        title="Lihat Detail">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
-                                            </path>
-                                        </svg>
-                                    </a>
-                                    <a href="{{ route('pengeluarans.edit', $pengeluaran->id) }}"
-                                        class="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 px-3 py-1 rounded-md transition-colors"
-                                        title="Edit">
-                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                            </path>
-                                        </svg>
-                                        Edit
-                                    </a>
-                                    <form action="{{ route('pengeluarans.destroy', $pengeluaran->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors" title="Hapus">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr class="animate-fadeIn">
-                            <td colspan="9" class="px-6 py-4 text-center text-gray-500">Tidak ada pengeluaran
-                                ditemukan.</td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if ($pengeluarans->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200">
-                {{ $pengeluarans->appends(['search' => request('search')])->links() }}
-            </div>
             @endif
+
+            <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Manajemen Pengeluaran</h1>
+                    <div class="flex items-center gap-4 mt-2">
+                        <p class="text-gray-600">{{ $pengeluarans->total() }} pengeluaran ditemukan</p>
+                        @isset($totalPengeluaran)
+                            <div class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
+                                Total: Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
+                            </div>
+                        @endisset
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <div class="relative group">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Ekspor
+                        </button>
+                        <div
+                            class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
+                            <a href="{{ route('pengeluarans.export.excel') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
+                                Excel</a>
+                            <a href="{{ route('pengeluarans.export.csv') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
+                                CSV</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
+                <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-100 rounded-lg">
+                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002 2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-800">Data Pengeluaran</h3>
+                            </div>
+                        </div>
+                        <div class="relative">
+                            <input type="text" name="search" id="searchInput" placeholder="Cari pengeluaran..."
+                                class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all"
+                                value="{{ request('search') }}" autocomplete="off">
+                            <button type="button" class="absolute left-3 top-2.5 text-gray-400">
+                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                            </button>
+                            @if (request('search'))
+                                <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                    title="Bersihkan pencarian">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M6 18L18 6M6 6l12 12"></path>
+                                    </svg>
+                                </button>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 border-b border-gray-200">
+                            <tr>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk
+                                </th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
+                                    Masuk
+                                </th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
+                                    Keluar
+                                </th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
+                                </th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
+                                </th>
+                                <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total
+                                </th>
+                                <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk
+                                </th>
+                                <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-200">
+                            @forelse ($pengeluarans as $index => $pengeluaran)
+                                <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        {{ $pengeluarans->firstItem() + $index }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="font-medium text-gray-900">{{ $pengeluaran->nama_toko ?? '-' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-gray-500">
+                                        {{ $pengeluaran->nomor_struk ?? '-' }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @if ($pengeluaran->income)
+                                            <div class="text-gray-900">{{ $pengeluaran->income->tanggal->format('d M Y') }}
+                                            </div>
+                                        @else
+                                            <div class="text-gray-900">{{ $pengeluaran->created_at->format('d M Y') }}
+                                            </div>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-gray-900">{{ $pengeluaran->tanggal->format('d M Y') }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-gray-700">{{ $pengeluaran->pegawai->nama ?? '-' }}</div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="text-gray-700 line-clamp-2"
+                                            title="@foreach ($pengeluaran->daftar_barang as $item){{ $item['nama'] }} (x{{ $item['jumlah'] }}) @endforeach">
+                                            @foreach ($pengeluaran->daftar_barang as $item)
+                                                {{ $item['nama'] }} (x{{ $item['jumlah'] }})<br>
+                                            @endforeach
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-red-600">
+                                        Rp{{ number_format($pengeluaran->total, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="flex flex-col items-center">
+                                            @php
+                                                $imagePath = null;
+                                                $source = null;
+
+                                                // Cek bukti pembayaran pengeluaran
+                                                if ($pengeluaran->bukti_pembayaran) {
+                                                    $imagePath =
+                                                        strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
+                                                            ? $pengeluaran->bukti_pembayaran
+                                                            : 'storage/' . $pengeluaran->bukti_pembayaran;
+                                                    $source = 'pengeluaran';
+                                                }
+                                                // Cek bukti pembayaran dari income jika ada relasi
+                                                elseif (
+                                                    $pengeluaran->income &&
+                                                    $pengeluaran->income->bukti_pembayaran
+                                                ) {
+                                                    $imagePath =
+                                                        strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
+                                                            ? $pengeluaran->income->bukti_pembayaran
+                                                            : 'storage/' . $pengeluaran->income->bukti_pembayaran;
+                                                    $source = 'income';
+                                                }
+                                            @endphp
+
+                                            {{-- Tampilkan gambar jika ada --}}
+                                            @if ($imagePath)
+                                                <img src="{{ asset($imagePath) }}" alt="Bukti Pembayaran"
+                                                    class="w-24 h-24 object-cover rounded shadow mb-2 cursor-pointer hover:opacity-90"
+                                                    onclick="openModal('{{ asset($imagePath) }}')">
+
+                                                <span class="text-xs text-gray-500 mb-1">
+                                                    Lihat {{ $source === 'income' ? '(Dari Pemasukan)' : '' }}
+                                                </span>
+                                            @else
+                                                <span class="text-gray-400 italic text-xs mb-2">Tidak ada bukti</span>
+                                            @endif
+                                        </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <div class="flex justify-center space-x-2">
+                                            <a href="{{ route('pengeluarans.show', $pengeluaran->id) }}"
+                                                class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                                                title="Lihat Detail">
+                                                <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+                                                    </path>
+                                                </svg>
+                                            </a>
+                                            <a href="{{ route('pengeluarans.edit', $pengeluaran->id) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 px-3 py-1 rounded-md transition-colors"
+                                                title="Edit">
+                                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
+                                                    </path>
+                                                </svg>
+                                                Edit
+                                            </a>
+                                            <form action="{{ route('pengeluarans.destroy', $pengeluaran->id) }}"
+                                                method="POST"
+                                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit"
+                                                    class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
+                                                    title="Hapus">
+                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                                        viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="2"
+                                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                                        </path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr class="animate-fadeIn">
+                                    <td colspan="10" class="px-6 py-4 text-center text-gray-500">Tidak ada pengeluaran
+                                        ditemukan.</td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if ($pengeluarans->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-200">
+                        {{ $pengeluarans->appends(['search' => request('search')])->links() }}
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Image Modal -->
-<div id="imageModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-            <div class="absolute inset-0 bg-gray-500 opacity-75" onclick="closeModal()"></div>
-        </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <img id="modalImage" src="" alt="Bukti Pengeluaran"
-                    class="w-full h-auto max-h-[80vh] object-contain">
+    <!-- Image Modal -->
+    <div id="imageModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75" onclick="closeModal()"></div>
             </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onclick="closeModal()"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Tutup
-                </button>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <img id="modalImage" src="" alt="Bukti Pengeluaran"
+                        class="w-full h-auto max-h-[80vh] object-contain">
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Tutup
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-    // Image modal functions
-    function openModal(imageSrc) {
-        document.getElementById('modalImage').src = imageSrc;
-        document.getElementById('imageModal').classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeModal() {
-        document.getElementById('imageModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('imageModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
+    <script>
+        // Image modal functions
+        function openModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
         }
-    });
 
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-            if (!document.getElementById('imageModal').classList.contains('hidden')) {
+        function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
                 closeModal();
             }
-        }
-    });
-
-    // Auto-hide success message after 5 seconds
-    @if(session('success'))
-    setTimeout(() => {
-        const successMessage = document.querySelector('.fixed.top-4.right-4');
-        if (successMessage) {
-            successMessage.style.transform = 'translateX(100%)';
-            setTimeout(() => {
-                successMessage.remove();
-            }, 300);
-        }
-    }, 5000);
-    @endif
-
-    // Search functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchInput');
-        const clearSearch = document.getElementById('clearSearch');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                const searchTerm = searchInput.value.trim();
-                const url = new URL(window.location.href);
-
-                if (searchTerm) {
-                    url.searchParams.set('search', searchTerm);
-                } else {
-                    url.searchParams.delete('search');
-                }
-
-                window.location.href = url.toString();
-            }, 500);
         });
 
-        if (clearSearch) {
-            clearSearch.addEventListener('click', function() {
-                const url = new URL(window.location.href);
-                url.searchParams.delete('search');
-                window.location.href = url.toString();
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (!document.getElementById('imageModal').classList.contains('hidden')) {
+                    closeModal();
+                }
+            }
+        });
+
+        // Auto-hide success message after 5 seconds
+        @if (session('success'))
+            setTimeout(() => {
+                const successMessage = document.querySelector('.fixed.top-4.right-4');
+                if (successMessage) {
+                    successMessage.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        successMessage.remove();
+                    }, 300);
+                }
+            }, 5000);
+        @endif
+
+        // Search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const clearSearch = document.getElementById('clearSearch');
+            let searchTimeout;
+
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchTerm = searchInput.value.trim();
+                    const url = new URL(window.location.href);
+
+                    if (searchTerm) {
+                        url.searchParams.set('search', searchTerm);
+                    } else {
+                        url.searchParams.delete('search');
+                    }
+
+                    window.location.href = url.toString();
+                }, 500);
             });
+
+            if (clearSearch) {
+                clearSearch.addEventListener('click', function() {
+                    const url = new URL(window.location.href);
+                    url.searchParams.delete('search');
+                    window.location.href = url.toString();
+                });
+            }
+        });
+    </script>
+
+    <style>
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-    });
-</script>
 
-<style>
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out forwards;
         }
 
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
         }
-    }
 
-    .animate-slideIn {
-        animation: slideIn 0.3s ease-out forwards;
-    }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
 
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out forwards;
-    }
+        .pagination .active span {
+            background-color: #4f46e5;
+            color: white;
+        }
 
-    .line-clamp-2 {
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-    }
-
-    .pagination .active span {
-        background-color: #4f46e5;
-        color: white;
-    }
-
-    .pagination a:hover {
-        background-color: #f5f3ff;
-    }
-</style>
+        .pagination a:hover {
+            background-color: #f5f3ff;
+        }
+    </style>
 @endsection
