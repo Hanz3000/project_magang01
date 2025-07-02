@@ -12,7 +12,7 @@ class PengeluaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengeluaran::with('pegawai');
+        $query = Pengeluaran::with(['pegawai', 'income']); // Tambahkan 'income'
 
         if ($request->has('search') && $request->search != '') {
             $query->where('nama_toko', 'like', '%' . $request->search . '%')
@@ -26,12 +26,6 @@ class PengeluaranController extends Controller
         return view('struks.pengeluarans.index', compact('pengeluarans'));
     }
 
-    public function indexByStruk(Struk $struk)
-    {
-        $pengeluarans = $struk->pengeluarans()->with('pegawai')->latest()->paginate(10);
-        return view('pengeluarans.index', compact('pengeluarans', 'struk'));
-    }
-
     public function create()
     {
         $struks = Struk::all();
@@ -39,49 +33,21 @@ class PengeluaranController extends Controller
         return view('pengeluarans.create', compact('struks', 'pegawais'));
     }
 
-    public function createByStruk(Struk $struk)
+    public function store(Request $request)
     {
-        $pegawais = Pegawai::all();
-        return view('pengeluarans.create', compact('struk', 'pegawais'));
-    }
-
-    public function storeByStruk(Request $request, Struk $struk)
-    {
-        $validated = $request->validate([
-            'struk_id' => 'required|exists:struks,id',
+        // Validasi dasar yang berlaku untuk semua jenis pengeluaran
+        $baseRules = [
             'pegawai_id' => 'required|exists:pegawais,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string',
-        ]);
+            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ];
 
-        $items = json_decode($struk->items, true) ?? [];
-        $total = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
-
-        $pengeluaran = $struk->pengeluarans()->create([
-            'nama_toko' => $struk->nama_toko,
-            'nomor_struk' => $struk->nomor_struk,
-            'tanggal' => $validated['tanggal'],
-            'pegawai_id' => $validated['pegawai_id'],
-            'daftar_barang' => json_encode($items),
-            'total' => $total,
-            'jumlah_item' => count($items),
-            'bukti_pembayaran' => $struk->foto_struk,
-            'keterangan' => $validated['keterangan'] ?? null,
-        ]);
-
-        return redirect()->route('struks.pengeluarans.index', $struk)
-            ->with('success', 'Pengeluaran berhasil dibuat dari struk.');
-    }
-
-    public function store(Request $request)
-    {
+        // Jika pengeluaran dari pemasukan
         if ($request->has('from_income')) {
-            $validated = $request->validate([
+            $validated = $request->validate(array_merge($baseRules, [
                 'struk_id' => 'required|exists:struks,id',
-                'pegawai_id' => 'required|exists:pegawais,id',
-                'tanggal' => 'required|date',
-                'keterangan' => 'nullable|string',
-            ]);
+            ]));
 
             $struk = Struk::findOrFail($validated['struk_id']);
             $items = json_decode($struk->items, true) ?? [];
@@ -96,10 +62,12 @@ class PengeluaranController extends Controller
                 'total' => $total,
                 'jumlah_item' => count($items),
                 'keterangan' => $validated['keterangan'] ?? null,
+                'struk_id' => $validated['struk_id'],
             ];
 
+            // Handle file upload
             if ($request->hasFile('bukti_pembayaran')) {
-                $pengeluaranData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('struk_foto', 'public');
+                $pengeluaranData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
             }
 
             Pengeluaran::create($pengeluaranData);
@@ -107,37 +75,38 @@ class PengeluaranController extends Controller
             return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil dibuat dari pemasukan.');
         }
 
-        $validated = $request->validate([
-            'struk_id' => 'required|exists:struks,id',
-            'pegawai_id' => 'required|exists:pegawais,id',
-            'tanggal' => 'required|date',
+        // Jika pengeluaran manual
+        $validated = $request->validate(array_merge($baseRules, [
+            'nama_toko' => 'required|string',
+            'nomor_struk' => 'required|string',
             'items' => 'required|array|min:1',
             'items.*.nama' => 'required|string',
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.harga' => 'required|integer|min:0',
-            'keterangan' => 'nullable|string',
-        ]);
+        ]));
 
         $total = collect($validated['items'])->sum(fn($item) => $item['jumlah'] * $item['harga']);
 
         $pengeluaranData = [
-            'nama_toko' => $request->nama_toko,
-            'nomor_struk' => $request->nomor_struk,
+            'nama_toko' => $validated['nama_toko'],
+            'nomor_struk' => $validated['nomor_struk'],
             'tanggal' => $validated['tanggal'],
             'pegawai_id' => $validated['pegawai_id'],
             'daftar_barang' => json_encode($validated['items']),
             'total' => $total,
             'jumlah_item' => collect($validated['items'])->sum('jumlah'),
             'keterangan' => $validated['keterangan'] ?? null,
+            'struk_id' => null, // Manual expenses don't need struk_id
         ];
 
+        // Handle file upload
         if ($request->hasFile('bukti_pembayaran')) {
-            $pengeluaranData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('struk_foto', 'public');
+            $pengeluaranData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
         }
 
         Pengeluaran::create($pengeluaranData);
 
-        return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil dibuat.');
+        return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran manual berhasil dibuat.');
     }
 
     public function show($id)
@@ -150,37 +119,69 @@ class PengeluaranController extends Controller
     {
         $pengeluaran = Pengeluaran::findOrFail($id);
         $pegawais = Pegawai::all();
-        return view('struks.pengeluarans.edit', compact('pengeluaran', 'pegawais'));
+        $struks = Struk::all();
+        return view('struks.pengeluarans.edit', compact('pengeluaran', 'pegawais', 'struks'));
     }
 
     public function update(Request $request, Pengeluaran $pengeluaran)
     {
-        $validated = $request->validate([
+        $rules = [
             'nama_toko' => 'required|string',
             'nomor_struk' => 'required|string',
             'pegawai_id' => 'required|exists:pegawais,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string',
-        ]);
+            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ];
 
-        $pengeluaran->update($validated);
+        // Jika pengeluaran manual dan ingin mengupdate items
+        if ($pengeluaran->struk_id === null && $request->has('items')) {
+            $rules['items'] = 'required|array|min:1';
+            $rules['items.*.nama'] = 'required|string';
+            $rules['items.*.jumlah'] = 'required|integer|min:1';
+            $rules['items.*.harga'] = 'required|integer|min:0';
+        }
+
+        $validated = $request->validate($rules);
+
+        $updateData = [
+            'nama_toko' => $validated['nama_toko'],
+            'nomor_struk' => $validated['nomor_struk'],
+            'pegawai_id' => $validated['pegawai_id'],
+            'tanggal' => $validated['tanggal'],
+            'keterangan' => $validated['keterangan'] ?? null,
+        ];
+
+        // Jika pengeluaran manual dan ada items
+        if ($pengeluaran->struk_id === null && isset($validated['items'])) {
+            $total = collect($validated['items'])->sum(fn($item) => $item['jumlah'] * $item['harga']);
+            $updateData['daftar_barang'] = json_encode($validated['items']);
+            $updateData['total'] = $total;
+            $updateData['jumlah_item'] = collect($validated['items'])->sum('jumlah');
+        }
+
+        // Handle file upload
+        if ($request->hasFile('bukti_pembayaran')) {
+            // Delete old file if exists
+            if ($pengeluaran->bukti_pembayaran) {
+                Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
+            }
+            $updateData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
+        }
+
+        $pengeluaran->update($updateData);
 
         return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil diperbarui.');
     }
 
     public function destroy(Pengeluaran $pengeluaran)
     {
+        // Delete associated file if exists
+        if ($pengeluaran->bukti_pembayaran) {
+            Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
+        }
+
         $pengeluaran->delete();
         return back()->with('success', 'Pengeluaran berhasil dihapus');
-    }
-
-    public function exportExcel()
-    {
-        return response()->json(['message' => 'Export Excel belum diimplementasikan']);
-    }
-
-    public function exportCsv()
-    {
-        return response()->json(['message' => 'Export CSV belum diimplementasikan']);
     }
 }

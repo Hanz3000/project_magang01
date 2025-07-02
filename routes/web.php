@@ -10,6 +10,7 @@ use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\TransaksiController;
 
+
 // ------------------- AUTH ROUTES -------------------
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -107,4 +108,8 @@ Route::middleware('auth')->group(function () {
     Route::get('pengeluarans/export/excel', [PengeluaranController::class, 'exportExcel'])->name('pengeluarans.export.excel');
     Route::get('pengeluarans/export/csv', [PengeluaranController::class, 'exportCsv'])->name('pengeluarans.export.csv');
     Route::put('/pengeluarans/{id}', [PengeluaranController::class, 'update'])->name('pengeluarans.update');
+    Route::get('/struks/{id}/items', [TransaksiController::class, 'getStrukItems']);
+
+    Route::get('/struks/{struk}/items', [StrukController::class, 'getItems'])->name('struks.items');
+    Route::get('/pengeluaran', [PengeluaranController::class, 'index']);
 });
