@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-5xl space-y-6">
+<div class="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-7xl space-y-6">
         <!-- Header -->
         <div class="text-center">
             <h1 class="text-3xl font-bold text-gray-800">Dashboard Analisis</h1>
@@ -14,7 +14,6 @@
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-blue-50 text-blue-600 mr-4">
-                        <!-- Ikon Struk -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
@@ -28,7 +27,6 @@
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-green-50 text-green-600 mr-4">
-                        <!-- Ikon Barang Masuk -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                         </svg>
@@ -42,7 +40,6 @@
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-red-50 text-red-600 mr-4">
-                        <!-- Ikon Barang Keluar -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4m8 8V4" />
                         </svg>
@@ -56,7 +53,6 @@
             <div class="bg-white p-5 rounded-lg shadow-sm border border-gray-100 hover:shadow transition-shadow duration-200">
                 <div class="flex items-center">
                     <div class="p-3 rounded-full bg-purple-50 text-purple-600 mr-4">
-                        <!-- Ikon Tanggal -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
@@ -110,7 +106,6 @@
                             @endif
                         </span>
                     </div>
-
                 </div>
                 @else
                 <div class="text-center py-6">
@@ -164,7 +159,6 @@
                             @endif
                         </span>
                     </div>
-
                 </div>
                 @else
                 <div class="text-center py-6">
@@ -210,7 +204,6 @@
                         Cari
                     </button>
                 </form>
-
             </div>
 
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
@@ -259,11 +252,10 @@
                     Menampilkan {{ $barangList->firstItem() }} sampai {{ $barangList->lastItem() }} dari {{ $barangList->total() }} hasil
                 </div>
             </div>
-
         </div>
 
         <!-- Item Pengeluaran Terbaru -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-red-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
@@ -272,7 +264,6 @@
                     Daftar Pengeluaran Barang
                 </h2>
                 <form action="{{ route('dashboard') }}" method="GET" class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex space-x-2">
-
                     <input type="text" name="search_pengeluaran" value="{{ request('search_pengeluaran') }}"
                         class="flex-grow md:w-64 border border-red-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-transparent text-sm"
                         placeholder="Cari nama barang pengeluaran...">
@@ -292,7 +283,6 @@
                         </svg>
                         Cari
                     </button>
-
                 </form>
             </div>
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
@@ -329,10 +319,8 @@
                                 </div>
                             </td>
                         </tr>
-
                         @endforelse
                     </tbody>
-
                 </table>
             </div>
             <div class="mt-4">
@@ -343,6 +331,64 @@
             </div>
         </div>
 
+        <!-- History Rekap Barang -->
+        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11H9v2h2V7zm0 4H9v4h2v-4z" clip-rule="evenodd" />
+                </svg>
+                History Rekap Barang
+            </h2>
+
+            <div class="overflow-x-auto border border-gray-200 rounded-lg">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Masuk</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Keluar</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($historyBarang as $index => $item)
+                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $item['nama_barang'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $item['tanggal_masuk'] ? \Carbon\Carbon::parse($item['tanggal_masuk'])->format('d-m-Y') : '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $item['tanggal_keluar'] ? \Carbon\Carbon::parse($item['tanggal_keluar'])->format('d-m-Y') : '-' }}
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-8 text-center text-sm text-gray-500">
+                                <div class="flex flex-col items-center justify-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <p class="mt-3 text-gray-600 font-medium">Tidak ada history barang ditemukan.</p>
+                                    <p class="text-xs text-gray-400">Belum ada data masuk atau keluar yang terekam.</p>
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            @if($historyBarang->total() > 0)
+            <div class="mt-4">
+                {{ $historyBarang->links('vendor.pagination.custom') }}
+                <div class="showing-results mt-2 text-sm text-gray-600 text-center">
+                    Menampilkan {{ $historyBarang->firstItem() }} sampai {{ $historyBarang->lastItem() }} dari {{ $historyBarang->total() }} hasil
+                </div>
+            </div>
+            @endif
+        </div>
     </div>
 </div>
 @endsection
