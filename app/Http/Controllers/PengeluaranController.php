@@ -63,7 +63,7 @@ class PengeluaranController extends Controller
                 'jumlah_item' => count($items),
                 'keterangan' => $validated['keterangan'] ?? null,
                 'struk_id' => $validated['struk_id'],
-                'bukti_pembayaran' => $struk->foto_struk ? 'struk_foto/'.$struk->foto_struk : null,
+                'bukti_pembayaran' => $struk->foto_struk ? 'struk_foto/' . $struk->foto_struk : null,
             ];
 
             // Handle file upload
