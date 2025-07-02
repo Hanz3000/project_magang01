@@ -1,6 +1,55 @@
 @extends('layouts.app')
 
 @section('content')
+    @push('styles')
+        <style>
+            .checkbox-style {
+                appearance: none;
+                -webkit-appearance: none;
+                -moz-appearance: none;
+                width: 18px;
+                height: 18px;
+                border: 2px solid #d1d5db;
+                border-radius: 0.25rem;
+                outline: none;
+                cursor: pointer;
+                position: relative;
+                transition: all 0.2s;
+            }
+
+            .checkbox-style:checked {
+                background-color: #4f46e5;
+                border-color: #4f46e5;
+            }
+
+            .checkbox-style:checked::after {
+                content: '✓';
+                position: absolute;
+                color: white;
+                font-size: 12px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .animate-fadeIn {
+                animation: fadeIn 0.3s ease-out forwards;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(10px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    @endpush
+
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             @if (session('success'))
@@ -15,6 +64,13 @@
                 </div>
             @endif
 
+            <!-- Form untuk Bulk Delete -->
+            <form id="bulkDeleteForm" method="POST" action="{{ route('pengeluarans.massDelete') }}">
+                @csrf
+                @method('DELETE')
+                <input type="hidden" name="selected_ids" id="selectedIds">
+            </form>
+
             <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">Manajemen Pengeluaran</h1>
@@ -28,6 +84,30 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-2">
+                    <!-- Bulk Actions Container -->
+                    <div id="bulkActionsContainer"
+                        class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
+                        <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0
+                            dipilih</span>
+                        <button onclick="confirmBulkDelete()"
+                            class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
+                            </svg>
+                            Hapus
+                        </button>
+                        <button onclick="clearSelection()"
+                            class="p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
+                            title="Batal">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
+                    </div>
+
                     <div class="relative group">
                         <button
                             class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
@@ -94,16 +174,19 @@
                     <table class="w-full text-sm">
                         <thead class="bg-gray-50 border-b border-gray-200">
                             <tr>
+                                <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider w-10">
+                                    <input type="checkbox" id="selectAll" class="checkbox-style">
+                                </th>
                                 <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
-                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko
+                                </th>
+                                <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
+                                    Struk
                                 </th>
                                 <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                                    Masuk
-                                </th>
+                                    Masuk</th>
                                 <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                                    Keluar
-                                </th>
+                                    Keluar</th>
                                 <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
                                 </th>
                                 <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
@@ -121,6 +204,10 @@
                             @forelse ($pengeluarans as $index => $pengeluaran)
                                 <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        <input type="checkbox" name="selected_ids[]" value="{{ $pengeluaran->id }}"
+                                            class="rowCheckbox checkbox-style">
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
                                         {{ $pengeluarans->firstItem() + $index }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
@@ -131,8 +218,8 @@
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         @if ($pengeluaran->income)
-                                            <div class="text-gray-900">{{ $pengeluaran->income->tanggal->format('d M Y') }}
-                                            </div>
+                                            <div class="text-gray-900">
+                                                {{ $pengeluaran->income->tanggal->format('d M Y') }}</div>
                                         @else
                                             <div class="text-gray-900">{{ $pengeluaran->created_at->format('d M Y') }}
                                             </div>
@@ -161,16 +248,13 @@
                                                 $imagePath = null;
                                                 $source = null;
 
-                                                // Cek bukti pembayaran pengeluaran
                                                 if ($pengeluaran->bukti_pembayaran) {
                                                     $imagePath =
                                                         strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
                                                             ? $pengeluaran->bukti_pembayaran
                                                             : 'storage/' . $pengeluaran->bukti_pembayaran;
                                                     $source = 'pengeluaran';
-                                                }
-                                                // Cek bukti pembayaran dari income jika ada relasi
-                                                elseif (
+                                                } elseif (
                                                     $pengeluaran->income &&
                                                     $pengeluaran->income->bukti_pembayaran
                                                 ) {
@@ -182,12 +266,10 @@
                                                 }
                                             @endphp
 
-                                            {{-- Tampilkan gambar jika ada --}}
                                             @if ($imagePath)
                                                 <img src="{{ asset($imagePath) }}" alt="Bukti Pembayaran"
                                                     class="w-24 h-24 object-cover rounded shadow mb-2 cursor-pointer hover:opacity-90"
                                                     onclick="openModal('{{ asset($imagePath) }}')">
-
                                                 <span class="text-xs text-gray-500 mb-1">
                                                     Lihat {{ $source === 'income' ? '(Dari Pemasukan)' : '' }}
                                                 </span>
@@ -244,7 +326,7 @@
                                 </tr>
                             @empty
                                 <tr class="animate-fadeIn">
-                                    <td colspan="10" class="px-6 py-4 text-center text-gray-500">Tidak ada pengeluaran
+                                    <td colspan="12" class="px-6 py-4 text-center text-gray-500">Tidak ada pengeluaran
                                         ditemukan.</td>
                                 </tr>
                             @endforelse
@@ -253,8 +335,59 @@
                 </div>
 
                 @if ($pengeluarans->hasPages())
-                    <div class="px-6 py-4 border-t border-gray-200">
-                        {{ $pengeluarans->appends(['search' => request('search')])->links() }}
+                    <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+                        <div class="text-sm text-gray-600">
+                            Menampilkan {{ $pengeluarans->firstItem() }} sampai {{ $pengeluarans->lastItem() }} dari
+                            {{ $pengeluarans->total() }}
+                            hasil
+                        </div>
+                        <div class="flex space-x-1">
+                            {{-- Previous Page Link --}}
+                            @if ($pengeluarans->onFirstPage())
+                                <span class="px-3 py-1 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </span>
+                            @else
+                                <a href="{{ $pengeluarans->previousPageUrl() }}"
+                                    class="px-3 py-1 rounded-lg border border-gray-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 19l-7-7 7-7" />
+                                    </svg>
+                                </a>
+                            @endif
+
+                            {{-- Pagination Elements --}}
+                            @foreach ($pengeluarans->getUrlRange(1, $pengeluarans->lastPage()) as $page => $url)
+                                @if ($page == $pengeluarans->currentPage())
+                                    <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white">{{ $page }}</span>
+                                @else
+                                    <a href="{{ $url }}"
+                                        class="px-3 py-1 rounded-lg border border-gray-200 text-gray-700 hover:bg-indigo-50 transition-colors">{{ $page }}</a>
+                                @endif
+                            @endforeach
+
+                            {{-- Next Page Link --}}
+                            @if ($pengeluarans->hasMorePages())
+                                <a href="{{ $pengeluarans->nextPageUrl() }}"
+                                    class="px-3 py-1 rounded-lg border border-gray-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
+                            @else
+                                <span class="px-3 py-1 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </span>
+                            @endif
+                        </div>
                     </div>
                 @endif
             </div>
@@ -284,50 +417,145 @@
         </div>
     </div>
 
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modalTitle">Konfirmasi Penghapusan
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500">Apakah Anda yakin ingin menghapus data yang dipilih?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="submitBulkDelete()"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Hapus
+                    </button>
+                    <button type="button" onclick="closeDeleteModal()"
+                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Batal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Image modal functions
-        function openModal(imageSrc) {
-            document.getElementById('modalImage').src = imageSrc;
-            document.getElementById('imageModal').classList.remove('hidden');
-            document.body.classList.add('overflow-hidden');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elemen yang diperlukan
+            const selectAll = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+            const bulkActions = document.getElementById('bulkActionsContainer');
+            const selectedCount = document.getElementById('selectedCount');
+            const selectedIdsInput = document.getElementById('selectedIds');
 
-        function closeModal() {
-            document.getElementById('imageModal').classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-        }
+            // Fungsi untuk update bulk actions
+            function updateBulkActions() {
+                const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+                const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
 
-        // Close modal when clicking outside
-        document.getElementById('imageModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeModal();
+                if (selectedCheckboxes.length > 0) {
+                    bulkActions.classList.remove('hidden');
+                    selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
+                    selectedIdsInput.value = selectedIds.join(',');
+
+                    // Update select all checkbox
+                    if (selectAll) {
+                        selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
+                        selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length <
+                            rowCheckboxes.length;
+                    }
+                } else {
+                    bulkActions.classList.add('hidden');
+                    selectedIdsInput.value = '';
+                    if (selectAll) selectAll.checked = false;
+                }
             }
-        });
 
-        // Close modal with ESC key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                if (!document.getElementById('imageModal').classList.contains('hidden')) {
+            // Select all checkbox
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    rowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                    updateBulkActions();
+                });
+            }
+
+            // Individual row checkbox
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkActions);
+            });
+
+            // Event delegation untuk checkbox yang mungkin ditambahkan dinamis
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('rowCheckbox')) {
+                    updateBulkActions();
+                }
+            });
+
+            // Image modal functions
+            function openModal(imageSrc) {
+                document.getElementById('modalImage').src = imageSrc;
+                document.getElementById('imageModal').classList.remove('hidden');
+                document.body.classList.add('overflow-hidden');
+            }
+
+            function closeModal() {
+                document.getElementById('imageModal').classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            }
+
+            // Close modal when clicking outside
+            document.getElementById('imageModal').addEventListener('click', function(e) {
+                if (e.target === this) {
                     closeModal();
                 }
-            }
-        });
+            });
 
-        // Auto-hide success message after 5 seconds
-        @if (session('success'))
-            setTimeout(() => {
-                const successMessage = document.querySelector('.fixed.top-4.right-4');
-                if (successMessage) {
-                    successMessage.style.transform = 'translateX(100%)';
-                    setTimeout(() => {
-                        successMessage.remove();
-                    }, 300);
+            // Close modal with ESC key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (!document.getElementById('imageModal').classList.contains('hidden')) {
+                        closeModal();
+                    }
                 }
-            }, 5000);
-        @endif
+            });
 
-        // Search functionality
-        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide success message after 5 seconds
+            @if (session('success'))
+                setTimeout(() => {
+                    const successMessage = document.querySelector('.fixed.top-4.right-4');
+                    if (successMessage) {
+                        successMessage.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            successMessage.remove();
+                        }, 300);
+                    }
+                }, 5000);
+            @endif
+
+            // Search functionality
             const searchInput = document.getElementById('searchInput');
             const clearSearch = document.getElementById('clearSearch');
             let searchTimeout;
@@ -354,6 +582,59 @@
                     url.searchParams.delete('search');
                     window.location.href = url.toString();
                 });
+            }
+        });
+
+        // Fungsi untuk clear selection
+        function clearSelection() {
+            document.querySelectorAll('.rowCheckbox').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            document.getElementById('selectAll').checked = false;
+            document.getElementById('bulkActionsContainer').classList.add('hidden');
+            document.getElementById('selectedIds').value = '';
+        }
+
+        // Fungsi untuk konfirmasi bulk delete
+        function confirmBulkDelete() {
+            const selectedIds = document.getElementById('selectedIds').value;
+            if (!selectedIds) {
+                alert('Pilih setidaknya satu data untuk dihapus');
+                return;
+            }
+
+            const count = selectedIds.split(',').length;
+            if (confirm(`Apakah Anda yakin ingin menghapus ${count} data yang dipilih?`)) {
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        }
+
+        // Delete modal functions
+        function openDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+
+        function submitBulkDelete() {
+            document.getElementById('bulkDeleteForm').submit();
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('deleteModal').classList.contains('hidden')) {
+                closeDeleteModal();
             }
         });
     </script>
@@ -398,13 +679,86 @@
             overflow: hidden;
         }
 
+        .group:hover .group-hover\:block {
+            display: block;
+        }
+
+        .group:hover .group-hover\:opacity-100 {
+            opacity: 1;
+        }
+
+        .group:hover .group-hover\:visible {
+            visibility: visible;
+        }
+
+        .hover-scale {
+            transition: transform 0.2s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+
+        /* Custom pagination styling */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            padding: 0;
+        }
+
+        .pagination li {
+            margin: 0 4px;
+        }
+
+        .pagination a,
+        .pagination span {
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+
+        .pagination a {
+            color: #4f46e5;
+            border: 1px solid #e5e7eb;
+        }
+
+        .pagination a:hover {
+            background-color: #f5f3ff;
+        }
+
         .pagination .active span {
             background-color: #4f46e5;
             color: white;
         }
 
-        .pagination a:hover {
-            background-color: #f5f3ff;
+        .pagination .disabled span {
+            color: #9ca3af;
+            border-color: #e5e7eb;
+        }
+
+        * {
+            transition: all 0.2s ease;
+        }
+
+        /* Loading animation */
+        @keyframes pulse {
+            0% {
+                opacity: 0.6;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        .loading-pulse {
+            animation: pulse 1.5s infinite;
         }
     </style>
 @endsection

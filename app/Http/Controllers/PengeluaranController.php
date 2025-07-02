@@ -201,4 +201,31 @@ class PengeluaranController extends Controller
         $pengeluaran->delete();
         return back()->with('success', 'Pengeluaran berhasil dihapus');
     }
+
+    public function massDelete(Request $request)
+    {
+        $request->validate([
+            'selected_ids' => 'required|string'
+        ]);
+
+        $selectedIds = json_decode($request->selected_ids);
+
+        // Validasi input
+        if (!is_array($selectedIds)) {
+            return back()->with('error', 'Data tidak valid');
+        }
+
+        // Hapus file bukti pembayaran terlebih dahulu
+        $pengeluarans = Pengeluaran::whereIn('id', $selectedIds)->get();
+        foreach ($pengeluarans as $pengeluaran) {
+            if ($pengeluaran->bukti_pembayaran) {
+                Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
+            }
+        }
+
+        // Hapus data dari database
+        Pengeluaran::whereIn('id', $selectedIds)->delete();
+
+        return back()->with('success', count($selectedIds) . ' data pengeluaran berhasil dihapus');
+    }
 }
