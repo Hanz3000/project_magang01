@@ -9,13 +9,46 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@400;600&display=swap');
 
-    body {
-        background: linear-gradient(135deg, #f6f7fb 0%, #e9ecef 100%);
-        min-height: 100vh;
-        font-family: 'Poppins', 'Inter', sans-serif;
-        color: #23272f;
+body {
+    background: linear-gradient(135deg, #f6f7fb 0%, #e9ecef 100%);
+    min-height: 100vh;
+    font-family: 'Poppins', 'Inter', sans-serif;
+    color: #23272f;
+}
+
+    /* === GLOBAL STYLES === */
+    * {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        box-sizing: border-box;
     }
 
+    :root {
+        --font-xs: 0.75rem;
+        /* 12px */
+        --font-sm: 0.875rem;
+        /* 14px */
+        --font-base: 1rem;
+        /* 16px */
+        --font-lg: 1.125rem;    
+        /* 18px */
+        --font-xl: 1.25rem;
+        /* 20px */
+        --font-2xl: 1.5rem;
+        /* 24px */
+
+        --primary: #5a67d8;
+        --primary-hover: #4c51bf;
+        --secondary: #718096;
+        --secondary-hover: #4a5568;
+        --danger: #e53e3e;
+        --danger-hover: #c53030;
+        --success: #48bb78;
+        --error: #e53e3e;
+        --border: #e2e8f0;
+        --bg-light: #f8fafc;
+    }
+
+    /* === FORM CONTAINER === */
     .form-container {
         max-width: 900px;
         margin: 2.5rem auto;
@@ -39,6 +72,7 @@
         padding: 2.2rem 2rem;
     }
 
+    /* === FORM ELEMENTS === */
     .section-title {
         display: flex;
         align-items: center;
@@ -1217,10 +1251,10 @@
                             ${formatRupiah(subtotal)}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                            ${imageUrl ?
+                            ${imageUrl ? 
                                 `<a href="#" onclick="openImageModal('${imageUrl}', '${item.nama || 'Struk'}')" class="inline-block">
                                     ${gambar}
-                                </a>` :
+                                </a>` : 
                                 gambar}
                         </td>
                     </tr>
