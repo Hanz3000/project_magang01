@@ -94,12 +94,7 @@
             @endif
         </div>
 
-        {{-- Keterangan --}}
-        <div class="mb-3">
-            <label class="block mb-1">Keterangan</label>
-            <textarea name="keterangan" rows="3"
-                class="w-full border rounded px-3 py-2">{{ old('keterangan', $pengeluaran->keterangan) }}</textarea>
-        </div>
+        
 
         {{-- Tombol Aksi --}}
         <div class="flex justify-end space-x-4">
