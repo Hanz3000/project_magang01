@@ -41,20 +41,28 @@ class DashboardController extends Controller
         // Generate and paginate history
         $historyBarang = $this->generateAndPaginateHistoryBarang('page_history');
 
-        // Contoh data dummy, ganti dengan query sesuai kebutuhan
-        $labels = [
-            now()->subDays(6)->format('d-m-Y'),
-            now()->subDays(5)->format('d-m-Y'),
-            now()->subDays(4)->format('d-m-Y'),
-            now()->subDays(3)->format('d-m-Y'),
-            now()->subDays(2)->format('d-m-Y'),
-            now()->subDays(1)->format('d-m-Y'),
-            now()->format('d-m-Y'),
-        ];
+        // Generate labels for last 7 days
+        $labels = [];
+        $dataMasuk = [];
+        $dataKeluar = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $labels[] = now()->subDays($i)->format('d-m-Y');
 
-        // Data pemasukan dan pengeluaran per hari (isi sesuai hasil query)
-        $dataMasuk = [5, 8, 3, 7, 2, 4, 6];
-        $dataKeluar = [2, 4, 1, 5, 3, 2, 1];
+            // Hitung jumlah barang masuk pada tanggal ini
+            $masuk = Struk::whereDate('tanggal_struk', $date)->get()->reduce(function ($carry, $struk) {
+                $items = $this->parseItems($struk->items);
+                return $carry + collect($items)->sum('jumlah');
+            }, 0);
+            $dataMasuk[] = $masuk;
+
+            // Hitung jumlah barang keluar pada tanggal ini
+            $keluar = Pengeluaran::whereDate('tanggal', $date)->get()->reduce(function ($carry, $pengeluaran) {
+                $items = $this->parseItems($pengeluaran->daftar_barang);
+                return $carry + collect($items)->sum('jumlah');
+            }, 0);
+            $dataKeluar[] = $keluar;
+        }
 
         // Return dashboard view with data
         return view('dashboard', [

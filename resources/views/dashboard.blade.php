@@ -168,69 +168,6 @@
             </div>
         </div>
 
-        <!-- Grafik Statistik Barang -->
-        <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mb-6">
-            <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17a4 4 0 01-4-4V5a4 4 0 018 0v8a4 4 0 01-4 4zm0 0v2m0 0h2m-2 0H9" />
-                </svg>
-                Grafik Pemasukan & Pengeluaran Barang (7 Hari Terakhir)
-            </h2>
-            <canvas id="barangChart" height="80"></canvas>
-        </div>
-
-        @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            const ctx = document.getElementById('barangChart').getContext('2d');
-            const barangChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: {
-                        !!json_encode($chartDataMasuk['labels'] ?? []) !!
-                    },
-                    datasets: [{
-                            label: 'Barang Masuk',
-                            data: {
-                                !!json_encode($chartDataMasuk['data'] ?? []) !!
-                            },
-                            borderColor: '#3b82f6',
-                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        },
-                        {
-                            label: 'Barang Keluar',
-                            data: {
-                                !!json_encode($chartDataKeluar['data'] ?? []) !!
-                            },
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            fill: true,
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top'
-                        },
-                        title: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        </script>
-        @endpush
-
         <!-- Daftar Barang -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
@@ -269,7 +206,8 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Struk</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Masuk</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Keluar</th> <!-- Kolom baru -->
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -282,15 +220,13 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $item['tanggal_keluar'] ? \Carbon\Carbon::parse($item['tanggal_keluar'])->format('d-m-Y') : '-' }}
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center text-sm text-gray-500">Tidak ada data barang masuk.</td>
-                        </tr>
-
-
-                        <tr>
-                            <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
                                 <div class="flex flex-col items-center justify-center py-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
