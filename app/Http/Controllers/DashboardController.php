@@ -41,6 +41,21 @@ class DashboardController extends Controller
         // Generate and paginate history
         $historyBarang = $this->generateAndPaginateHistoryBarang('page_history');
 
+        // Contoh data dummy, ganti dengan query sesuai kebutuhan
+        $labels = [
+            now()->subDays(6)->format('d-m-Y'),
+            now()->subDays(5)->format('d-m-Y'),
+            now()->subDays(4)->format('d-m-Y'),
+            now()->subDays(3)->format('d-m-Y'),
+            now()->subDays(2)->format('d-m-Y'),
+            now()->subDays(1)->format('d-m-Y'),
+            now()->format('d-m-Y'),
+        ];
+
+        // Data pemasukan dan pengeluaran per hari (isi sesuai hasil query)
+        $dataMasuk = [5, 8, 3, 7, 2, 4, 6];
+        $dataKeluar = [2, 4, 1, 5, 3, 2, 1];
+
         // Return dashboard view with data
         return view('dashboard', [
             'barangList' => $barangList,
@@ -53,6 +68,14 @@ class DashboardController extends Controller
             'totalPengeluaran' => $totalStrukPengeluaran,
             'totalBarangMasuk' => $totalBarangMasuk,
             'totalBarangKeluar' => $totalBarangKeluar,
+            'chartDataMasuk' => [
+                'labels' => $labels,
+                'data' => $dataMasuk,
+            ],
+            'chartDataKeluar' => [
+                'labels' => $labels,
+                'data' => $dataKeluar,
+            ],
         ]);
     }
 
