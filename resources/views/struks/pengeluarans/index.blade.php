@@ -189,6 +189,7 @@
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
                             </th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                             <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total
                             </th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk
@@ -228,13 +229,18 @@
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-700">{{ $pengeluaran->pegawai->nama ?? '-' }}</div>
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="text-gray-700 line-clamp-2"
-                                    title="@foreach ($pengeluaran->daftar_barang as $item){{ $item['nama'] }} (x{{ $item['jumlah'] }}) @endforeach">
-                                    @foreach ($pengeluaran->daftar_barang as $item)
-                                    {{ $item['nama'] }} (x{{ $item['jumlah'] }})<br>
-                                    @endforeach
+                            <td class="px-6 py-4 whitespace-nowrap align-top">
+                                @foreach ($pengeluaran->daftar_barang as $item)
+                                <div class="flex items-center mb-1">
+                                    <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle"></span>
+                                    <span class="text-gray-700">{{ $item['nama'] }}</span>
                                 </div>
+                                @endforeach
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap align-top text-gray-400 text-center">
+                                @foreach ($pengeluaran->daftar_barang as $item)
+                                <div class="mb-1">x{{ $item['jumlah'] }}</div>
+                                @endforeach
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-red-600">
                                 Rp{{ number_format($pengeluaran->total, 0, ',', '.') }}
