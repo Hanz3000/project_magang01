@@ -23,7 +23,7 @@
             <!-- Store Info -->
             <div class="bg-gray-50 rounded-xl p-5 border border-gray-100 shadow-sm">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         <div>
                             <p class="text-sm font-medium text-gray-500">Nama Toko</p>
                             <p class="text-xl font-bold text-gray-800">{{ $struk->nama_toko }}</p>
@@ -33,14 +33,22 @@
                             <p class="text-xl font-bold text-gray-800">{{ $struk->nomor_struk }}</p>
                         </div>
                     </div>
-                    <div class="space-y-3">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Tanggal Transaksi</p>
-                            <p class="text-xl font-bold">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</p>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Tanggal Masuk</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Tanggal Keluar</p>
+                                <p class="text-lg font-semibold text-gray-800">{{ date('d M Y', strtotime($struk->tanggal_keluar)) }}</p>
+                            </div>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Pembayaran</p>
-                            <p class="text-2xl font-extrabold text-indigo-600">Rp{{ number_format($struk->total_harga, 0, ',', '.') }}</p>
+                            <p class="text-2xl font-extrabold text-indigo-600">
+                                Rp{{ number_format($struk->total_harga, 0, ',', '.') }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -71,10 +79,11 @@
                     <table class="min-w-full divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Jumlah</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Harga Satuan</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase border">No</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Nama Barang</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase border">Jumlah</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase border">Harga Satuan</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase border">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200">
@@ -83,18 +92,18 @@
                             $rawItems = $struk->items;
 
                             if (is_string($rawItems)) {
-                            $decoded = json_decode($rawItems, true);
-                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                            $items = $decoded;
-                            }
+                                $decoded = json_decode($rawItems, true);
+                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                    $items = $decoded;
+                                }
                             } elseif (is_object($rawItems) || is_array($rawItems)) {
-                            foreach ($rawItems as $key => $value) {
-                            $items[$key] = is_object($value) ? (array) $value : $value;
-                            }
+                                foreach ($rawItems as $key => $value) {
+                                    $items[$key] = is_object($value) ? (array) $value : $value;
+                                }
                             }
                             @endphp
 
-                            @forelse ($items as $item)
+                            @foreach ($items as $index => $item)
                             @php
                             $nama = $item['nama'] ?? 'N/A';
                             $jumlah = (int) ($item['jumlah'] ?? 0);
@@ -102,20 +111,14 @@
                             $subtotal = $jumlah * $harga;
                             @endphp
                             <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ $nama }}</td>
-                                <td class="px-6 py-4 text-sm text-center text-gray-500">{{ $jumlah }}</td>
-                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600">Rp{{ number_format($harga, 0, ',', '.') }}</td>
-                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600">Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
+                                <td class="px-4 py-4 text-sm text-center text-gray-500 border">{{ $index + 1 }}</td>
+                                <td class="px-6 py-4 text-sm font-medium text-gray-900 border">{{ $nama }}</td>
+                                <td class="px-6 py-4 text-sm text-center text-gray-500 border">{{ $jumlah }}</td>
+                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600 border">Rp{{ number_format($harga, 0, ',', '.') }}</td>
+                                <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600 border">Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
-                                    Tidak ada barang
-                                </td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
-
                     </table>
                 </div>
             </div>
@@ -144,7 +147,6 @@
         </button>
     </div>
 </div>
-
 
 <script>
     function openModal(src) {
