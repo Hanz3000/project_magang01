@@ -180,11 +180,11 @@ class DashboardController extends Controller
                         return null;
                     }
                     return [
-                        'nama_barang' => $barang['nama'] ?? '-',
-                        'jumlah' => $barang['jumlah'] ?? 0,
+                        'nama_barang' => $item['nama'] ?? '-',
+                        'jumlah' => $item['jumlah'] ?? 0,
                         'nomor_struk' => $pengeluaran->nomor_struk,
                         'tanggal' => $pengeluaran->tanggal,
-                        'tanggal_struk' => $pengeluaran->tanggal_struk, // ✅ Tambahkan ini!
+                        'tanggal_struk' => $pengeluaran->tanggal_struk,
                     ];
                 })->filter(); // Remove null entries
             });
