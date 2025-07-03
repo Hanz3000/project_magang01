@@ -130,7 +130,6 @@
             </div>
         </div>
 
-<<<<<<< HEAD
         <div
             class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
             <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
@@ -460,7 +459,6 @@
         const selectedCount = document.getElementById('selectedCount');
         const selectedIdsInput = document.getElementById('selectedIds');
 
-        // Fungsi untuk update bulk actions
         function updateBulkActions() {
             const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
@@ -469,12 +467,9 @@
                 bulkActions.classList.remove('hidden');
                 selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
                 selectedIdsInput.value = selectedIds.join(',');
-
-                // Update select all checkbox
                 if (selectAll) {
                     selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
-                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length <
-                        rowCheckboxes.length;
+                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
                 }
             } else {
                 bulkActions.classList.add('hidden');
@@ -483,7 +478,6 @@
             }
         }
 
-        // Select all checkbox
         if (selectAll) {
             selectAll.addEventListener('change', function() {
                 const isChecked = this.checked;
@@ -494,116 +488,81 @@
             });
         }
 
-        // Individual row checkbox
         rowCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateBulkActions);
         });
 
-        // Event delegation untuk checkbox yang mungkin ditambahkan dinamis
         document.addEventListener('change', function(e) {
             if (e.target.classList.contains('rowCheckbox')) {
                 updateBulkActions();
             }
         });
 
-        // Image modal functions
+        window.clearSelection = function() {
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            if (selectAll) selectAll.checked = false;
+            bulkActions.classList.add('hidden');
+            selectedIdsInput.value = '';
+        };
+
+        window.confirmBulkDelete = function() {
+            const selectedIds = selectedIdsInput.value;
+            if (!selectedIds) {
+                alert('Pilih setidaknya satu data untuk dihapus');
+                return;
+            }
+            const count = selectedIds.split(',').length;
+            if (confirm(`Apakah Anda yakin ingin menghapus ${count} data yang dipilih?`)) {
+                document.getElementById('bulkDeleteForm').submit();
+            }
+        };
+
+        // Modal gambar
         window.openModal = function(imageSrc) {
             document.getElementById('modalImage').src = imageSrc;
             document.getElementById('imageModal').classList.remove('hidden');
             document.body.classList.add('overflow-hidden');
         }
-
         window.closeModal = function() {
             document.getElementById('imageModal').classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
         }
-
-        // Close modal when clicking outside
         document.getElementById('imageModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
 
-        // Close modal with ESC key
+        // Modal delete
+        window.openDeleteModal = function() {
+            document.getElementById('deleteModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+        window.closeDeleteModal = function() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+        window.submitBulkDelete = function() {
+            document.getElementById('bulkDeleteForm').submit();
+        }
+        document.getElementById('deleteModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeleteModal();
+            }
+        });
+
+        // ESC untuk tutup modal
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 if (!document.getElementById('imageModal').classList.contains('hidden')) {
                     closeModal();
                 }
-            }
-=======
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const selectAll = document.getElementById('selectAll');
-            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
-            const bulkActions = document.getElementById('bulkActionsContainer');
-            const selectedCount = document.getElementById('selectedCount');
-            const selectedIdsInput = document.getElementById('selectedIds');
-
-            function updateBulkActions() {
-                const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
-                const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
-                if (selectedCheckboxes.length > 0) {
-                    bulkActions.classList.remove('hidden');
-                    selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
-                    selectedIdsInput.value = JSON.stringify(selectedIds);
-                } else {
-                    bulkActions.classList.add('hidden');
-                    selectedIdsInput.value = '';
-                }
-
-                // Update select all checkbox
-                if (selectAll) {
-                    selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length && rowCheckboxes.length > 0;
-                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
+                if (!document.getElementById('deleteModal').classList.contains('hidden')) {
+                    closeDeleteModal();
                 }
             }
-
-            if (selectAll) {
-                selectAll.addEventListener('change', function() {
-                    const isChecked = this.checked;
-                    rowCheckboxes.forEach(checkbox => {
-                        checkbox.checked = isChecked;
-                    });
-                    updateBulkActions();
-                });
-            }
-
-            rowCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateBulkActions);
-            });
-
-            // Event delegation untuk checkbox dinamis
-            document.addEventListener('change', function(e) {
-                if (e.target.classList.contains('rowCheckbox')) {
-                    updateBulkActions();
-                }
-            });
-
-            // Fungsi untuk clear selection
-            window.clearSelection = function() {
-                rowCheckboxes.forEach(checkbox => {
-                    checkbox.checked = false;
-                });
-                if (selectAll) selectAll.checked = false;
-                bulkActions.classList.add('hidden');
-                selectedIdsInput.value = '';
-            };
-
-            // Fungsi untuk konfirmasi bulk delete
-            window.confirmBulkDelete = function() {
-                const selectedIds = selectedIdsInput.value;
-                if (!selectedIds) {
-                    alert('Pilih setidaknya satu data untuk dihapus');
-                    return;
-                }
-                const count = selectedIds.split(',').length;
-                if (confirm(`Apakah Anda yakin ingin menghapus ${count} data yang dipilih?`)) {
-                    document.getElementById('bulkDeleteForm').submit();
-                }
-            };
->>>>>>> d1251cf571e7c1f6ee5672dead36f0a244b23c5a
         });
 
         // Auto-hide success message after 5 seconds
@@ -646,59 +605,6 @@
                 url.searchParams.delete('search');
                 window.location.href = url.toString();
             });
-        }
-    });
-
-    // Fungsi untuk clear selection
-    function clearSelection() {
-        document.querySelectorAll('.rowCheckbox').forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        document.getElementById('selectAll').checked = false;
-        document.getElementById('bulkActionsContainer').classList.add('hidden');
-        document.getElementById('selectedIds').value = '';
-    }
-
-    // Fungsi untuk konfirmasi bulk delete
-    function confirmBulkDelete() {
-        const selectedIds = document.getElementById('selectedIds').value;
-        if (!selectedIds) {
-            alert('Pilih setidaknya satu data untuk dihapus');
-            return;
-        }
-
-        const count = selectedIds.split(',').length;
-        if (confirm(`Apakah Anda yakin ingin menghapus ${count} data yang dipilih?`)) {
-            document.getElementById('bulkDeleteForm').submit();
-        }
-    }
-
-    // Delete modal functions
-    function openDeleteModal() {
-        document.getElementById('deleteModal').classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
-    }
-
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    function submitBulkDelete() {
-        document.getElementById('bulkDeleteForm').submit();
-    }
-
-    // Close modal when clicking outside
-    document.getElementById('deleteModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeDeleteModal();
-        }
-    });
-
-    // Close modal with ESC key
-    document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && !document.getElementById('deleteModal').classList.contains('hidden')) {
-            closeDeleteModal();
         }
     });
 </script>

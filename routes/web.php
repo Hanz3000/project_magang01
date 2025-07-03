@@ -112,5 +112,4 @@ Route::middleware('auth')->group(function () {
 
     Route::delete('/pengeluarans/mass-delete', [PengeluaranController::class, 'massDelete'])->name('pengeluarans.massDelete');
     Route::get('/struks/{struk}/items', [StrukController::class, 'getItems'])->name('struks.items');
-
 });
