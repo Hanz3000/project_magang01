@@ -91,8 +91,10 @@ Route::middleware('auth')->group(function () {
 
     // ------------------- PENGELUARAN -------------------
     Route::prefix('pengeluarans')->group(function () {
-        Route::get('/', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+        // PASTIKAN INI PALING ATAS!
+        Route::delete('/mass-delete', [PengeluaranController::class, 'massDelete'])->name('pengeluarans.massDelete');
 
+        Route::get('/', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
         Route::post('/', [PengeluaranController::class, 'store'])->name('pengeluarans.store');
         Route::get('/{pengeluaran}', [PengeluaranController::class, 'show'])->name('pengeluarans.show');
         Route::get('/{pengeluaran}/edit', [PengeluaranController::class, 'edit'])->name('pengeluarans.edit');

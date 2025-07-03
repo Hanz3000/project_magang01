@@ -130,6 +130,7 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <div
             class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
             <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
@@ -531,6 +532,78 @@
                     closeModal();
                 }
             }
+=======
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAll = document.getElementById('selectAll');
+            const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+            const bulkActions = document.getElementById('bulkActionsContainer');
+            const selectedCount = document.getElementById('selectedCount');
+            const selectedIdsInput = document.getElementById('selectedIds');
+
+            function updateBulkActions() {
+                const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
+                const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+                if (selectedCheckboxes.length > 0) {
+                    bulkActions.classList.remove('hidden');
+                    selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
+                    selectedIdsInput.value = JSON.stringify(selectedIds);
+                } else {
+                    bulkActions.classList.add('hidden');
+                    selectedIdsInput.value = '';
+                }
+
+                // Update select all checkbox
+                if (selectAll) {
+                    selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length && rowCheckboxes.length > 0;
+                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
+                }
+            }
+
+            if (selectAll) {
+                selectAll.addEventListener('change', function() {
+                    const isChecked = this.checked;
+                    rowCheckboxes.forEach(checkbox => {
+                        checkbox.checked = isChecked;
+                    });
+                    updateBulkActions();
+                });
+            }
+
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateBulkActions);
+            });
+
+            // Event delegation untuk checkbox dinamis
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('rowCheckbox')) {
+                    updateBulkActions();
+                }
+            });
+
+            // Fungsi untuk clear selection
+            window.clearSelection = function() {
+                rowCheckboxes.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                if (selectAll) selectAll.checked = false;
+                bulkActions.classList.add('hidden');
+                selectedIdsInput.value = '';
+            };
+
+            // Fungsi untuk konfirmasi bulk delete
+            window.confirmBulkDelete = function() {
+                const selectedIds = selectedIdsInput.value;
+                if (!selectedIds) {
+                    alert('Pilih setidaknya satu data untuk dihapus');
+                    return;
+                }
+                const count = selectedIds.split(',').length;
+                if (confirm(`Apakah Anda yakin ingin menghapus ${count} data yang dipilih?`)) {
+                    document.getElementById('bulkDeleteForm').submit();
+                }
+            };
+>>>>>>> d1251cf571e7c1f6ee5672dead36f0a244b23c5a
         });
 
         // Auto-hide success message after 5 seconds
