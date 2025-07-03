@@ -923,6 +923,13 @@
 
                                 </div>
 
+                                <div class="input-group">
+                                    <label for="from_income_tanggal_struk">
+                                        <i class="fas fa-calendar-day mr-1"></i>
+                                        Tanggal Masuk (Pemasukan)
+                                    </label>
+                                    <input type="date" id="from_income_tanggal_struk" readonly>
+                                </div>
 
                                 <div class="input-group">
                                     <label for="from_income_total">
@@ -1048,10 +1055,18 @@
         strukSelect.addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
             const tanggalKeluar = selectedOption.getAttribute('data-keluar');
+            const tanggalStruk = selectedOption.getAttribute('data-tanggal'); // Ambil tanggal_struk
+
             if (tanggalKeluar) {
                 tanggalInput.value = tanggalKeluar;
             } else {
                 tanggalInput.value = '';
+            }
+
+            if (tanggalStruk) {
+                document.getElementById('from_income_tanggal_struk').value = tanggalStruk;
+            } else {
+                document.getElementById('from_income_tanggal_struk').value = '';
             }
         });
     });
@@ -1121,11 +1136,18 @@
         $('#struk_id').on('change', function() {
             const selectedOption = $(this).find('option:selected');
             const tanggalKeluar = selectedOption.data('keluar');
-            console.log('Tanggal keluar:', tanggalKeluar); // Tambahkan ini untuk debug
+            const tanggalStruk = selectedOption.data('tanggal'); // Ambil tanggal_struk
+
             if (tanggalKeluar) {
                 $('#from_income_tanggal').val(tanggalKeluar);
             } else {
                 $('#from_income_tanggal').val('');
+            }
+
+            if (tanggalStruk) {
+                $('#from_income_tanggal_struk').val(tanggalStruk);
+            } else {
+                $('#from_income_tanggal_struk').val('');
             }
         });
 

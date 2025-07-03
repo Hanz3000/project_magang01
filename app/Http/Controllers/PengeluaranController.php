@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Pengeluaran;
 use App\Models\Struk;
 use App\Models\Pegawai;
+use App\Models\Barang; // Pastikan sudah di-import
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,7 +24,10 @@ class PengeluaranController extends Controller
         }
 
         $pengeluarans = $query->latest()->paginate(10);
-        return view('struks.pengeluarans.index', compact('pengeluarans'));
+        return view('struks.pengeluarans.index', [
+            'pengeluarans' => $pengeluarans,
+            'struks' => Struk::paginate(10), // Ubah dari all() ke paginate()
+        ]);
     }
 
     public function create(Request $request)
@@ -31,13 +35,14 @@ class PengeluaranController extends Controller
         $struks = Struk::all();
         $pegawais = Pegawai::all();
         $income = null;
+        $barangList = Barang::all(); // Tambahkan baris ini
 
         // Kalau ada income_id di query, ambil struk terkait
         if ($request->has('income_id')) {
             $income = Struk::find($request->income_id);
         }
 
-        return view('pengeluarans.create', compact('struks', 'pegawais', 'income'));
+        return view('pengeluarans.create', compact('struks', 'pegawais', 'income', 'barangList')); // Tambahkan 'barangList'
     }
 
     public function store(Request $request)
