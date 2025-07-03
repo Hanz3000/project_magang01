@@ -216,16 +216,18 @@
                             <td class="px-6 py-4 whitespace-nowrap text-gray-500">
                                 {{ $pengeluaran->nomor_struk ?? '-' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                @if ($pengeluaran->income)
+
+
+                            <td>
                                 <div class="text-gray-900">
-                                    {{ $pengeluaran->income->tanggal->format('d M Y') }}
+                                    @if ($pengeluaran->tanggal_struk)
+                                    {{ date('d M Y', strtotime($pengeluaran->tanggal_struk)) }}
+                                    @else
+                                    <span class="text-gray-400 italic text-xs">-</span>
+                                    @endif
                                 </div>
-                                @else
-                                <div class="text-gray-900">{{ $pengeluaran->created_at->format('d M Y') }}
-                                </div>
-                                @endif
                             </td>
+
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-900">{{ $pengeluaran->tanggal->format('d M Y') }}</div>
                             </td>

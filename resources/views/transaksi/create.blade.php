@@ -928,7 +928,7 @@
                                         <i class="fas fa-calendar-day mr-1"></i>
                                         Tanggal Masuk (Pemasukan)
                                     </label>
-                                    <input type="date" id="from_income_tanggal_struk" readonly>
+                                    <input type="date" id="from_income_tanggal_struk" name="tanggal_struk" required>
                                 </div>
 
                                 <div class="input-group">
@@ -992,15 +992,23 @@
                             document.addEventListener("DOMContentLoaded", function() {
                                 const strukSelect = document.getElementById("struk_id");
                                 const tanggalField = document.getElementById("from_income_tanggal");
+                                const tanggalStrukField = document.getElementById("from_income_tanggal_struk"); // Tambahan
 
                                 strukSelect.addEventListener("change", function() {
                                     const selectedOption = this.options[this.selectedIndex];
                                     const tanggalKeluar = selectedOption.getAttribute("data-keluar");
+                                    const tanggalStruk = selectedOption.getAttribute("data-tanggal"); // Tambahan
 
                                     if (tanggalKeluar) {
                                         tanggalField.value = tanggalKeluar;
                                     } else {
-                                        tanggalField.value = ""; // Kosongkan jika tidak ada
+                                        tanggalField.value = "";
+                                    }
+
+                                    if (tanggalStruk) {
+                                        tanggalStrukField.value = tanggalStruk;
+                                    } else {
+                                        tanggalStrukField.value = "";
                                     }
                                 });
                             });

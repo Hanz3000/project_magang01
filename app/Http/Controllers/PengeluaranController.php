@@ -45,6 +45,7 @@ class PengeluaranController extends Controller
         return view('pengeluarans.create', compact('struks', 'pegawais', 'income', 'barangList')); // Tambahkan 'barangList'
     }
 
+
     public function store(Request $request)
     {
         // Validasi dasar yang berlaku untuk semua jenis pengeluaran
@@ -59,6 +60,7 @@ class PengeluaranController extends Controller
         if ($request->has('from_income')) {
             $validated = $request->validate(array_merge($baseRules, [
                 'struk_id' => 'required|exists:struks,id',
+                'tanggal_struk' => 'required|date', // Pastikan divalidasi juga
             ]));
 
             $struk = Struk::findOrFail($validated['struk_id']);
@@ -69,6 +71,7 @@ class PengeluaranController extends Controller
                 'nama_toko' => $struk->nama_toko,
                 'nomor_struk' => $struk->nomor_struk,
                 'tanggal' => $validated['tanggal'],
+                'tanggal_struk' => $validated['tanggal_struk'], // <-- Tambahkan ini!
                 'pegawai_id' => $validated['pegawai_id'],
                 'daftar_barang' => json_encode($items),
                 'total' => $total,
