@@ -183,10 +183,8 @@
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
                                 Struk
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                                Masuk</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal
-                                Keluar</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
@@ -199,7 +197,6 @@
                             </th>
                         </tr>
                     </thead>
-
                     <tbody class="divide-y divide-gray-200">
                         @forelse ($pengeluarans as $index => $pengeluaran)
                         <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
@@ -216,8 +213,9 @@
                             <td class="px-6 py-4 whitespace-nowrap text-gray-500">
                                 {{ $pengeluaran->nomor_struk ?? '-' }}
                             </td>
-
-
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-gray-900">{{ $pengeluaran->tanggal->format('d M Y') }}</div>
+                            </td>
                             <td>
                                 <div class="text-gray-900">
                                     @if ($pengeluaran->tanggal_struk)
@@ -226,10 +224,6 @@
                                     <span class="text-gray-400 italic text-xs">-</span>
                                     @endif
                                 </div>
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-900">{{ $pengeluaran->tanggal->format('d M Y') }}</div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-700">{{ $pengeluaran->pegawai->nama ?? '-' }}</div>
@@ -548,6 +542,16 @@
             const val = searchInput.value;
             searchInput.value = '';
             searchInput.value = val;
+        }
+
+        const clearSearchButton = document.getElementById('clearSearch');
+
+        if (clearSearchButton) {
+            clearSearchButton.addEventListener('click', function() {
+                const url = new URL(window.location.href);
+                url.searchParams.delete('search');
+                window.location.href = url.toString();
+            });
         }
     });
 

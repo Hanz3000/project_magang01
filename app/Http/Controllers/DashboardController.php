@@ -76,14 +76,7 @@ class DashboardController extends Controller
             'totalPengeluaran' => $totalStrukPengeluaran,
             'totalBarangMasuk' => $totalBarangMasuk,
             'totalBarangKeluar' => $totalBarangKeluar,
-            'chartDataMasuk' => [
-                'labels' => $labels,
-                'data' => $dataMasuk,
-            ],
-            'chartDataKeluar' => [
-                'labels' => $labels,
-                'data' => $dataKeluar,
-            ],
+
         ]);
     }
 
@@ -187,10 +180,11 @@ class DashboardController extends Controller
                         return null;
                     }
                     return [
-                        'nama_barang' => $item['nama'],
-                        'jumlah' => (int) ($item['jumlah'] ?? 0),
+                        'nama_barang' => $barang['nama'] ?? '-',
+                        'jumlah' => $barang['jumlah'] ?? 0,
                         'nomor_struk' => $pengeluaran->nomor_struk,
                         'tanggal' => $pengeluaran->tanggal,
+                        'tanggal_struk' => $pengeluaran->tanggal_struk, // ✅ Tambahkan ini!
                     ];
                 })->filter(); // Remove null entries
             });
