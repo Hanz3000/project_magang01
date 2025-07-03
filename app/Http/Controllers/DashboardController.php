@@ -73,7 +73,6 @@ class DashboardController extends Controller
                 $items = $this->parseItems($struk->items);
 
                 return collect($items)->map(function ($item) use ($struk) {
-                    // Skip invalid items
                     if (!isset($item['nama']) || !isset($item['jumlah'])) {
                         return null;
                     }
@@ -82,17 +81,36 @@ class DashboardController extends Controller
                         'jumlah' => (int) ($item['jumlah'] ?? 0),
                         'nomor_struk' => $struk->nomor_struk,
                         'tanggal' => $struk->tanggal_struk,
+                        'tanggal_keluar' => $struk->tanggal_keluar, // Tambahkan baris ini
                     ];
-                })->filter(); // Remove null entries
+                })->filter();
             })
             ->groupBy('nama')
             ->map(function ($items, $nama) {
                 $latest = $items->sortByDesc('tanggal')->first();
+
+                // Cari tanggal keluar terakhir dari tabel Pengeluaran
+                $latestPengeluaran = \App\Models\Pengeluaran::query()
+                    ->get()
+                    ->flatMap(function ($pengeluaran) {
+                        return collect($this->parseItems($pengeluaran->daftar_barang))
+                            ->map(function ($item) use ($pengeluaran) {
+                                return [
+                                    'nama' => $item['nama'] ?? null,
+                                    'tanggal' => $pengeluaran->tanggal,
+                                ];
+                            });
+                    })
+                    ->where('nama', $nama)
+                    ->sortByDesc('tanggal')
+                    ->first();
+
                 return [
                     'nama' => $nama,
                     'jumlah' => $items->sum('jumlah'),
                     'nomor_struk' => $latest['nomor_struk'],
                     'tanggal' => $latest['tanggal'],
+                    'tanggal_keluar' => $latest['tanggal_keluar'] ?? null, // Ambil dari struk
                 ];
             })
             ->values();
@@ -101,18 +119,28 @@ class DashboardController extends Controller
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
             $barangList = $barangList->filter(function ($item) use ($search) {
-                return stripos($item['nama'], $search) !== false || 
-                       stripos($item['nomor_struk'], $search) !== false;
+                return stripos($item['nama'], $search) !== false ||
+                    stripos($item['nomor_struk'], $search) !== false;
             });
         }
 
-        // Apply sorting
-        $barangList = $this->sortCollection($barangList, $filters['sort'] ?? null, [
-            'nama_asc' => fn($c) => $c->sortBy('nama'),
-            'nama_desc' => fn($c) => $c->sortByDesc('nama'),
-            'tanggal_asc' => fn($c) => $c->sortBy('tanggal'),
-            'tanggal_desc' => fn($c) => $c->sortByDesc('tanggal'),
-        ], 'tanggal_desc');
+        // Apply sorting (PASTIKAN INI SETELAH GROUPBY DAN FILTER)
+        $sort = $filters['sort'] ?? 'tanggal_desc';
+        switch ($sort) {
+            case 'nama_asc':
+                $barangList = $barangList->sortBy('nama')->values();
+                break;
+            case 'nama_desc':
+                $barangList = $barangList->sortByDesc('nama')->values();
+                break;
+            case 'tanggal_asc':
+                $barangList = $barangList->sortBy('tanggal')->values();
+                break;
+            case 'tanggal_desc':
+            default:
+                $barangList = $barangList->sortByDesc('tanggal')->values();
+                break;
+        }
 
         return $this->paginateCollection($barangList, 10, $pageName);
     }
@@ -141,7 +169,7 @@ class DashboardController extends Controller
             $search = strtolower($filters['search_pengeluaran']);
             $pengeluaranList = $pengeluaranList->filter(function ($item) use ($search) {
                 return stripos($item['nama_barang'], $search) !== false ||
-                       stripos($item['nomor_struk'], $search) !== false;
+                    stripos($item['nomor_struk'], $search) !== false;
             });
         }
 
