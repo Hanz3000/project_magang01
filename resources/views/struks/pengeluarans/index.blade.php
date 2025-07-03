@@ -242,41 +242,32 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-red-600">
                                         Rp{{ number_format($pengeluaran->total, 0, ',', '.') }}
                                     </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                        <div class="flex flex-col items-center">
-                                            @php
-                                                $imagePath = null;
-                                                $source = null;
+                                    <td class="px-6 py-4 whitespace-nowrap text-center">
+                                        @php
+                                            $imagePath = null;
+                                            if ($pengeluaran->bukti_pembayaran) {
+                                                $imagePath = strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
+                                                    ? $pengeluaran->bukti_pembayaran
+                                                    : 'storage/' . $pengeluaran->bukti_pembayaran;
+                                            } elseif ($pengeluaran->income && $pengeluaran->income->bukti_pembayaran) {
+                                                $imagePath = strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
+                                                    ? $pengeluaran->income->bukti_pembayaran
+                                                    : 'storage/' . $pengeluaran->income->bukti_pembayaran;
+                                            }
+                                        @endphp
 
-                                                if ($pengeluaran->bukti_pembayaran) {
-                                                    $imagePath =
-                                                        strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
-                                                            ? $pengeluaran->bukti_pembayaran
-                                                            : 'storage/' . $pengeluaran->bukti_pembayaran;
-                                                    $source = 'pengeluaran';
-                                                } elseif (
-                                                    $pengeluaran->income &&
-                                                    $pengeluaran->income->bukti_pembayaran
-                                                ) {
-                                                    $imagePath =
-                                                        strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
-                                                            ? $pengeluaran->income->bukti_pembayaran
-                                                            : 'storage/' . $pengeluaran->income->bukti_pembayaran;
-                                                    $source = 'income';
-                                                }
-                                            @endphp
-
-                                            @if ($imagePath)
-                                                <img src="{{ asset($imagePath) }}" alt="Bukti Pembayaran"
-                                                    class="w-24 h-24 object-cover rounded shadow mb-2 cursor-pointer hover:opacity-90"
-                                                    onclick="openModal('{{ asset($imagePath) }}')">
-                                                <span class="text-xs text-gray-500 mb-1">
-                                                    Lihat {{ $source === 'income' ? '(Dari Pemasukan)' : '' }}
-                                                </span>
-                                            @else
-                                                <span class="text-gray-400 italic text-xs mb-2">Tidak ada bukti</span>
-                                            @endif
-                                        </div>
+                                        @if ($imagePath)
+                                            <button onclick="openModal('{{ asset($imagePath) }}')" class="text-indigo-600 hover:text-indigo-900">
+                                                <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                    </path>
+                                                </svg>
+                                                <span class="text-xs text-gray-500 block">Lihat</span>
+                                            </button>
+                                        @else
+                                            <span class="text-gray-400 italic text-xs">Tidak ada</span>
+                                        @endif
                                     </td>
 
                                     <td class="px-6 py-4 whitespace-nowrap text-center">
@@ -302,7 +293,7 @@
                                                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
                                                     </path>
                                                 </svg>
-                                                Edit
+                                            
                                             </a>
                                             <form action="{{ route('pengeluarans.destroy', $pengeluaran->id) }}"
                                                 method="POST"
@@ -394,26 +385,17 @@
         </div>
     </div>
 
-    <!-- Image Modal -->
-    <div id="imageModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75" onclick="closeModal()"></div>
-            </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div
-                class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <img id="modalImage" src="" alt="Bukti Pengeluaran"
-                        class="w-full h-auto max-h-[80vh] object-contain">
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" onclick="closeModal()"
-                        class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Tutup
-                    </button>
-                </div>
-            </div>
+    <!-- Image Preview Modal -->
+    <div id="imageModal" class="fixed inset-0 z-50 hidden bg-black bg-opacity-80 flex items-center justify-center">
+        <div class="relative">
+            <img id="modalImage" src="" alt="Preview Struk" class="max-h-[80vh] rounded shadow-lg select-none">
+            <button onclick="closeModal()"
+                class="absolute top-2 right-2 text-white hover:text-gray-300 transition duration-200">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
         </div>
     </div>
 
@@ -529,6 +511,61 @@
                     document.getElementById('bulkDeleteForm').submit();
                 }
             };
+
+            // Search tanpa enter, langsung cari saat user mengetik (debounce)
+            const searchInput = document.getElementById('searchInput');
+            let searchTimeout;
+
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        const searchTerm = searchInput.value.trim();
+                        const url = new URL(window.location.href);
+
+                        if (searchTerm) {
+                            url.searchParams.set('search', searchTerm);
+                        } else {
+                            url.searchParams.delete('search');
+                        }
+
+                        // Ganti location tanpa reload penuh, lalu reload data
+                        window.location.href = url.toString();
+
+                        // Setelah reload, cursor otomatis tetap di input karena autofocus
+                    }, 500); // 500ms debounce
+                });
+            }
+
+            // Agar cursor tetap di input setelah reload
+            if (searchInput) {
+                searchInput.setAttribute('autofocus', 'autofocus');
+                searchInput.focus();
+                // Pindahkan cursor ke akhir teks
+                const val = searchInput.value;
+                searchInput.value = '';
+                searchInput.value = val;
+            }
+        });
+
+        function openModal(imageSrc) {
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('imageModal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+        }
+        function closeModal() {
+            document.getElementById('imageModal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        }
+        document.getElementById('imageModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && !document.getElementById('imageModal').classList.contains('hidden')) {
+                closeModal();
+            }
         });
     </script>
 
