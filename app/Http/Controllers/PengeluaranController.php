@@ -97,7 +97,7 @@ class PengeluaranController extends Controller
             }
 
             // Redirect ke index pengeluaran
-            return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil disimpan!');
+            return redirect()->route('pengeluarans.index')->with('created', 'Pengeluaran berhasil disimpan!');
         }
 
         // Jika pengeluaran manual
@@ -197,7 +197,7 @@ class PengeluaranController extends Controller
 
         $pengeluaran->update($updateData);
 
-        return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran berhasil diperbarui.');
+        return redirect()->route('pengeluarans.index')->with('updated', 'Pengeluaran berhasil diperbarui.');
     }
 
     public function destroy(Pengeluaran $pengeluaran)
@@ -208,7 +208,7 @@ class PengeluaranController extends Controller
         }
 
         $pengeluaran->delete();
-        return back()->with('success', 'Pengeluaran berhasil dihapus');
+        return back()->with('deleted', 'Pengeluaran berhasil dihapus');
     }
 
     public function massDelete(Request $request)

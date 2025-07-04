@@ -68,7 +68,7 @@ class StrukController extends Controller
             'foto_struk'     => $fotoFilename
         ]);
 
-        return redirect()->route('struks.index')->with('success', 'Struk berhasil disimpan!');
+        return redirect()->route('struks.index')->with('created', 'Struk berhasil disimpan!');
     }
 
     public function edit(Struk $struk)
@@ -113,7 +113,7 @@ class StrukController extends Controller
             'foto_struk'     => $validatedData['foto_struk'] // ✅ gunakan yang disimpan
         ]);
 
-        return redirect()->route('struks.index')->with('success', 'Struk berhasil diperbarui!');
+        return redirect()->route('struks.index')->with('updated', 'Struk berhasil diperbarui!');
     }
 
 
@@ -123,7 +123,7 @@ class StrukController extends Controller
             Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
         }
         $struk->delete();
-        return redirect()->route('struks.index')->with('success', 'Struk berhasil dihapus!');
+        return redirect()->route('struks.index')->with('deleted', 'Struk berhasil dihapus!');
     }
 
     public function show(Struk $struk)

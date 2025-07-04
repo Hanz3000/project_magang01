@@ -46,6 +46,11 @@
         </div>
     </form>
 </div>
+@if ($errors->has('nip'))
+    <div class="text-red-600 text-sm mt-1">
+        {{ $errors->first('nip') }}
+    </div>
+@endif
 
 @if(session('success') && request()->has('action') && request()->input('action') === 'save_and_continue')
 <script>

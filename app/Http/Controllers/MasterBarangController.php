@@ -17,8 +17,8 @@ class MasterBarangController extends Controller
 
         $barangs = $query->get();
 
-        return view('master_barang.index', compact('barangs'));
-    }
+        return view('master_barang.index', compact('barangs'))  ->with('success', 'Barang berhasil ditambahkan');
+    }   
 
     public function create()
     {
@@ -37,10 +37,10 @@ class MasterBarangController extends Controller
 
         // Tambahkan pengecekan action
         if ($request->has('action') && $request->action === 'save_and_continue') {
-            return redirect()->back()->with('success', 'Barang berhasil ditambahkan. Silakan tambah barang baru.');
+            return redirect()->back()->with('created', 'Barang berhasil ditambahkan. Silakan tambah barang baru.');
         }
 
-        return redirect()->route('master-barang.index')->with('success', 'Barang berhasil ditambahkan.');
+        return redirect()->route('master-barang.index')->with('created', 'Barang berhasil ditambahkan.');
     }
 
     public function edit(string $id)
@@ -60,7 +60,7 @@ class MasterBarangController extends Controller
             'nama_barang' => $request->nama_barang
         ]);
 
-        return redirect()->route('master-barang.index')->with('success', 'Barang berhasil diperbarui.');
+        return redirect()->route('master-barang.index')->with('updated', 'Barang berhasil diperbarui.');
     }
 
     public function destroy(string $id)
@@ -68,7 +68,7 @@ class MasterBarangController extends Controller
         $barang = Barang::findOrFail($id);
         $barang->delete();
 
-        return redirect()->route('master-barang.index')->with('success', 'Barang berhasil dihapus.');
+        return redirect()->route('master-barang.index')->with('deleted', 'Barang berhasil dihapus.');
     }
 
     public function bulkDelete(Request $request)
