@@ -1091,29 +1091,7 @@
                             </div>
 
                             {{-- Payment Proof --}}
-                            <div class="section-title">
-                                <i class="fas fa-camera"></i>
-                                <span>Bukti Pembayaran</span>
-                            </div>
-
-                            <div class="file-upload-container"
-                                onclick="document.getElementById('from_income_bukti_pembayaran').click()">
-                                <input type="file" name="bukti_pembayaran" id="from_income_bukti_pembayaran" accept="image/*" style="display: none;">
-                                <div>
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Klik untuk upload bukti pembayaran</p>
-                                    <p>Format: JPG, PNG (Maks. 2MB)</p>
-                                </div>
-                                <div class="file-preview" id="from-income-file-preview">
-                                    <img id="from-income-preview-image" src="#" alt="Preview" class="hidden" style="max-width:150px; border-radius:12px; margin:0 auto;">
-                                </div>
-                                <div class="file-info hidden">
-                                    <span id="from-income-file-name"></span>
-                                    <button type="button" onclick="removeFromIncomePhoto()" class="remove-file-btn">
-                                        <i class="fas fa-times"></i> Hapus
-                                    </button>
-                                </div>
-                            </div>
+                            
 
                             <div class="button-group">
                                 <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
