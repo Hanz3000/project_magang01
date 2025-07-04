@@ -7,427 +7,471 @@
     <title>Inventaris Barang</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <!-- Tambahkan sebelum penutup </head> -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-        * {
-            font-family: 'Inter', sans-serif;
-        }
+    * {
+        font-family: 'Inter', sans-serif;
+    }
 
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --sidebar-gradient: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            --glow-primary: rgba(102, 126, 234, 0.4);
-            --glow-secondary: rgba(118, 75, 162, 0.3);
-        }
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --sidebar-gradient: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        --glow-primary: rgba(102, 126, 234, 0.4);
+        --glow-secondary: rgba(118, 75, 162, 0.3);
+    }
 
-        body {
-            background: #e3f2fd;
-            background-attachment: fixed;
-            position: relative;
-        }
+    body {
+        background: #e3f2fd;
+        background-attachment: fixed;
+        position: relative;
+    }
 
-        .sidebar-gradient {
-            background: var(--sidebar-gradient);
-            position: relative;
-            overflow: hidden;
-        }
+    .sidebar-gradient {
+        background: var(--sidebar-gradient);
+        position: relative;
+        overflow: hidden;
+    }
 
-        .sidebar-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg,
-                    transparent 30%,
-                    rgba(255, 255, 255, 0.05) 50%,
-                    transparent 70%);
+    .sidebar-gradient::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(45deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.05) 50%,
+                transparent 70%);
+        transform: translateX(-100%);
+        animation: shimmer 3s infinite;
+    }
+
+    @keyframes shimmer {
+        0% {
             transform: translateX(-100%);
-            animation: shimmer 3s infinite;
         }
 
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .hover-glow {
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-
-        .hover-glow::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-        }
-
-        .hover-glow:hover::before {
+        100% {
             transform: translateX(100%);
         }
+    }
 
-        .hover-glow:hover {
-            box-shadow:
-                0 0 30px var(--glow-primary),
-                0 10px 25px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px) scale(1.02);
-        }
+    .hover-glow {
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+    }
 
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
+    .hover-glow::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transform: translateX(-100%);
+        transition: transform 0.6s ease;
+    }
 
-        .menu-item {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .hover-glow:hover::before {
+        transform: translateX(100%);
+    }
 
-        .menu-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.2),
-                    transparent);
-            transition: left 0.5s ease;
-        }
+    .hover-glow:hover {
+        box-shadow:
+            0 0 30px var(--glow-primary),
+            0 10px 25px rgba(0, 0, 0, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px) scale(1.02);
+    }
 
-        .menu-item:hover::after {
-            left: 100%;
-        }
+    .glass-effect {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow:
+            0 8px 32px rgba(0, 0, 0, 0.1),
+            inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    }
 
-        .menu-item:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.1);
-        }
+    .menu-item {
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        .icon-glow {
-            filter: drop-shadow(0 0 8px currentColor);
-            transition: all 0.3s ease;
-        }
+    .menu-item::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent);
+        transition: left 0.5s ease;
+    }
 
-        .menu-item:hover .icon-glow {
-            filter: drop-shadow(0 0 12px currentColor) brightness(1.2);
-            transform: scale(1.1) rotate(5deg);
-        }
+    .menu-item:hover::after {
+        left: 100%;
+    }
 
-        .slide-in-right {
-            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+    .menu-item:hover {
+        transform: translateX(5px);
+        background: rgba(255, 255, 255, 0.1);
+    }
 
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%) scale(0.9);
-                opacity: 0;
-            }
+    .icon-glow {
+        filter: drop-shadow(0 0 8px currentColor);
+        transition: all 0.3s ease;
+    }
 
-            to {
-                transform: translateX(0) scale(1);
-                opacity: 1;
-            }
-        }
+    .menu-item:hover .icon-glow {
+        filter: drop-shadow(0 0 12px currentColor) brightness(1.2);
+        transform: scale(1.1) rotate(5deg);
+    }
 
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
-        }
+    .slide-in-right {
+        animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .header-glass {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .logo-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            box-shadow:
-                0 0 20px rgba(102, 126, 234, 0.4),
-                0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .logo-container:hover {
-            transform: scale(1.05) rotate(2deg);
-            box-shadow:
-                0 0 30px rgba(102, 126, 234, 0.6),
-                0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .toggle-btn {
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .toggle-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
-            transition: all 0.3s ease;
-            transform: translate(-50%, -50%);
-        }
-
-        .toggle-btn:hover::before {
-            width: 100px;
-            height: 100px;
-        }
-
-        .toggle-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .submenu-item {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .submenu-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 3px;
-            height: 0;
-            background: linear-gradient(to bottom, #667eea, #764ba2);
-            transition: height 0.3s ease;
-            transform: translateY(-50%);
-        }
-
-        .submenu-item:hover::before {
-            height: 100%;
-        }
-
-        .submenu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            padding-left: 1rem;
-            transform: translateX(5px);
-        }
-
-        .main-content {
-            background: transparent;
-            backdrop-filter: none;
-        }
-
-        .floating-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: -1;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            animation: float 6s infinite linear;
-        }
-
-        .particle:nth-child(odd) {
-            animation-delay: -3s;
-            background: rgba(102, 126, 234, 0.4);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        @keyframes spin-reverse {
-            from {
-                transform: rotate(360deg);
-            }
-
-            to {
-                transform: rotate(0deg);
-            }
-        }
-
-        @keyframes progress {
-            0% {
-                width: 0%;
-            }
-
-            100% {
-                width: 100%;
-            }
-        }
-
-        .animate-spin-reverse {
-            animation: spin-reverse 1s linear infinite;
-        }
-
-        .animate-progress {
-            animation: progress 3s ease-in-out infinite;
-        }
-
-        .content-area {
-            background: #fff;
-            backdrop-filter: none;
-            border-radius: 20px;
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.08),
-                0 0 0 1px rgba(33, 150, 243, 0.08);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .content-area::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
-        }
-
-        .auth-button {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .auth-button:hover::before {
-            left: 100%;
-        }
-
-        .auth-button:hover {
-            transform: translateY(-1px);
-            text-shadow: 0 0 8px currentColor;
-        }
-
-        .user-avatar {
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .user-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .dropdown-menu {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.2);
-        }
-
-        .dropdown-item {
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
-            padding-left: 1.25rem;
-        }
-
-        /* Animasi untuk teks sidebar */
-        .sidebar-text-enter {
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%) scale(0.9);
             opacity: 0;
-            transform: translateX(-10px);
         }
 
-        .sidebar-text-enter-active {
+        to {
+            transform: translateX(0) scale(1);
             opacity: 1;
-            transform: translateX(0);
-            transition: all 300ms ease-out;
         }
+    }
 
-        .sidebar-text-exit {
-            opacity: 1;
-            transform: translateX(0);
-        }
+    .fade-in {
+        animation: fadeIn 0.5s ease-out;
+    }
 
-        .sidebar-text-exit-active {
+    @keyframes fadeIn {
+        from {
             opacity: 0;
-            transform: translateX(-10px);
-            transition: all 200ms ease-in;
+            transform: translateY(20px);
         }
 
-        /* Optimasi untuk sidebar kecil */
-        .sidebar-small .menu-item {
-            padding: 0.75rem 0;
-            justify-content: center;
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .header-glass {
+        background: rgba(255, 255, 255, 0.9);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .logo-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow:
+            0 0 20px rgba(102, 126, 234, 0.4),
+            0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .logo-container:hover {
+        transform: scale(1.05) rotate(2deg);
+        box-shadow:
+            0 0 30px rgba(102, 126, 234, 0.6),
+            0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle-btn {
+        background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .toggle-btn::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
+        transition: all 0.3s ease;
+        transform: translate(-50%, -50%);
+    }
+
+    .toggle-btn:hover::before {
+        width: 100px;
+        height: 100px;
+    }
+
+    .toggle-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .submenu-item {
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .submenu-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 50%;
+        width: 3px;
+        height: 0;
+        background: linear-gradient(to bottom, #667eea, #764ba2);
+        transition: height 0.3s ease;
+        transform: translateY(-50%);
+    }
+
+    .submenu-item:hover::before {
+        height: 100%;
+    }
+
+    .submenu-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        padding-left: 1rem;
+        transform: translateX(5px);
+    }
+
+    .main-content {
+        background: transparent;
+        backdrop-filter: none;
+    }
+
+    .floating-particles {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.6);
+        border-radius: 50%;
+        animation: float 6s infinite linear;
+    }
+
+    .particle:nth-child(odd) {
+        animation-delay: -3s;
+        background: rgba(102, 126, 234, 0.4);
+    }
+
+    @keyframes float {
+        0% {
+            transform: translateY(100vh) rotate(0deg);
+            opacity: 0;
         }
 
-        .sidebar-small .menu-icon {
-            margin: 0 auto;
+        10% {
+            opacity: 1;
         }
+
+        90% {
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateY(-100px) rotate(360deg);
+            opacity: 0;
+        }
+    }
+
+    @keyframes spin-reverse {
+        from {
+            transform: rotate(360deg);
+        }
+
+        to {
+            transform: rotate(0deg);
+        }
+    }
+
+    @keyframes progress {
+        0% {
+            width: 0%;
+        }
+
+        100% {
+            width: 100%;
+        }
+    }
+
+    .animate-spin-reverse {
+        animation: spin-reverse 1s linear infinite;
+    }
+
+    .animate-progress {
+        animation: progress 3s ease-in-out infinite;
+    }
+
+    .content-area {
+        background: #fff;
+        backdrop-filter: none;
+        border-radius: 20px;
+        box-shadow:
+            0 20px 40px rgba(0, 0, 0, 0.08),
+            0 0 0 1px rgba(33, 150, 243, 0.08);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .content-area::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
+    }
+
+    .auth-button {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-button::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .auth-button:hover::before {
+        left: 100%;
+    }
+
+    .auth-button:hover {
+        transform: translateY(-1px);
+        text-shadow: 0 0 8px currentColor;
+    }
+
+    .user-avatar {
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .user-avatar:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .dropdown-menu {
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
+            0 0 0 1px rgba(255, 255, 255, 0.2);
+    }
+
+    .dropdown-item {
+        transition: all 0.2s ease;
+    }
+
+    .dropdown-item:hover {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
+        padding-left: 1.25rem;
+    }
+
+    /* Animasi untuk teks sidebar */
+    .sidebar-text-enter {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    .sidebar-text-enter-active {
+        opacity: 1;
+        transform: translateX(0);
+        transition: all 300ms ease-out;
+    }
+
+    .sidebar-text-exit {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    .sidebar-text-exit-active {
+        opacity: 0;
+        transform: translateX(-10px);
+        transition: all 200ms ease-in;
+    }
+
+    /* Optimasi untuk sidebar kecil */
+    .sidebar-small .menu-item {
+        padding: 0.75rem 0;
+        justify-content: center;
+    }
+
+    .sidebar-small .menu-icon {
+        margin: 0 auto;
+    }
+    .swal2-toast {
+    animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 2.5s forwards !important;
+    border-left: 4px solid;
+    border-radius: 0.375rem !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+.swal2-toast.swal2-success {
+    border-left-color: #10B981 !important;
+}
+
+.swal2-toast.swal2-info {
+    border-left-color: #3B82F6 !important;
+}
+
+.swal2-toast.swal2-warning {
+    border-left-color: #EF4444 !important;
+}
+
+.swal2-toast.swal2-error {
+    border-left-color: #DC2626 !important;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
     </style>
 </head>
 
@@ -718,7 +762,7 @@
             <!-- Content Area -->
             <div class="p-6 min-h-full">
                 <div class="content-area p-6 fade-in">
-                    
+
 
                     <!-- Main Content -->
                     @yield('content')
@@ -729,8 +773,7 @@
 
     <!-- Floating Particles Background -->
     <div class="floating-particles">
-        @for ($i = 0; $i < 20; $i++)
-            <div class="particle" style="
+        @for ($i = 0; $i < 20; $i++) <div class="particle" style="
                 left: {{ rand(0, 100) }}%;
                 animation-duration: {{ rand(5, 15) }}s;
                 animation-delay: {{ rand(0, 5) }}s;
@@ -743,6 +786,112 @@
 
     <!-- Scripts -->
     @stack('scripts')
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            // Fungsi untuk notifikasi
+            function showActionNotification(action, message) {
+                const settings = {
+                    create: {
+                        icon: 'success',
+                        title: 'Data Berhasil Ditambahkan',
+                        color: '#10B981'
+                    },
+                    update: {
+                        icon: 'info',
+                        title: 'Data Berhasil Diperbarui',
+                        color: '#3B82F6'
+                    },
+                    delete: {
+                        icon: 'warning',
+                        title: 'Data Berhasil Dihapus',
+                        color: '#EF4444'
+                    },
+                    error: {
+                        icon: 'error',
+                        title: 'Terjadi Kesalahan',
+                        color: '#DC2626'
+                    }
+                };
+
+                const config = settings[action] || {
+                    icon: 'info',
+                    title: 'Notifikasi'
+                };
+
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: 'white',
+                    iconColor: config.color,
+                    color: '#1F2937',
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
+
+                Toast.fire({
+                    icon: config.icon,
+                    title: config.title,
+                    text: message
+                });
+            }
+
+            // Debug session
+            console.log("Checking for notifications...");
+            
+            // Handle notifications
+            @if(session('created'))
+                console.log("Found created notification");
+                showActionNotification('create', '{{ session('created') }}');
+            @endif
+
+            @if(session('updated'))
+                console.log("Found updated notification");
+                showActionNotification('update', '{{ session('updated') }}');
+            @endif
+
+            @if(session('deleted'))
+                console.log("Found deleted notification");
+                showActionNotification('delete', '{{ session('deleted') }}');
+            @endif
+
+            @if(session('error'))
+                console.log("Found error notification");
+                showActionNotification('error', '{{ session('error') }}');
+            @endif
+
+        } catch (error) {
+            console.error("Notification error:", error);
+        }
+    });
+
+    // Fungsi konfirmasi delete
+    function confirmDelete(event, itemName = 'data') {
+        event.preventDefault();
+        const form = event.target.closest('form');
+        
+        Swal.fire({
+            title: `Hapus ${itemName}?`,
+            text: "Data yang dihapus tidak dapat dikembalikan!",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Hapus!',
+            cancelButtonText: 'Batal',
+            background: 'white'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+</script>
 </body>
 
 </html>

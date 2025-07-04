@@ -30,28 +30,30 @@ class PegawaiController extends Controller
     }
 
     public function store(Request $request)
-    {
-        // Validasi input sebelum simpan
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'nip' => 'required|numeric|digits_between:5,20|unique:pegawais,nip',
-        ]);
+{
+    // Validasi input sebelum simpan
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'nip' => 'required|numeric|digits_between:5,20|unique:pegawais,nip',
+    ], [
+        'nip.required' => 'NIP wajib diisi.',
+        'nip.numeric' => 'NIP harus berupa angka.',
+        'nip.digits_between' => 'NIP harus terdiri dari minimal 5 hingga maksimal 20 digit.',
+        'nip.unique' => 'NIP sudah digunakan.',
+    ]);
 
-        // Simpan data ke database
-        Pegawai::create($request->only('nama', 'nip'));
+    Pegawai::create($request->only('nama', 'nip'));
 
-        // Jika klik "Tambah dan Lanjut"
-        if ($request->action === 'save_and_continue') {
-            return redirect()
-                ->route('pegawai.create')
-                ->with('success', 'Data pegawai berhasil ditambahkan. Silakan tambah data baru.');
-        }
-
-        // Redirect ke halaman index dengan pesan sukses (untuk tombol Simpan biasa)
+    if ($request->action === 'save_and_continue') {
         return redirect()
-            ->route('pegawai.index')
-            ->with('success', 'Data pegawai berhasil ditambahkan.');
+            ->route('pegawai.create')
+            ->with('created', 'Data pegawai berhasil ditambahkan. Silakan tambah data baru.');
     }
+
+    return redirect()
+        ->route('pegawai.index')
+        ->with('created', 'Data pegawai berhasil ditambahkan.');
+}
 
     public function edit(Pegawai $pegawai)
     {
@@ -62,19 +64,18 @@ class PegawaiController extends Controller
     {
         // Validasi input saat update, abaikan unique jika NIP tidak diubah
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'nip' => 'required|numeric|digits_between:5,20|unique:pegawais,nip,' . $pegawai->id,
-        ]);
-
-        // Update data
-        $pegawai->update([
-            'nama' => $request->nama,
-            'nip' => $request->nip,
-        ]);
+    'nama' => 'required|string|max:255',
+    'nip' => 'required|numeric|digits_between:5,20|unique:pegawais,nip,' . $pegawai->id,
+], [
+    'nip.required' => 'NIP wajib diisi.',
+    'nip.numeric' => 'NIP harus berupa angka.',
+    'nip.digits_between' => 'NIP harus terdiri dari minimal 5 hingga maksimal 20 digit.',
+    'nip.unique' => 'NIP sudah digunakan.',
+]);
 
         return redirect()
             ->route('pegawai.index')
-            ->with('success', 'Data pegawai berhasil diperbarui.');
+            ->with('updated', 'Data pegawai berhasil diperbarui.');
     }
 
     public function destroy(Pegawai $pegawai)
@@ -83,7 +84,7 @@ class PegawaiController extends Controller
 
         return redirect()
             ->route('pegawai.index')
-            ->with('success', 'Pegawai berhasil dihapus.');
+            ->with('deleted', 'Pegawai berhasil dihapus.');
     }
 
     public function bulkDelete(Request $request)
@@ -93,10 +94,10 @@ class PegawaiController extends Controller
             \App\Models\Pegawai::whereIn('id', $ids)->delete();
             return redirect()
                 ->route('pegawai.index')
-                ->with('success', 'Pegawai terpilih berhasil dihapus.');
+                ->with('deleted', 'Pegawai terpilih berhasil dihapus.');
         }
         return redirect()
             ->route('pegawai.index')
-            ->with('success', 'Tidak ada pegawai yang dipilih.');
+            ->with('created', 'Tidak ada pegawai yang dipilih.');
     }
 }

@@ -8,6 +8,11 @@
         </svg>
         Edit Pegawai
     </h2>
+@if ($errors->has('nip'))
+    <div class="text-red-600 text-sm mt-1">
+        {{ $errors->first('nip') }}
+    </div>
+@endif
 
     {{-- Error Validasi --}}
     @if ($errors->any())
