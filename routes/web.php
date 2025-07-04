@@ -89,6 +89,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
     });
 
+    Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+
     // ------------------- PENGELUARAN -------------------
     Route::prefix('pengeluarans')->group(function () {
         // PASTIKAN INI PALING ATAS!
