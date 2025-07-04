@@ -44,6 +44,7 @@
                                 class="block h-6 rounded-full cursor-pointer transition-colors duration-300 ease-in-out
     {{ $isPemasukan ? 'bg-indigo-400' : 'bg-gray-300' }}">
 
+
                                 <span
                                     class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out
                 {{ $isPemasukan ? '' : 'translate-x-6' }}">
