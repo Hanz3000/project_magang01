@@ -144,8 +144,9 @@ class PengeluaranController extends Controller
     {
         $pengeluaran = Pengeluaran::findOrFail($id);
         $pegawais = Pegawai::all();
-        $struks = Struk::all();
-        return view('struks.pengeluarans.edit', compact('pengeluaran', 'pegawais', 'struks'));
+        $barangs = Barang::all(); // tambahkan ini
+
+        return view('struks.pengeluarans.edit', compact('pengeluaran', 'pegawais', 'barangs'));
     }
 
     public function update(Request $request, Pengeluaran $pengeluaran)

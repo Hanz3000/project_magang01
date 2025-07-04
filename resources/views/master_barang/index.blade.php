@@ -17,11 +17,6 @@
             </a>
         </div>
 
-        @if (session('success'))
-        <div class="bg-green-50 border-l-4 border-green-400 text-green-700 p-4 mx-6 mt-4 rounded">
-            <p class="text-sm font-medium">{{ session('success') }}</p>
-        </div>
-        @endif
 
         <div class="px-6 py-4">
             <!-- Kontrol untuk bulk actions - hanya muncul jika ada item terpilih -->
