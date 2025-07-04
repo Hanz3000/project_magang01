@@ -108,7 +108,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Data Struk</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">Data Struk Pemasukan</h3>
                             <p class="text-sm text-gray-500">{{ $struks->total() }} struk ditemukan</p>
                         </div>
                     </div>
