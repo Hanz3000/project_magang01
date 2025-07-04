@@ -71,60 +71,76 @@
             <input type="hidden" name="selected_ids" id="selectedIds">
         </form>
 
-        <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-800">Manajemen Pengeluaran</h1>
-                <div class="flex items-center gap-4 mt-2">
-                    <p class="text-gray-600">{{ $pengeluarans->total() }} pengeluaran ditemukan</p>
-                    @isset($totalPengeluaran)
-                    <div class="px-3 py-1 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">
-                        Total: Rp{{ number_format($totalPengeluaran, 0, ',', '.') }}
-                    </div>
-                    @endisset
-                </div>
-            </div>
-            <div class="flex flex-wrap gap-2">
-                <!-- Bulk Actions Container -->
-                <div id="bulkActionsContainer"
-                    class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
-                    <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0
-                        dipilih</span>
-                    <button onclick="confirmBulkDelete()"
-                        class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                            </path>
-                        </svg>
-                        Hapus
-                    </button>
-                    <button onclick="clearSelection()"
-                        class="p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
-                        title="Batal">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M6 18L18 6M6 6l12 12"></path>
-                        </svg>
-                    </button>
-                </div>
+        <!-- Header Section -->
+        <div class="mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
 
-                <div class="relative group">
-                    <button
-                        class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                        </svg>
-                        Ekspor
-                    </button>
-                    <div
-                        class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
-                        <a href="{{ route('pengeluarans.export.excel') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
-                            Excel</a>
-                        <a href="{{ route('pengeluarans.export.csv') }}"
-                            class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
-                            CSV</a>
+                <!-- Title Section -->
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
+                    <p class="text-gray-600">Kelola dan atur semua struk pengeluaran</p>
+                </div>
+                <!-- Action Buttons & Toggle Switch -->
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto items-center">
+                    <!-- Toggle Switch -->
+                    @php
+                    $isPemasukan = request()->routeIs('struks.index');
+                    @endphp
+
+                    <div class="flex items-center gap-2 mt-2 sm:mt-0">
+                        <div class="relative inline-block w-12 align-middle select-none">
+                            <input type="checkbox" id="toggle-pengeluaran" class="hidden" {{ $isPemasukan ? '' : 'checked' }}>
+                            <label for="toggle-pengeluaran"
+                                title="Lihat Data Pemasukan"
+                                class="block h-6 rounded-full cursor-pointer transition-colors duration-300 ease-in-out
+    {{ !$isPemasukan ? 'bg-indigo-400' : 'bg-gray-300' }}">
+
+                                <span
+                                    class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out
+                {{ !$isPemasukan ? 'translate-x-6' : '' }}">
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const toggle = document.getElementById('toggle-pengeluaran');
+                            toggle.addEventListener('change', function() {
+                                if (!this.checked) {
+                                    window.location.href = "{{ route('struks.index') }}";
+                                }
+                            });
+                        });
+                    </script>
+
+                    <!-- Export Button -->
+                    <div class="relative group">
+                        <button class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Ekspor
+                        </button>
+                        <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
+                            <a href="{{ route('struks.export.excel') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format Excel</a>
+                            <a href="{{ route('struks.export.csv') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format CSV</a>
+                        </div>
+                    </div>
+                    <!-- Bulk Actions ... (lanjutkan seperti semula) -->
+                    <div id="bulkActionsContainer" class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
+                        <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0 dipilih</span>
+                        <button onclick="confirmBulkDelete()" class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Hapus
+                        </button>
+                        <button onclick="clearSelection()" class="p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors" title="Batal">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -145,6 +161,7 @@
                         </div>
                         <div>
                             <h3 class="text-lg font-semibold text-gray-800">Data Pengeluaran</h3>
+                            <p class="text-sm text-gray-500">{{ $pengeluarans->total() }} struk ditemukan</p>
                         </div>
                     </div>
                     <div class="relative">
