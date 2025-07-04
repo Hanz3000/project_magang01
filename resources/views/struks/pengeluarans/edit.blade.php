@@ -17,9 +17,8 @@
             {{-- Nama Toko --}}
             <div>
                 <label class="block mb-1 font-medium">Nama Toko</label>
-            <input type="text" name="nama_toko" class="w-full border rounded px-3 py-2 bg-gray-100" 
-                value="{{ old('nama_toko', $pengeluaran->nama_toko) }}" readonly>
-
+                <input type="text" name="nama_toko" class="w-full border rounded px-3 py-2 bg-gray-100" 
+                    value="{{ old('nama_toko', $pengeluaran->nama_toko) }}" readonly>
             </div>
 
             {{-- Nomor Struk --}}
@@ -72,17 +71,10 @@
                                     class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
                             </div>
                         </div>
-                        <button type="button"
-                            class="text-red-500 hover:text-red-700 transition duration-150 ease-in-out">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
                     </div>
                     @endforeach
                 </div>
+            </div> <!-- 🔴 Penutup daftar barang -->
 
             {{-- Total --}}
             <div>
@@ -92,24 +84,45 @@
             </div>
 
             {{-- Bukti Pembayaran --}}
-            <div>
+            <div x-data="{ open: false }">
                 <label class="block mb-1 font-medium">Bukti Pembayaran</label>
+
                 @if ($pengeluaran->bukti_pembayaran)
-                <img src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}" alt="Bukti Pembayaran"
-                    class="h-40 object-contain border rounded">
+                <img @click="open = true"
+                    src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}"
+                    alt="Bukti Pembayaran"
+                    class="h-40 object-contain border rounded cursor-pointer hover:opacity-80 transition">
+
+                <!-- Modal -->
+                <div x-show="open" x-transition
+                    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
+                    <div @click.away="open = false" class="max-w-3xl mx-auto">
+                        <img src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}"
+                            class="rounded shadow-lg max-h-[80vh]">
+                        <button @click="open = false"
+                            class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+                            Tutup
+                        </button>
+                    </div>
+                </div>
                 @else
                 <p class="text-sm text-gray-500">Tidak ada bukti pembayaran</p>
                 @endif
             </div>
 
             {{-- Tombol Aksi --}}
-            <div class="flex justify-end gap-3 pt-4 border-t">
+            <div class="flex justify-end space-x-4">
                 <a href="{{ route('pengeluarans.index') }}"
-                    class="px-4 py-2 rounded border border-gray-300 bg-white hover:bg-gray-50">Batal</a>
+                    class="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Batal
+                </a>
                 <button type="submit"
-                    class="px-4 py-2 rounded bg-indigo-600 text-white hover:bg-indigo-700">Simpan Perubahan</button>
+                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700">
+                    Simpan Perubahan
+                </button>
             </div>
-        </form>
+
+        </form> 
     </div>
 </div>
 @endsection

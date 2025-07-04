@@ -52,6 +52,18 @@
 
 <div class="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-50 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        @if (session('success'))
+        <div class="fixed top-4 right-4 z-50">
+            <div
+                class="bg-emerald-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 transform transition-all duration-300 animate-slideIn">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>{{ session('success') }}</span>
+            </div>
+        </div>
+        @endif
+
         <!-- Form untuk Bulk Delete -->
         <form id="bulkDeleteForm" method="POST" action="{{ route('pengeluarans.massDelete') }}">
             @csrf
@@ -71,40 +83,8 @@
                     @endisset
                 </div>
             </div>
-            <div class="flex flex-wrap gap-2 items-center">
-                @php
-                $isPemasukan = request()->routeIs('struks.index');
-                @endphp
-
-                <div class="flex items-center gap-2 mt-2 sm:mt-0">
-                    <div class="relative inline-block w-12 align-middle select-none">
-                        <input type="checkbox" id="toggle-pengeluaran" class="hidden" {{ $isPemasukan ? '' : 'checked' }}>
-                        <label for="toggle-pengeluaran"
-                            title="Lihat Data Pemasukan"
-                            class="block h-6 rounded-full cursor-pointer transition-colors duration-300 ease-in-out
-    {{ !$isPemasukan ? 'bg-indigo-400' : 'bg-gray-300' }}">
-
-                            <span
-                                class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out
-                {{ !$isPemasukan ? 'translate-x-6' : '' }}">
-                            </span>
-                        </label>
-                    </div>
-                </div>
-
-                <script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        const toggle = document.getElementById('toggle-pengeluaran');
-                        toggle.addEventListener('change', function() {
-                            if (!this.checked) {
-                                window.location.href = "{{ route('struks.index') }}";
-                            }
-                        });
-                    });
-                </script>
-
-
-                <!-- Export Button Container -->
+            <div class="flex flex-wrap gap-2">
+                <!-- Bulk Actions Container -->
                 <div id="bulkActionsContainer"
                     class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
                     <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0
