@@ -5,71 +5,62 @@
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 {{-- Font Awesome --}}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+{{-- Google Fonts --}}
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Poppins:wght@400;600&display=swap');
+    :root {
+        --primary: #4f46e5;
+        --primary-light: #6366f1;
+        --primary-dark: #4338ca;
+        --secondary: #64748b;
+        --secondary-light: #94a3b8;
+        --secondary-dark: #475569;
+        --success: #10b981;
+        --error: #ef4444;
+        --warning: #f59e0b;
+        --info: #3b82f6;
+        --light: #f8fafc;
+        --dark: #0f172a;
+        --gray: #e2e8f0;
+        --gray-dark: #cbd5e1;
+        --border-radius: 0.75rem;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
 
     body {
-        background: linear-gradient(135deg, #f6f7fb 0%, #e9ecef 100%);
-        min-height: 100vh;
-        font-family: 'Poppins', 'Inter', sans-serif;
-        color: #23272f;
-    }
-
-    /* === GLOBAL STYLES === */
-    * {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        box-sizing: border-box;
-    }
-
-    :root {
-        --font-xs: 0.75rem;
-        /* 12px */
-        --font-sm: 0.875rem;
-        /* 14px */
-        --font-base: 1rem;
-        /* 16px */
-        --font-lg: 1.125rem;
-        /* 18px */
-        --font-xl: 1.25rem;
-        /* 20px */
-        --font-2xl: 1.5rem;
-        /* 24px */
-
-        --primary: #5a67d8;
-        --primary-hover: #4c51bf;
-        --secondary: #718096;
-        --secondary-hover: #4a5568;
-        --danger: #e53e3e;
-        --danger-hover: #c53030;
-        --success: #48bb78;
-        --error: #e53e3e;
-        --border: #e2e8f0;
-        --bg-light: #f8fafc;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f1f5f9;
+        color: var(--dark);
+        line-height: 1.5;
     }
 
     /* === FORM CONTAINER === */
     .form-container {
-        max-width: 900px;
-        margin: 2.5rem auto;
-        padding: 0 1rem;
+        max-width: 960px;
+        margin: 2rem auto;
+        padding: 0 1.25rem;
     }
 
     .form-card {
         background: #fff;
-        border-radius: 1.25rem;
-        box-shadow: 0 6px 24px 0 rgba(44, 62, 80, 0.08);
-        border: 1px solid #e3e6ed;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--gray);
         overflow: hidden;
-        transition: box-shadow 0.2s;
+        transition: var(--transition);
     }
 
     .form-card:hover {
-        box-shadow: 0 12px 32px 0 rgba(44, 62, 80, 0.13);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
     }
 
     .form-inner {
-        padding: 2.2rem 2rem;
+        padding: 2.5rem;
     }
 
     /* === FORM ELEMENTS === */
@@ -77,63 +68,70 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
-        font-size: 1.18rem;
+        font-size: 1.25rem;
         font-weight: 700;
-        color: #2d3a4a;
-        margin-bottom: 1.3rem;
-        padding-bottom: 0.6rem;
-        border-bottom: 2px solid #e3e6ed;
-        letter-spacing: 0.01em;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--gray);
+        letter-spacing: -0.01em;
     }
 
     .section-title i {
         font-size: 1.2em;
-        color: #6c63ff;
+        color: var(--primary);
+        background: rgba(79, 70, 229, 0.1);
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
     .form-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 1.2rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
         margin-bottom: 2rem;
     }
 
     .input-group {
         position: relative;
-        margin-bottom: 1.1rem;
+        margin-bottom: 1.25rem;
     }
 
     .input-group label {
-        font-size: 0.98rem;
+        font-size: 0.9375rem;
         font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.45rem;
+        color: var(--secondary-dark);
+        margin-bottom: 0.5rem;
         display: block;
     }
 
     .input-group input,
     .input-group select {
         width: 100%;
-        padding: 0.85rem 1rem;
-        border: 1.5px solid #dbe2ef;
-        border-radius: 0.9rem;
-        font-size: 1.03rem;
-        background: #f8fafc;
-        color: #23272f;
-        transition: all 0.2s;
-        margin-top: 0.18rem;
+        padding: 0.875rem 1.25rem;
+        border: 1px solid var(--gray);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        background: var(--light);
+        color: var(--dark);
+        transition: var(--transition);
+        margin-top: 0.25rem;
     }
 
     .input-group input:focus,
     .input-group select:focus {
         outline: none;
-        border-color: #6c63ff;
+        border-color: var(--primary);
         background: #fff;
-        box-shadow: 0 0 0 2px #6c63ff22;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
     }
 
     .input-group input::placeholder {
-        color: #b0b3c6;
+        color: var(--secondary-light);
         opacity: 1;
     }
 
@@ -142,80 +140,93 @@
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
-        margin-top: 2rem;
+        margin-top: 2.5rem;
     }
 
     .btn {
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.9rem;
+        padding: 0.875rem 1.75rem;
+        border-radius: var(--border-radius);
         font-weight: 600;
-        font-size: 1.01rem;
+        font-size: 1rem;
         border: none;
         cursor: pointer;
-        transition: all 0.18s;
+        transition: var(--transition);
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
-        box-shadow: 0 2px 8px 0 rgba(44, 62, 80, 0.06);
+        box-shadow: var(--shadow-sm);
     }
 
     .btn-primary {
-        background: linear-gradient(90deg, #495af0 60%, #6c63ff 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: #fff;
         border: none;
     }
 
     .btn-primary:hover,
     .btn-primary:focus {
-        background: linear-gradient(90deg, #2d3a4a 60%, #495af0 100%);
-        color: #fff;
+        background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%);
+        box-shadow: var(--shadow);
     }
 
     .btn-secondary {
-        background: #f8fafc;
-        color: #495af0;
-        border: 1.5px solid #e3e6ed;
+        background: #fff;
+        color: var(--primary);
+        border: 1px solid var(--gray);
     }
 
     .btn-secondary:hover,
     .btn-secondary:focus {
-        background: #e3e6ed;
-        color: #2d3a4a;
+        background: var(--light);
+        color: var(--primary-dark);
+        border-color: var(--gray-dark);
     }
 
     .btn-danger {
-        background: #f8d7da;
-        color: #b02a37;
-        border: 1.5px solid #f5c2c7;
+        background: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
     }
 
     .btn-danger:hover,
     .btn-danger:focus {
-        background: #f5c2c7;
-        color: #842029;
+        background: #fecaca;
+        color: #991b1b;
     }
 
     /* === ALERTS === */
     .alert {
         padding: 1rem 1.5rem;
-        border-radius: 1rem;
-        margin-bottom: 1.5rem;
-        border-left: 4px solid;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.75rem;
         font-size: 1rem;
-        background: #f8fafc;
-        color: #23272f;
+        background: var(--light);
+        color: var(--dark);
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        border-left: 4px solid;
+    }
+
+    .alert i {
+        font-size: 1.25rem;
+        margin-top: 0.125rem;
+    }
+
+    .alert-content {
+        flex: 1;
     }
 
     .alert-success {
-        background: #e6f4ea;
-        color: #2e7d32;
-        border-left-color: #43aa8b;
+        background: #ecfdf5;
+        color: #065f46;
+        border-left-color: var(--success);
     }
 
     .alert-error {
-        background: #f8d7da;
-        color: #b02a37;
-        border-left-color: #f44336;
+        background: #fef2f2;
+        color: #b91c1c;
+        border-left-color: var(--error);
     }
 
     .alert ul {
@@ -232,10 +243,10 @@
 
     .tab-header {
         display: flex;
-        border-bottom: 1.5px solid #e3e6ed;
-        margin-bottom: 1.3rem;
-        background: #f8fafc;
-        border-radius: 1rem 1rem 0 0;
+        border-bottom: 1px solid var(--gray);
+        margin-bottom: 1.5rem;
+        background: var(--light);
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
         overflow: hidden;
     }
 
@@ -245,31 +256,31 @@
         border: none;
         cursor: pointer;
         font-weight: 600;
-        color: #495af0;
+        color: var(--primary);
         border-bottom: 3px solid transparent;
-        transition: all 0.2s;
-        font-size: 1.04rem;
-        border-radius: 1rem 1rem 0 0;
-        background: #f8fafc;
+        transition: var(--transition);
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
     .tab-button.active,
     .tab-button:focus {
-        color: #23272f;
+        color: var(--dark);
         background: #fff;
-        border-bottom: 3px solid #6c63ff;
-        box-shadow: 0 2px 8px 0 #6c63ff22;
+        border-bottom: 3px solid var(--primary);
     }
 
     .tab-button:hover:not(.active) {
-        background: #e3e6ed;
-        color: #2d3a4a;
+        background: rgba(79, 70, 229, 0.05);
+        color: var(--primary-dark);
     }
 
     .tab-content {
         display: none;
         flex: 1;
-        padding: 1.3rem 0 0 0;
+        padding: 1.5rem 0 0 0;
         background: transparent;
     }
 
@@ -281,33 +292,35 @@
     .expense-type-selector {
         display: flex;
         gap: 1rem;
-        margin-bottom: 1.3rem;
+        margin-bottom: 1.5rem;
     }
 
     .expense-type-btn {
-        padding: 0.7rem 1.3rem;
-        border-radius: 0.7rem;
-        background: #f8fafc;
-        border: 1.5px solid #e3e6ed;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        background: var(--light);
+        border: 1px solid var(--gray);
         cursor: pointer;
-        transition: all 0.2s;
+        transition: var(--transition);
         display: flex;
         align-items: center;
         gap: 0.5rem;
-        color: #495af0;
+        color: var(--primary);
         font-weight: 600;
+        flex: 1;
+        justify-content: center;
     }
 
     .expense-type-btn.active,
     .expense-type-btn:focus {
-        background: #495af0;
+        background: var(--primary);
         color: #fff;
-        border-color: #495af0;
+        border-color: var(--primary);
     }
 
     .expense-type-btn:hover:not(.active) {
-        background: #e3e6ed;
-        color: #2d3a4a;
+        background: var(--gray);
+        color: var(--dark);
     }
 
     /* === ITEM TABLE STYLES === */
@@ -315,30 +328,30 @@
         width: 100%;
         border-collapse: separate;
         border-spacing: 0;
-        margin-bottom: 1.3rem;
-        background: #f8fafc;
-        border-radius: 1rem;
+        margin-bottom: 1.5rem;
+        background: #fff;
+        border-radius: var(--border-radius);
         overflow: hidden;
-        box-shadow: 0 2px 8px 0 rgba(44, 62, 80, 0.04);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray);
     }
 
     .item-table th,
     .item-table td {
-        padding: 0.8rem 1rem;
+        padding: 1rem 1.25rem;
+        text-align: left;
     }
 
     .item-table th {
-        background: #e3e6ed;
-        color: #2d3a4a;
-        font-weight: 700;
-        border-bottom: 2px solid #dbe2ef;
-        font-size: 0.99rem;
+        background: var(--light);
+        color: var(--secondary-dark);
+        font-weight: 600;
+        border-bottom: 1px solid var(--gray);
     }
 
     .item-table td {
-        border-bottom: 1px solid #e3e6ed;
-        color: #23272f;
-        font-size: 0.99rem;
+        border-bottom: 1px solid var(--gray);
+        color: var(--dark);
     }
 
     .item-table tr:last-child td {
@@ -346,104 +359,106 @@
     }
 
     .item-table tr:hover td {
-        background: #f1f3f7;
+        background: rgba(79, 70, 229, 0.03);
     }
 
     /* === FILE UPLOAD STYLES === */
     .file-upload-container {
-        border: 2px dashed #e3e6ed;
-        border-radius: 1rem;
-        padding: 2rem;
+        border: 2px dashed var(--gray);
+        border-radius: var(--border-radius);
+        padding: 2.5rem;
         text-align: center;
         cursor: pointer;
-        background: #f8fafc;
-        transition: border-color 0.2s, background 0.2s;
-        margin-bottom: 1rem;
+        background: var(--light);
+        transition: var(--transition);
+        margin-bottom: 1.5rem;
     }
 
     .file-upload-container:hover {
-        border-color: #495af0;
-        background: #e3e6ed;
+        border-color: var(--primary);
+        background: rgba(79, 70, 229, 0.05);
     }
 
     .file-upload-container i {
-        color: #495af0;
-        margin-bottom: 0.5rem;
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+    }
+
+    .file-upload-container p {
+        margin: 0.5rem 0;
+        color: var(--secondary);
+    }
+
+    .file-upload-container .file-info {
+        margin-top: 1.5rem;
+        display: none;
+    }
+
+    .file-preview {
+        display: none;
+        margin-bottom: 1rem;
     }
 
     .file-preview img {
-        max-width: 120px;
-        border-radius: 0.75rem;
-        margin-bottom: 0.5rem;
-        box-shadow: 0 2px 8px 0 #6c63ff22;
-    }
-
-    .file-info {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.97rem;
+        max-width: 150px;
+        border-radius: calc(var(--border-radius) - 0.25rem);
+        box-shadow: var(--shadow-sm);
     }
 
     .remove-file-btn {
-        color: #f44336;
+        color: var(--error);
         cursor: pointer;
         background: none;
         border: none;
         font-weight: 600;
-        transition: color 0.2s;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        margin-top: 1rem;
     }
 
     .remove-file-btn:hover {
-        color: #b02a37;
+        color: #991b1b;
     }
 
     .total-display {
-        font-size: 1.12rem;
-        color: #2d3a4a;
-        margin-bottom: 1.3rem;
+        font-size: 1.125rem;
+        color: var(--dark);
+        margin-bottom: 1.5rem;
         margin-top: 1rem;
         text-align: right;
         font-weight: 700;
+        padding: 1rem;
+        background: var(--light);
+        border-radius: var(--border-radius);
     }
 
-    /* === SCROLLBAR STYLES === */
-    ::-webkit-scrollbar {
-        width: 8px;
-        background: #e3e6ed;
-        border-radius: 8px;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #6c63ff;
-        border-radius: 8px;
-    }
-
-    /* === SELECT2 DROPDOWN MODERN === */
+    /* === SELECT2 DROPDOWN STYLES === */
     .select2-container--default .select2-selection--single {
-        background: #f8fafc;
-        border: 1.5px solid #e3e6ed;
-        border-radius: 0.9rem;
-        height: 46px;
+        background: var(--light);
+        border: 1px solid var(--gray);
+        border-radius: var(--border-radius);
+        height: 48px;
         padding: 0.5rem 1rem;
-        font-size: 1.03rem;
-        color: #23272f;
-        transition: border-color 0.2s, box-shadow 0.2s;
-        box-shadow: none;
+        font-size: 1rem;
+        color: var(--dark);
+        transition: var(--transition);
         display: flex;
         align-items: center;
     }
 
     .select2-container--default .select2-selection--single:focus,
     .select2-container--default .select2-selection--single.select2-selection--focus {
-        border-color: #495af0;
-        box-shadow: 0 0 0 2px #495af022;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
         background: #fff;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
-        color: #23272f;
-        line-height: 2.1rem;
+        color: var(--dark);
+        line-height: 1.5;
         padding-left: 0;
     }
 
@@ -453,39 +468,37 @@
     }
 
     .select2-dropdown {
-        border-radius: 0.9rem;
-        border: 1.5px solid #e3e6ed;
-        box-shadow: 0 8px 32px 0 rgba(44, 62, 80, 0.10);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--gray);
+        box-shadow: var(--shadow-md);
         background: #fff;
-        font-size: 1.03rem;
-        color: #23272f;
+        font-size: 1rem;
+        color: var(--dark);
         z-index: 9999;
     }
 
     .select2-results__option {
-        padding: 0.7rem 1.2rem;
-        border-radius: 0.7rem;
-        transition: background 0.15s, color 0.15s;
+        padding: 0.75rem 1.25rem;
+        transition: var(--transition);
     }
 
     .select2-results__option--highlighted {
-        background: #e3e6ed !important;
-        color: #495af0 !important;
+        background: rgba(79, 70, 229, 0.1) !important;
+        color: var(--primary-dark) !important;
     }
 
     .select2-results__option--selected {
-        background: #495af0 !important;
+        background: var(--primary) !important;
         color: #fff !important;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__placeholder {
-        color: #b0b3c6;
-        opacity: 1;
+        color: var(--secondary-light);
     }
 
     .select2-container--default .select2-selection--single .select2-selection__clear {
-        color: #f44336;
-        font-size: 1.2rem;
+        color: var(--error);
+        font-size: 1.25rem;
         margin-right: 0.5rem;
     }
 
@@ -493,19 +506,92 @@
         width: 100% !important;
     }
 
-    /* Native select fallback */
-    .input-group select:not(.select2-hidden-accessible) {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        background: #f8fafc url("data:image/svg+xml,%3Csvg width='16' height='16' fill='gray' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%23495af0' stroke-width='2' fill='none' fill-rule='evenodd'/%3E%3C/svg%3E") no-repeat right 1rem center/1.2em auto;
-        padding-right: 2.5rem;
+    /* === HIDDEN UTILITY === */
+    .hidden {
+        display: none !important;
+    }
+
+    /* === MODAL STYLES === */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.7);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        visibility: hidden;
+        transition: var(--transition);
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-content {
+        background: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-lg);
+        width: 90%;
+        max-width: 800px;
+        max-height: 90vh;
+        overflow-y: auto;
+        transform: translateY(20px);
+        transition: var(--transition);
+    }
+
+    .modal-overlay.active .modal-content {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--gray);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--secondary);
+        transition: var(--transition);
+    }
+
+    .modal-close:hover {
+        color: var(--error);
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-image {
+        width: 100%;
+        height: auto;
+        max-height: 70vh;
+        object-fit: contain;
+        border-radius: calc(var(--border-radius) - 0.25rem);
     }
 
     /* === RESPONSIVE ADJUSTMENTS === */
     @media (max-width: 768px) {
         .form-inner {
-            padding: 1.1rem;
+            padding: 1.5rem;
         }
 
         .form-grid {
@@ -513,16 +599,17 @@
         }
 
         .tab-header {
-            flex-direction: column;
+            flex-direction: row;
+            overflow-x: auto;
+            padding-bottom: 0;
         }
 
         .tab-button {
-            width: 100%;
-            border-radius: 1rem 1rem 0 0;
+            white-space: nowrap;
         }
 
         .button-group {
-            flex-direction: column-reverse;
+            flex-direction: column;
             gap: 0.75rem;
         }
 
@@ -534,6 +621,25 @@
         .expense-type-selector {
             flex-direction: column;
         }
+
+        .modal-content {
+            width: 95%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-inner {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 1.125rem;
+        }
+
+        .item-table th,
+        .item-table td {
+            padding: 0.75rem;
+        }
     }
 </style>
 
@@ -543,20 +649,24 @@
             {{-- Notifications --}}
             @if (session('success'))
             <div class="alert alert-success">
-                <i class="fas fa-check-circle mr-2"></i>
-                {{ session('success') }}
+                <i class="fas fa-check-circle"></i>
+                <div class="alert-content">
+                    {{ session('success') }}
+                </div>
             </div>
             @endif
 
             @if ($errors->any())
             <div class="alert alert-error">
-                <i class="fas fa-exclamation-triangle mr-2"></i>
-                <strong>Terjadi kesalahan:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="alert-content">
+                    <strong>Terjadi kesalahan:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
             @endif
 
@@ -587,7 +697,7 @@
                                     <i class="fas fa-store mr-1"></i>
                                     Nama Toko
                                 </label>
-                                <input type="text" name="nama_toko" id="nama_toko" required>
+                                <input type="text" name="nama_toko" id="nama_toko" placeholder="Masukkan nama toko" required>
                             </div>
 
                             <div class="input-group">
@@ -595,7 +705,7 @@
                                     <i class="fas fa-receipt mr-1"></i>
                                     Nomor Struk
                                 </label>
-                                <input type="text" name="nomor_struk" id="nomor_struk" required>
+                                <input type="text" name="nomor_struk" id="nomor_struk" placeholder="Masukkan nomor struk" required>
                             </div>
 
                             <div class="input-group">
@@ -613,7 +723,6 @@
                                 </label>
                                 <input type="date" name="tanggal_keluar" id="tanggal_keluar"
                                     value="{{ old('tanggal_keluar', date('Y-m-d')) }}">
-
                             </div>
                         </div>
 
@@ -630,7 +739,7 @@
                                     <th>Jumlah</th>
                                     <th>Harga Satuan</th>
                                     <th>Subtotal</th>
-                                    <th>Gambar</th> <!-- Kolom baru -->
+                                    <th>Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="income-items-container">
@@ -656,7 +765,7 @@
                                     <td>
                                         <div class="input-group">
                                             <input type="number" name="items[0][harga]" class="harga" min="0"
-                                                required>
+                                                required placeholder="0">
                                         </div>
                                     </td>
                                     <td>
@@ -690,12 +799,22 @@
                         </div>
 
                         <div class="file-upload-container" onclick="document.getElementById('foto_struk').click()">
-                            <input type="file" name="foto_struk" id="foto_struk" accept="image/*"
-                                style="display: none;">
+                            <input type="file" name="foto_struk" id="foto_struk" accept="image/*" style="display: none;">
                             <div>
-                                <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+                                <i class="fas fa-cloud-upload-alt"></i>
                                 <p>Klik untuk upload foto struk</p>
                                 <p>Format: JPG, PNG (Maks. 2MB)</p>
+                            </div>
+                        </div>
+
+                        {{-- Preview muncul di bawahnya --}}
+                        <div id="file-preview-wrapper" class="mt-4 text-center hidden">
+                            <img id="preview-image" src="#" alt="Preview" class="mx-auto rounded-lg shadow cursor-pointer" style="max-width:180px;max-height:180px;" onclick="openImageModal(this.src, 'Foto Struk')">
+                            <div class="mt-2">
+                                <span id="file-name" class="text-sm text-gray-600"></span>
+                                <button type="button" onclick="removePhoto()" class="remove-file-btn ml-2">
+                                    <i class="fas fa-times"></i> Hapus
+                                </button>
                             </div>
                         </div>
 
@@ -738,7 +857,7 @@
                                         <i class="fas fa-store mr-1"></i>
                                         Nama Toko
                                     </label>
-                                    <input type="text" name="nama_toko" id="expense_nama_toko" required>
+                                    <input type="text" name="nama_toko" id="expense_nama_toko" placeholder="Masukkan nama toko" required>
                                 </div>
 
                                 <div class="input-group">
@@ -746,10 +865,9 @@
                                         <i class="fas fa-receipt mr-1"></i>
                                         Nomor Struk
                                     </label>
-                                    <input type="text" name="nomor_struk" id="expense_nomor_struk" required>
+                                    <input type="text" name="nomor_struk" id="expense_nomor_struk" placeholder="Masukkan nomor struk" required>
                                 </div>
 
-                                <!-- inputan tanggal di pemasukan -->
                                 <div class="input-group">
                                     <label for="expense_tanggal">
                                         <i class="fas fa-calendar-alt mr-1"></i>
@@ -757,7 +875,6 @@
                                     </label>
                                     <input type="date" name="tanggal" id="expense_tanggal" required
                                         value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
-
                                 </div>
 
                                 <div class="input-group">
@@ -794,7 +911,7 @@
                                     <tr class="item-row" data-item="0">
                                         <td>
                                             <div class="input-group">
-                                                <input type="text" name="items[0][nama]" required>
+                                                <input type="text" name="items[0][nama]" placeholder="Nama barang" required>
                                             </div>
                                         </td>
                                         <td>
@@ -806,7 +923,7 @@
                                         <td>
                                             <div class="input-group">
                                                 <input type="number" name="items[0][harga]" class="expense-harga"
-                                                    min="0" required>
+                                                    min="0" placeholder="0" required>
                                             </div>
                                         </td>
                                         <td>
@@ -846,13 +963,20 @@
                                 <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*"
                                     style="display: none;">
                                 <div>
-                                    <i class="fas fa-cloud-upload-alt fa-3x mb-2"></i>
+                                    <i class="fas fa-cloud-upload-alt"></i>
                                     <p>Klik untuk upload bukti pembayaran</p>
                                     <p>Format: JPG, PNG (Maks. 2MB)</p>
                                 </div>
+                                <div class="file-preview" id="expense-file-preview">
+                                    <img id="expense-preview-image" src="#" alt="Preview" class="hidden" style="max-width:150px; border-radius:12px; margin:0 auto;">
+                                </div>
+                                <div class="file-info hidden">
+                                    <span id="expense-file-name"></span>
+                                    <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
+                                        <i class="fas fa-times"></i> Hapus
+                                    </button>
+                                </div>
                             </div>
-
-
 
                             <div class="button-group">
                                 <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
@@ -864,7 +988,6 @@
                             </div>
                         </form>
                     </div>
-
 
                     {{-- Expense From Income Form --}}
                     <div id="from-income-expense" class="expense-form hidden">
@@ -892,7 +1015,7 @@
                                             data-toko="{{ $struk->nama_toko }}"
                                             data-nomor="{{ $struk->nomor_struk }}"
                                             data-tanggal="{{ $struk->tanggal_struk }}"
-                                            data-keluar="{{ $struk->tanggal_keluar }}"> {{-- ✅ Tambahkan ini --}}
+                                            data-keluar="{{ $struk->tanggal_keluar }}">
                                             {{ $struk->nama_toko }} - {{ $struk->nomor_struk }}
                                             (Rp{{ number_format(collect(json_decode($struk->items, true))->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0)), 0, ',', '.') }})
                                         </option>
@@ -920,7 +1043,6 @@
                                     </label>
                                     <input type="date" name="tanggal" id="from_income_tanggal" required
                                         value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
-
                                 </div>
 
                                 <div class="input-group">
@@ -948,33 +1070,48 @@
 
                             <div id="income-items-preview" class="mb-6">
                                 <div class="overflow-x-auto">
-                                    <table class="w-full text-sm">
-                                        <thead class="bg-gray-50 border-b border-gray-200">
+                                    <table class="item-table">
+                                        <thead>
                                             <tr>
-                                                <th
-                                                    class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                                    Nama Barang</th>
-                                                <th
-                                                    class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                                    Jumlah</th>
-                                                <th
-                                                    class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">
-                                                    Harga Satuan</th>
-                                                <th
-                                                    class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">
-                                                    Subtotal</th>
-                                                <th
-                                                    class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">
-                                                    Gambar</th>
+                                                <th>Nama Barang</th>
+                                                <th>Jumlah</th>
+                                                <th>Harga Satuan</th>
+                                                <th>Subtotal</th>
+                                                <th>Gambar</th>
                                             </tr>
                                         </thead>
                                         <tbody id="items-list">
                                             <tr>
-                                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">Pilih
+                                                <td colspan="5" class="text-center text-gray-500">Pilih
                                                     struk untuk melihat daftar barang</td>
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+
+                            {{-- Payment Proof --}}
+                            <div class="section-title">
+                                <i class="fas fa-camera"></i>
+                                <span>Bukti Pembayaran</span>
+                            </div>
+
+                            <div class="file-upload-container"
+                                onclick="document.getElementById('from_income_bukti_pembayaran').click()">
+                                <input type="file" name="bukti_pembayaran" id="from_income_bukti_pembayaran" accept="image/*" style="display: none;">
+                                <div>
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>Klik untuk upload bukti pembayaran</p>
+                                    <p>Format: JPG, PNG (Maks. 2MB)</p>
+                                </div>
+                                <div class="file-preview" id="from-income-file-preview">
+                                    <img id="from-income-preview-image" src="#" alt="Preview" class="hidden" style="max-width:150px; border-radius:12px; margin:0 auto;">
+                                </div>
+                                <div class="file-info hidden">
+                                    <span id="from-income-file-name"></span>
+                                    <button type="button" onclick="removeFromIncomePhoto()" class="remove-file-btn">
+                                        <i class="fas fa-times"></i> Hapus
+                                    </button>
                                 </div>
                             </div>
 
@@ -987,33 +1124,6 @@
                                 </button>
                             </div>
                         </form>
-
-                        <script>
-                            document.addEventListener("DOMContentLoaded", function() {
-                                const strukSelect = document.getElementById("struk_id");
-                                const tanggalField = document.getElementById("from_income_tanggal");
-                                const tanggalStrukField = document.getElementById("from_income_tanggal_struk"); // Tambahan
-
-                                strukSelect.addEventListener("change", function() {
-                                    const selectedOption = this.options[this.selectedIndex];
-                                    const tanggalKeluar = selectedOption.getAttribute("data-keluar");
-                                    const tanggalStruk = selectedOption.getAttribute("data-tanggal"); // Tambahan
-
-                                    if (tanggalKeluar) {
-                                        tanggalField.value = tanggalKeluar;
-                                    } else {
-                                        tanggalField.value = "";
-                                    }
-
-                                    if (tanggalStruk) {
-                                        tanggalStrukField.value = tanggalStruk;
-                                    } else {
-                                        tanggalStrukField.value = "";
-                                    }
-                                });
-                            });
-                        </script>
-
                     </div>
                 </div>
             </div>
@@ -1022,31 +1132,14 @@
 </div>
 
 <!-- Image Modal -->
-<div id="imageModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 transition-opacity" aria-hidden="true" onclick="closeImageModal()">
-            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+<div id="imageModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalImageTitle"></h3>
+            <button class="modal-close" onclick="closeImageModal()">&times;</button>
         </div>
-
-        <div
-            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="sm:flex sm:items-start">
-                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modalImageTitle"></h3>
-                        <div class="mt-2">
-                            <img id="modalImageContent" src="" alt=""
-                                class="w-full h-auto max-h-screen-70 object-contain">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button type="button" onclick="closeImageModal()"
-                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                    Tutup
-                </button>
-            </div>
+        <div class="modal-body">
+            <img id="modalImageContent" src="" alt="" class="modal-image">
         </div>
     </div>
 </div>
@@ -1056,29 +1149,51 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const strukSelect = document.getElementById('struk_id');
-        const tanggalInput = document.getElementById('from_income_tanggal');
+    // Format currency
+    function formatRupiah(angka) {
+        if (!angka) return 'Rp 0';
+        return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
 
-        strukSelect.addEventListener('change', function() {
-            const selectedOption = this.options[this.selectedIndex];
-            const tanggalKeluar = selectedOption.getAttribute('data-keluar');
-            const tanggalStruk = selectedOption.getAttribute('data-tanggal'); // Ambil tanggal_struk
+    // Image preview function
+    function previewImage(event, previewId, fileNameId, previewContainerId) {
+        const input = event.target;
+        const file = input.files[0];
 
-            if (tanggalKeluar) {
-                tanggalInput.value = tanggalKeluar;
-            } else {
-                tanggalInput.value = '';
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                $(previewId).attr('src', e.target.result).removeClass('hidden');
+                $(fileNameId).text(file.name);
+                $(previewContainerId).closest('.file-upload-container').find('.file-preview, .file-info').removeClass('hidden');
             }
 
-            if (tanggalStruk) {
-                document.getElementById('from_income_tanggal_struk').value = tanggalStruk;
-            } else {
-                document.getElementById('from_income_tanggal_struk').value = '';
-            }
-        });
-    });
+            reader.readAsDataURL(file);
+        }
+    }
 
+    // Remove photo functions
+    function removePhoto() {
+        $('#foto_struk').val('');
+        $('#preview-image').attr('src', '#');
+        $('#file-name').text('');
+        $('#file-preview-wrapper').addClass('hidden');
+    }
+
+    function removeExpensePhoto() {
+        $('#bukti_pembayaran').val('');
+        $('#expense-preview-image').attr('src', '#').addClass('hidden');
+        $('#expense-file-name').text('');
+        $('.file-preview, .file-info').addClass('hidden');
+    }
+
+    function removeFromIncomePhoto() {
+        $('#from_income_bukti_pembayaran').val('');
+        $('#from-income-preview-image').attr('src', '#').addClass('hidden');
+        $('#from-income-file-name').text('');
+        $('.file-preview, .file-info').addClass('hidden');
+    }
 
     // Image modal functions
     function openImageModal(imageUrl, title) {
@@ -1086,14 +1201,24 @@
 
         $('#modalImageContent').attr('src', imageUrl);
         $('#modalImageTitle').text(title || 'Gambar Barang');
-        $('#imageModal').removeClass('hidden');
+        $('#imageModal').addClass('active');
+        $('body').css('overflow', 'hidden');
     }
 
     function closeImageModal() {
-        $('#imageModal').addClass('hidden');
+        $('#imageModal').removeClass('active');
         $('#modalImageContent').attr('src', '');
         $('#modalImageTitle').text('');
+        $('body').css('overflow', 'auto');
     }
+
+    // Close modal when clicking outside
+    $('#imageModal').click(function(e) {
+        if (e.target === this) {
+            closeImageModal();
+        }
+    });
+
     $(document).ready(function() {
         // Initialize Select2
         function initSelect2() {
@@ -1140,25 +1265,6 @@
             $(`#${expenseType}-expense`).removeClass('hidden');
         });
 
-        // Event listener setelah Select2 diinisialisasi
-        $('#struk_id').on('change', function() {
-            const selectedOption = $(this).find('option:selected');
-            const tanggalKeluar = selectedOption.data('keluar');
-            const tanggalStruk = selectedOption.data('tanggal'); // Ambil tanggal_struk
-
-            if (tanggalKeluar) {
-                $('#from_income_tanggal').val(tanggalKeluar);
-            } else {
-                $('#from_income_tanggal').val('');
-            }
-
-            if (tanggalStruk) {
-                $('#from_income_tanggal_struk').val(tanggalStruk);
-            } else {
-                $('#from_income_tanggal_struk').val('');
-            }
-        });
-
         // Update total when struk is selected
         $('#struk_id').on('change', function() {
             const selectedOption = $(this).find('option:selected');
@@ -1175,20 +1281,73 @@
             } else {
                 $('#from_income_total').val('');
                 $('#items-list').html(
-                    '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Pilih struk untuk melihat daftar barang</td></tr>'
+                    '<tr><td colspan="5" class="text-center text-gray-500">Pilih struk untuk melihat daftar barang</td></tr>'
                 );
             }
         });
 
-
-        // File upload preview for income
+        // Preview setelah upload
         $('#foto_struk').change(function(e) {
-            previewImage(e, '#preview-image', '#file-name', '#file-preview');
+            const input = e.target;
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    $('#preview-image').attr('src', ev.target.result);
+                    $('#file-preview-wrapper').removeClass('hidden');
+                }
+                reader.readAsDataURL(file);
+                $('#file-name').text(file.name);
+            }
         });
+
+        // Hapus preview
+        function removePhoto() {
+            $('#foto_struk').val('');
+            $('#preview-image').attr('src', '#');
+            $('#file-name').text('');
+            $('#file-preview-wrapper').addClass('hidden');
+        }
+
+        // Modal detail gambar (sudah ada di kode kamu)
+        function openImageModal(imageUrl, title) {
+            if (!imageUrl) return;
+            $('#modalImageContent').attr('src', imageUrl);
+            $('#modalImageTitle').text(title || 'Gambar');
+            $('#imageModal').addClass('active');
+            $('body').css('overflow', 'hidden');
+        }
 
         // File upload preview for expense
         $('#bukti_pembayaran').change(function(e) {
-            previewImage(e, '#expense-preview-image', '#expense-file-name', '#expense-file-preview');
+            const input = e.target;
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    $('#expense-preview-image').attr('src', ev.target.result).removeClass('hidden');
+                    $('#expense-file-preview').show();
+                }
+                reader.readAsDataURL(file);
+                $('#expense-file-name').text(file.name);
+                $('.file-info').removeClass('hidden');
+            }
+        });
+
+        // File upload preview for from-income form
+        $('#from_income_bukti_pembayaran').change(function(e) {
+            const input = e.target;
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    $('#from-income-preview-image').attr('src', ev.target.result).removeClass('hidden');
+                    $('#from-income-file-preview').show();
+                }
+                reader.readAsDataURL(file);
+                $('#from-income-file-name').text(file.name);
+                $('.file-info').removeClass('hidden');
+            }
         });
 
         // Initialize event listeners for existing income rows
@@ -1206,47 +1365,26 @@
                 updateExpenseSubtotal(row);
             });
         });
-    });
 
-    // Format currency
-    function formatRupiah(angka) {
-        if (!angka) return 'Rp 0';
-        return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-    }
+        // Set tanggal keluar when selecting a struk
+        $('#struk_id').on('change', function() {
+            const selectedOption = $(this).find('option:selected');
+            const tanggalKeluar = selectedOption.data('keluar');
+            const tanggalStruk = selectedOption.data('tanggal');
 
-    // Image preview
-    function previewImage(event, previewId, fileNameId, previewContainerId) {
-        const input = event.target;
-        const file = input.files[0];
-
-        if (file) {
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                $(previewId).attr('src', e.target.result).removeClass('hidden');
-                $(fileNameId).text(file.name);
-                $(previewContainerId).removeClass('hidden');
+            if (tanggalKeluar) {
+                $('#from_income_tanggal').val(tanggalKeluar);
+            } else {
+                $('#from_income_tanggal').val('');
             }
 
-            reader.readAsDataURL(file);
-        }
-    }
-
-    // Remove photo
-    function removePhoto() {
-        $('#foto_struk').val('');
-        $('#preview-image').attr('src', '#').addClass('hidden');
-        $('#file-name').text('');
-        $('#file-preview').addClass('hidden');
-    }
-
-    function removeExpensePhoto() {
-        $('#bukti_pembayaran').val('');
-        $('#expense-preview-image').attr('src', '#').addClass('hidden');
-        $('#expense-file-name').text('');
-        $('#expense-file-preview').addClass('hidden');
-    }
-
+            if (tanggalStruk) {
+                $('#from_income_tanggal_struk').val(tanggalStruk);
+            } else {
+                $('#from_income_tanggal_struk').val('');
+            }
+        });
+    });
 
     // Fetch struk items for preview
     function fetchStrukItems(strukId) {
@@ -1267,58 +1405,44 @@
                             (fotoStruk ? `/storage/struk_foto/${fotoStruk}` : '');
 
                         const gambar = imageUrl ?
-                            `<img src="${imageUrl}" alt="${item.nama}" class="w-10 h-10 object-cover rounded mx-auto cursor-pointer hover:opacity-75">` :
+                            `<a href="#" onclick="openImageModal('${imageUrl}', '${item.nama || 'Struk'}')" class="inline-block">
+                                <img src="${imageUrl}" alt="${item.nama}" class="w-10 h-10 object-cover rounded mx-auto cursor-pointer hover:opacity-75">
+                            </a>` :
                             '<span class="text-gray-400 italic text-xs">Tidak ada gambar</span>';
 
                         html += `
-                    <tr class="border-b border-gray-200 hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap">
-                            <div class="font-medium text-gray-900">${item.nama || '-'}</div>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                            ${item.jumlah || '-'}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                            ${formatRupiah(item.harga || 0)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-indigo-600">
-                            ${formatRupiah(subtotal)}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-center">
-                            ${imageUrl ?
-                                `<a href="#" onclick="openImageModal('${imageUrl}', '${item.nama || 'Struk'}')" class="inline-block">
-                                                    ${gambar}
-                                                </a>` :
-                                gambar}
-                        </td>
-                    </tr>
-                    `;
+                            <tr class="border-b border-gray-200 hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="font-medium text-gray-900">${item.nama || '-'}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">
+                                    ${item.jumlah || '-'}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">
+                                    ${formatRupiah(item.harga || 0)}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-indigo-600">
+                                    ${formatRupiah(subtotal)}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-center">
+                                    ${gambar}
+                                </td>
+                            </tr>
+                        `;
                     });
                     $('#items-list').html(html);
                 } else {
                     $('#items-list').html(
-                        '<tr><td colspan="5" class="px-6 py-4 text-center text-gray-500">Tidak ada barang dalam struk ini</td></tr>'
+                        '<tr><td colspan="5" class="text-center text-gray-500">Tidak ada barang dalam struk ini</td></tr>'
                     );
                 }
             },
             error: function() {
                 $('#items-list').html(
-                    '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Gagal memuat daftar barang</td></tr>'
+                    '<tr><td colspan="5" class="text-center text-red-500">Gagal memuat daftar barang</td></tr>'
                 );
             }
         });
-    }
-
-    // File upload preview for from-income form
-    $('#from_income_bukti_pembayaran').change(function(e) {
-        previewImage(e, '#from-income-preview-image', '#from-income-file-name', '#from-income-file-preview');
-    });
-
-    function removeFromIncomePhoto() {
-        $('#from_income_bukti_pembayaran').val('');
-        $('#from-income-preview-image').attr('src', '#').addClass('hidden');
-        $('#from-income-file-name').text('');
-        $('#from-income-file-preview').addClass('hidden');
     }
 
     // Income items management
@@ -1328,38 +1452,38 @@
         const container = $('#income-items-container');
 
         const newRow = $(`
-                <tr class="item-row" data-item="${incomeItemIndex}">
-                    <td>
-                        <div class="input-group">
-                            <select name="items[${incomeItemIndex}][nama]" class="select-barang" required>
-                                <option value="">Pilih Barang</option>
-                                @foreach ($barangList as $barang)
-                                    <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input type="number" name="items[${incomeItemIndex}][jumlah]" class="jumlah" min="1" value="1" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input type="number" name="items[${incomeItemIndex}][harga]" class="harga" min="0" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="subtotal-display" id="subtotal-${incomeItemIndex}">Rp 0</div>
-                        <input type="hidden" name="items[${incomeItemIndex}][subtotal]" class="subtotal" value="0">
-                    </td>
-                    <td>
-                        <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `);
+            <tr class="item-row" data-item="${incomeItemIndex}">
+                <td>
+                    <div class="input-group">
+                        <select name="items[${incomeItemIndex}][nama]" class="select-barang" required>
+                            <option value="">Pilih Barang</option>
+                            @foreach ($barangList as $barang)
+                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${incomeItemIndex}][jumlah]" class="jumlah" min="1" value="1" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${incomeItemIndex}][harga]" class="harga" min="0" required placeholder="0">
+                    </div>
+                </td>
+                <td>
+                    <div class="subtotal-display" id="subtotal-${incomeItemIndex}">Rp 0</div>
+                    <input type="hidden" name="items[${incomeItemIndex}][subtotal]" class="subtotal" value="0">
+                </td>
+                <td>
+                    <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
 
         container.append(newRow);
 
@@ -1414,33 +1538,33 @@
         const container = $('#expense-items-container');
 
         const newRow = $(`
-                <tr class="item-row" data-item="${expenseItemIndex}">
-                    <td>
-                        <div class="input-group">
-                            <input type="text" name="items[${expenseItemIndex}][nama]" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input type="number" name="items[${expenseItemIndex}][jumlah]" class="expense-jumlah" min="1" value="1" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="input-group">
-                            <input type="number" name="items[${expenseItemIndex}][harga]" class="expense-harga" min="0" required>
-                        </div>
-                    </td>
-                    <td>
-                        <div class="subtotal-display" id="expense-subtotal-${expenseItemIndex}">Rp 0</div>
-                        <input type="hidden" name="items[${expenseItemIndex}][subtotal]" class="expense-subtotal" value="0">
-                    </td>
-                    <td>
-                        <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `);
+            <tr class="item-row" data-item="${expenseItemIndex}">
+                <td>
+                    <div class="input-group">
+                        <input type="text" name="items[${expenseItemIndex}][nama]" placeholder="Nama barang" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${expenseItemIndex}][jumlah]" class="expense-jumlah" min="1" value="1" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="input-group">
+                        <input type="number" name="items[${expenseItemIndex}][harga]" class="expense-harga" min="0" placeholder="0" required>
+                    </div>
+                </td>
+                <td>
+                    <div class="subtotal-display" id="expense-subtotal-${expenseItemIndex}">Rp 0</div>
+                    <input type="hidden" name="items[${expenseItemIndex}][subtotal]" class="expense-subtotal" value="0">
+                </td>
+                <td>
+                    <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `);
 
         container.append(newRow);
 
