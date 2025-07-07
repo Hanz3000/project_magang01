@@ -797,12 +797,6 @@
                                         value="{{ old('tanggal_struk', date('Y-m-d')) }}">
                                 </div>
                                 <div class="input-group">
-                                    <label for="tanggal_keluar">
-                                        <i class="fas fa-calendar-day mr-1"></i>
-                                        Tanggal Keluar
-                                    </label>
-                                    <input type="date" name="tanggal_keluar" id="tanggal_keluar"
-                                        value="{{ old('tanggal_keluar', date('Y-m-d')) }}">
                                 </div>
                             </div>
 
@@ -913,17 +907,6 @@
                             </div>
                         </form>
                     </div>
-
-                    {{-- Expense Tab Content --}}
-                    <div id="expense-tab" class="tab-content">
-                        <div class="expense-type-selector">
-                            <button type="button" class="expense-type-btn active" data-expense-type="manual">
-                                <i class="fas fa-edit mr-2"></i>Input Manual
-                            </button>
-                            <button type="button" class="expense-type-btn" data-expense-type="from-income">
-                                <i class="fas fa-exchange-alt mr-2"></i>Dari Pemasukan
-                            </button>
-                        </div>
 
                         {{-- Manual Expense Form --}}
                         <div id="manual-expense" class="expense-form">

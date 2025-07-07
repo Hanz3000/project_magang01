@@ -207,7 +207,6 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Struk</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Masuk</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Keluar</th> <!-- Kolom baru -->
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -219,9 +218,6 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['nomor_struk'] ?? '-' }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['tanggal_keluar'] ? \Carbon\Carbon::parse($item['tanggal_keluar'])->format('d-m-Y') : '-' }}
                             </td>
                         </tr>
                         @empty
@@ -283,7 +279,6 @@
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nomor Struk</th>
                             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Keluar</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Masuk</th> {{-- ✅ Tambahkan ini --}}
                         </tr>
                     </thead>
 
@@ -297,9 +292,6 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['tanggal_struk'] ? \Carbon\Carbon::parse($item['tanggal_struk'])->format('d-m-Y') : '-' }}
-                            </td> {{-- ✅ Tambahkan ini --}}
                         </tr>
                         @empty
                         <tr>

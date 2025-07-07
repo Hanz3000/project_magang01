@@ -217,8 +217,6 @@
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk
-                            </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang

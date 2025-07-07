@@ -39,10 +39,6 @@
                                 <p class="text-sm font-medium text-gray-500">Tanggal Masuk</p>
                                 <p class="text-lg font-semibold text-gray-800">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</p>
                             </div>
-                            <div>
-                                <p class="text-sm font-medium text-gray-500">Tanggal Keluar</p>
-                                <p class="text-lg font-semibold text-gray-800">{{ date('d M Y', strtotime($struk->tanggal_keluar)) }}</p>
-                            </div>
                         </div>
                         <div>
                             <p class="text-sm font-medium text-gray-500">Total Pembayaran</p>

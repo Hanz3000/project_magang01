@@ -19,9 +19,6 @@
                     <div><span class="font-semibold text-gray-700">Nama Toko:</span> {{ $pengeluaran->nama_toko }}</div>
                     <div><span class="font-semibold text-gray-700">Nomor Struk:</span> {{ $pengeluaran->nomor_struk }}</div>
                 <div>
-                    <span class="font-semibold text-gray-700">Tanggal Masuk:</span> {{ date('d M Y') }}
-                </div>
-                <div>
                     <span class="font-semibold text-gray-700">Tanggal Keluar:</span> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}
                 </div>
                 <div><span class="font-semibold text-gray-700">Pegawai:</span> {{ $pengeluaran->pegawai?->nama ?? '-' }}</div>
