@@ -24,30 +24,21 @@
         <!-- Header Section -->
         <div class="mb-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <!-- Title Section -->
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
                     <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
                 </div>
-                <!-- Action Buttons & Toggle Switch -->
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto items-center">
-                    <!-- Toggle Switch -->
                     @php
                     $isPemasukan = request()->routeIs('struks.index');
                     @endphp
-
                     <div class="flex items-center gap-2 mt-2 sm:mt-0">
                         <div class="relative inline-block w-12 align-middle select-none">
                             <input type="checkbox" id="toggle-struk" class="hidden" {{ $isPemasukan ? '' : 'checked' }}>
                             <label for="toggle-struk"
                                 title="Lihat Data Pengeluaran"
-                                class="block h-6 rounded-full cursor-pointer transition-colors duration-300 ease-in-out
-    {{ $isPemasukan ? 'bg-indigo-400' : 'bg-gray-300' }}">
-
-
-                                <span
-                                    class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out
-                {{ $isPemasukan ? '' : 'translate-x-6' }}">
+                                class="block h-6 rounded-full cursor-pointer transition-colors duration-300 ease-in-out {{ $isPemasukan ? 'bg-indigo-400' : 'bg-gray-300' }}">
+                                <span class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out {{ $isPemasukan ? '' : 'translate-x-6' }}">
                                 </span>
                             </label>
                         </div>
@@ -64,7 +55,6 @@
                         });
                     </script>
 
-                    <!-- Export Button -->
                     <div class="relative group">
                         <button class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -77,7 +67,6 @@
                             <a href="{{ route('struks.export.csv') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format CSV</a>
                         </div>
                     </div>
-                    <!-- Bulk Actions ... (lanjutkan seperti semula) -->
                     <div id="bulkActionsContainer" class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
                         <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0 dipilih</span>
                         <button onclick="confirmBulkDelete()" class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
@@ -96,9 +85,7 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
-            <!-- Table Header -->
             <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -132,7 +119,6 @@
                 </div>
             </div>
 
-            <!-- Table Content -->
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead class="bg-gray-50 border-b border-gray-200">
@@ -173,15 +159,6 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-gray-900">
-                                    @if($struk->tanggal_keluar)
-                                    {{ date('d M Y', strtotime($struk->tanggal_keluar)) }}
-                                    @else
-                                    <span class="text-gray-400 italic text-xs">-</span>
-                                    @endif
-                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="max-w-xs space-y-2">
@@ -263,7 +240,7 @@
 
                         @if (request('edit') == $struk->id)
                         <tr class="bg-indigo-50 animate-fadeIn">
-                            <td colspan="10" class="px-0 py-4">
+                            <td colspan="9" class="px-0 py-4">
                                 <div class="px-6 max-w-5xl ml-auto">
                                     <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}" class="space-y-4">
                                         @csrf
@@ -272,27 +249,26 @@
                                         <h4 class="font-medium text-gray-700 mb-2">Edit Item Struk</h4>
 
                                         <div id="itemsContainer" class="space-y-3">
+                                            @php
+                                            $totalHargaEdit = 0;
+                                            @endphp
                                             @foreach ($items as $idx => $item)
+                                            @php
+                                            $totalHargaEdit += ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0);
+                                            @endphp
                                             <div class="flex items-center space-x-4 item-row">
                                                 <input type="hidden" name="item_index[]" value="{{ $idx }}">
                                                 <div class="flex-1 relative">
-                                                    <select name="nama[]"
-                                                        class="item-select w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
-                                                        <option value="" disabled {{ empty($item['nama']) ? 'selected' : '' }}>Pilih Barang</option>
-                                                        @foreach ($barangList as $barang)
-                                                        <option value="{{ $barang->nama_barang }}"
-                                                            {{ (isset($item['nama']) && $item['nama'] == $barang->nama_barang) ? 'selected' : '' }}>
-                                                            {{ $barang->nama_barang }}
-                                                        </option>
-                                                        @endforeach
-                                                    </select>
+                                                    <input type="text" name="nama[]" value="{{ $item['nama'] ?? '' }}"
+                                                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100"
+                                                        readonly>
                                                 </div>
                                                 <input name="jumlah[]" type="number" value="{{ $item['jumlah'] ?? '' }}"
                                                     class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                    placeholder="Jumlah">
+                                                    placeholder="Jumlah" min="1">
                                                 <input name="harga[]" type="number" value="{{ $item['harga'] ?? '' }}"
                                                     class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                                                    placeholder="Harga">
+                                                    placeholder="Harga" min="0">
                                                 @if (count($items) > 1)
                                                 <button type="button"
                                                     onclick="confirmDeleteItem('{{ $struk->id }}', '{{ $idx }}')"
@@ -307,17 +283,24 @@
                                                 @endif
                                             </div>
                                             @endforeach
+                                            <div class="flex justify-end text-gray-700 font-medium">
+                                                Total: Rp{{ number_format($totalHargaEdit, 0, ',', '.') }}
+                                            </div>
                                         </div>
 
                                         <div class="flex items-center space-x-4 item-row border-2 border-dashed border-indigo-200 rounded-lg p-3 bg-indigo-25">
-                                            <select class="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" id="newItemNama" style="min-width:0">
-                                                <option value="" disabled selected>Pilih Barang</option>
-                                                @foreach ($barangList as $barang)
-                                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
-                                                @endforeach
-                                            </select>
-                                            <input type="number" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="newItemJumlah">
-                                            <input type="number" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga" id="newItemHarga">
+                                            <div class="flex-1 relative">
+                                                <select class="item-search w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                                                    id="newItemNama">
+                                                    <option value="" disabled selected>Pilih Barang</option>
+                                                    @foreach ($barangList as $barang)
+                                                    <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                                                    @endforeach
+                                                </select>
+                                                <div class="autocomplete-results absolute z-10 w-full mt-1 hidden bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
+                                            </div>
+                                            <input type="number" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="newItemJumlah" min="1">
+                                            <input type="number" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga" id="newItemHarga" min="0">
                                             <button type="button" onclick="addNewItemField()" class="px-3 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-1">
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -337,7 +320,7 @@
                         @endif
                         @empty
                         <tr class="animate-fadeIn">
-                            <td colspan="10" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
+                            <td colspan="9" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -350,7 +333,6 @@
                     Menampilkan {{ $struks->firstItem() }} sampai {{ $struks->lastItem() }} dari {{ $struks->total() }} hasil
                 </div>
                 <div class="flex space-x-1">
-                    {{-- Previous Page Link --}}
                     @if ($struks->onFirstPage())
                     <span class="px-3 py-1 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -365,7 +347,6 @@
                     </a>
                     @endif
 
-                    {{-- Pagination Elements --}}
                     @foreach ($struks->getUrlRange(1, $struks->lastPage()) as $page => $url)
                     @if ($page == $struks->currentPage())
                     <span class="px-3 py-1 rounded-lg bg-indigo-600 text-white">{{ $page }}</span>
@@ -374,7 +355,6 @@
                     @endif
                     @endforeach
 
-                    {{-- Next Page Link --}}
                     @if ($struks->hasMorePages())
                     <a href="{{ $struks->nextPageUrl() }}" class="px-3 py-1 rounded-lg border border-gray-200 text-indigo-600 hover:bg-indigo-50 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -410,7 +390,6 @@
 <!-- Edit Modal -->
 <div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <!-- Modal Header -->
         <div class="bg-white px-6 py-4 border-b border-gray-200 rounded-t-lg">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -432,7 +411,6 @@
             </div>
         </div>
 
-        <!-- Modal Body -->
         <div class="px-6 py-4">
             <form method="POST" action="" id="editItemsForm">
                 @csrf
@@ -452,6 +430,9 @@
                     </div>
                 </div>
                 <div id="modalItemsContainer" class="space-y-3 mb-6"></div>
+                <div class="flex justify-end text-gray-700 font-medium mb-4">
+                    <span id="modalTotalPrice">Total: Rp0</span>
+                </div>
                 <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 bg-indigo-50">
                     <div class="flex items-center gap-2 mb-3">
                         <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,13 +441,14 @@
                         <span class="text-sm font-medium text-indigo-700">Tambah Item Baru</span>
                     </div>
                     <div class="grid grid-cols-12 gap-4 items-end">
-                        <div class="col-span-5">
-                            <select class="w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white" id="modalNewItemNama">
+                        <div class="col-span-5 relative">
+                            <select class="item-search w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white" id="modalNewItemNama">
                                 <option value="" disabled selected>Pilih Barang</option>
                                 @foreach ($barangList as $barang)
-                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                                <option value="{{ $barang->nama_barang }}" data-price="{{ $barang->harga }}">{{ $barang->nama_barang }}</option>
                                 @endforeach
                             </select>
+                            <div class="autocomplete-results absolute z-10 w-full mt-1 hidden bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
                         </div>
                         <div class="col-span-2">
                             <input type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="modalNewItemJumlah" min="1">
@@ -489,7 +471,6 @@
                 </div>
             </form>
         </div>
-        <!-- Modal Footer -->
         <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg">
             <div class="flex justify-end space-x-3">
                 <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
@@ -509,7 +490,7 @@
         <div class="fixed inset-0 transition-opacity" aria-hidden="true">
             <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
         </div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true"></span>
         <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div class="sm:flex sm:items-start">
@@ -544,7 +525,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Initialize bulk actions
         const selectAll = document.getElementById('selectAll');
         const rowCheckboxes = document.querySelectorAll('.row-checkbox');
         const bulkActions = document.getElementById('bulkActionsContainer');
@@ -591,19 +571,10 @@
             }
         });
 
-        // Toggle switch functionality
         if (window.location.pathname.includes('pengeluarans')) {
             document.body.classList.add('pengeluaran-page');
         }
 
-        document.querySelectorAll('.toggle-label').forEach(label => {
-            label.addEventListener('click', function(e) {
-                e.preventDefault();
-                window.location.href = this.parentElement.href;
-            });
-        });
-
-        // Auto-hide success message
         @if(session('success'))
         setTimeout(() => {
             const successMessage = document.querySelector('.fixed.top-4.right-4');
@@ -616,7 +587,6 @@
         }, 5000);
         @endif
 
-        // Search functionality
         const searchInput = document.getElementById('searchInput');
         const clearSearch = document.getElementById('clearSearch');
         let searchTimeout;
@@ -637,8 +607,7 @@
                 }
 
                 @if(request('edit'))
-                url.searchParams.set('edit', '{{ request('
-                    edit ') }}');
+                url.searchParams.set('edit', '{{ request('edit') }}');
                 @endif
 
                 window.location.href = url.toString();
@@ -652,15 +621,13 @@
                 url.searchParams.delete('search');
 
                 @if(request('edit'))
-                url.searchParams.set('edit', '{{ request('
-                    edit ') }}');
+                url.searchParams.set('edit', '{{ request('edit') }}');
                 @endif
 
                 window.location.href = url.toString();
             });
         }
 
-        // Restore cursor position
         const savedCursorPosition = localStorage.getItem('searchCursorPosition');
         if (searchInput.value && savedCursorPosition) {
             setTimeout(() => {
@@ -670,7 +637,6 @@
             }, 50);
         }
 
-        // Table row animations
         document.querySelectorAll('tbody tr').forEach((row, index) => {
             row.style.opacity = '0';
             row.style.transform = 'translateY(10px)';
@@ -682,9 +648,11 @@
                 row.style.transform = 'translateY(0)';
             }, 50);
         });
+
+        // Initialize autocomplete for all item-search inputs
+        document.querySelectorAll('.item-search').forEach(input => initAutocomplete(input));
     });
 
-    // Clear selection
     function clearSelection() {
         document.querySelectorAll('.row-checkbox').forEach(checkbox => {
             checkbox.checked = false;
@@ -694,7 +662,6 @@
         document.getElementById('selectedIds').value = '';
     }
 
-    // Confirm bulk delete
     function confirmBulkDelete() {
         const selectedIds = document.getElementById('selectedIds').value;
         if (!selectedIds) {
@@ -708,7 +675,6 @@
         }
     }
 
-    // Image modal functions
     function openModal(imageSrc) {
         document.getElementById('modalImage').src = imageSrc;
         document.getElementById('imageModal').classList.remove('hidden');
@@ -720,7 +686,6 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    // Delete modal functions
     function openDeleteModal(formAction) {
         document.getElementById('deleteForm').action = formAction;
         document.getElementById('deleteModal').classList.remove('hidden');
@@ -732,7 +697,6 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    // Edit modal functions
     let currentEditStrukId = null;
 
     function openEditModal(strukId) {
@@ -748,6 +712,17 @@
         document.body.style.overflow = 'auto';
         document.getElementById('modalItemsContainer').innerHTML = '';
         clearNewItemFields();
+    }
+
+    function updateModalTotalPrice() {
+        const container = document.getElementById('modalItemsContainer');
+        let total = 0;
+        container.querySelectorAll('.item-row').forEach(row => {
+            const jumlah = parseFloat(row.querySelector('input[name="jumlah[]"]').value) || 0;
+            const harga = parseFloat(row.querySelector('input[name="harga[]"]').value) || 0;
+            total += jumlah * harga;
+        });
+        document.getElementById('modalTotalPrice').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
     }
 
     function loadExistingItems(strukId) {
@@ -769,6 +744,7 @@
                         deleteButton.classList.remove('hover:text-red-700', 'hover:bg-red-50');
                     }
                 }
+                updateModalTotalPrice();
             })
             .catch(error => {
                 container.innerHTML = '<div class="text-red-500">Gagal memuat data item.</div>';
@@ -779,11 +755,6 @@
         const container = document.getElementById('modalItemsContainer');
         const itemIndex = index !== null ? index : container.children.length;
 
-        let options = `<option value="" disabled ${!item.nama ? 'selected' : ''}>Pilih Barang</option>`;
-        @foreach($barangList as $barang)
-        options += `<option value="{{ $barang->nama_barang }}" ${item.nama === '{{ $barang->nama_barang }}' ? 'selected' : ''}>{{ $barang->nama_barang }}</option>`;
-        @endforeach
-
         const willBeOnlyItem = container.children.length === 0;
         const disableDelete = willBeOnlyItem;
 
@@ -792,9 +763,9 @@
         itemRow.innerHTML = `
             <input type="hidden" name="item_index[]" value="${itemIndex}">
             <div class="col-span-5">
-                <select name="nama[]" class="item-select w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white">
-                    ${options}
-                </select>
+                <input type="text" name="nama[]" value="${item.nama || ''}"
+                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100"
+                    readonly>
             </div>
             <div class="col-span-2">
                 <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
@@ -822,6 +793,12 @@
         `;
         container.appendChild(itemRow);
 
+        // Add event listeners for real-time total price update
+        const inputs = itemRow.querySelectorAll('input[name="jumlah[]"], input[name="harga[]"]');
+        inputs.forEach(input => {
+            input.addEventListener('input', updateModalTotalPrice);
+        });
+
         if (container.children.length === 2) {
             const deleteButtons = container.querySelectorAll('button[onclick="removeItemFromModal(this)"]');
             deleteButtons.forEach(btn => {
@@ -833,22 +810,23 @@
     }
 
     function addNewItemToModal() {
-        const nama = document.getElementById('modalNewItemNama').value;
+        const namaSelect = document.getElementById('modalNewItemNama');
         const jumlah = document.getElementById('modalNewItemJumlah').value;
         const harga = document.getElementById('modalNewItemHarga').value;
 
-        if (!nama || !jumlah || !harga) {
+        if (!namaSelect.value || !jumlah || !harga) {
             alert('Mohon lengkapi semua field untuk item baru');
             return;
         }
 
         const newItem = {
-            nama,
+            nama: namaSelect.value,
             jumlah,
             harga
         };
         addItemRowToModal(newItem);
         clearNewItemFields();
+        updateModalTotalPrice();
     }
 
     function clearNewItemFields() {
@@ -869,6 +847,7 @@
                     btn.classList.remove('hover:text-red-700', 'hover:bg-red-50');
                 });
             }
+            updateModalTotalPrice();
         } else {
             alert('Tidak dapat menghapus item terakhir');
         }
@@ -885,7 +864,7 @@
 
         let isValid = true;
         container.querySelectorAll('.item-row').forEach((row, index) => {
-            const nama = row.querySelector('select[name="nama[]"]').value;
+            const nama = row.querySelector('input[name="nama[]"]').value;
             const jumlah = row.querySelector('input[name="jumlah[]"]').value;
             const harga = row.querySelector('input[name="harga[]"]').value;
 
@@ -902,7 +881,6 @@
         form.submit();
     }
 
-    // Close modals when clicking outside
     document.getElementById('deleteModal').addEventListener('click', function(e) {
         if (e.target === this) {
             closeDeleteModal();
@@ -915,7 +893,6 @@
         }
     });
 
-    // Close modals with ESC key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             if (!document.getElementById('deleteModal').classList.contains('hidden')) {
@@ -930,7 +907,6 @@
         }
     });
 
-    // Confirm item deletion
     function confirmDeleteItem(strukId, index) {
         if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
             const form = document.createElement('form');
@@ -954,7 +930,6 @@
         }
     }
 
-    // Function to add new item fields
     function addNewItemField() {
         const newItemNama = document.getElementById('newItemNama');
         const newItemJumlah = document.getElementById('newItemJumlah');
@@ -966,38 +941,42 @@
             newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
 
             newItemRow.innerHTML = `
-            <div class="flex-1 relative">
-                <input name="nama[]" value="${newItemNama.value}" 
-                    class="item-search w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
-                    placeholder="Nama item">
-                <div class="autocomplete-results absolute z-10 w-full mt-1 hidden bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
-            </div>
-            <input name="jumlah[]" type="number" value="${newItemJumlah.value}" 
-                class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
-                placeholder="Jumlah">
-            <input name="harga[]" type="number" value="${newItemHarga.value}" 
-                class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
-                placeholder="Harga">
-            <button type="button" onclick="this.closest('.item-row').remove()" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        `;
+                <div class="flex-1 relative">
+                    <input type="text" name="nama[]" value="${newItemNama.value}" 
+                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100" 
+                        readonly>
+                </div>
+                <input name="jumlah[]" type="number" value="${newItemJumlah.value}" 
+                    class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
+                    placeholder="Jumlah" min="1">
+                <input name="harga[]" type="number" value="${newItemHarga.value}" 
+                    class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
+                    placeholder="Harga" min="0">
+                <button type="button" onclick="this.closest('.item-row').remove()" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            `;
             itemsContainer.appendChild(newItemRow);
-
-            const newInput = newItemRow.querySelector('.item-search');
-            initAutocomplete(newInput);
 
             newItemNama.selectedIndex = 0;
             newItemJumlah.value = '';
             newItemHarga.value = '';
+
+            // Update total price
+            let total = 0;
+            itemsContainer.querySelectorAll('.item-row').forEach(row => {
+                const jumlah = parseFloat(row.querySelector('input[name="jumlah[]"]').value) || 0;
+                const harga = parseFloat(row.querySelector('input[name="harga[]"]').value) || 0;
+                total += jumlah * harga;
+            });
+            itemsContainer.querySelector('.flex.justify-end').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
         } else {
             alert('Harap isi semua kolom untuk item baru (Nama, Jumlah, Harga).');
         }
     }
 
-    // Initialize autocomplete for item search
     function initAutocomplete(inputElement) {
         const resultsContainer = inputElement.nextElementSibling;
 
@@ -1030,6 +1009,18 @@
                                 priceInput.value = item.harga;
                             }
                             resultsContainer.classList.add('hidden');
+
+                            // Update total price in edit form
+                            const itemsContainer = inputElement.closest('#itemsContainer');
+                            if (itemsContainer) {
+                                let total = 0;
+                                itemsContainer.querySelectorAll('.item-row').forEach(row => {
+                                    const jumlah = parseFloat(row.querySelector('input[name="jumlah[]"]').value) || 0;
+                                    const harga = parseFloat(row.querySelector('input[name="harga[]"]').value) || 0;
+                                    total += jumlah * harga;
+                                });
+                                itemsContainer.querySelector('.flex.justify-end').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
+                            }
                         });
                         resultsContainer.appendChild(option);
                     });
@@ -1047,11 +1038,30 @@
                 resultsContainer.classList.add('hidden');
             }
         });
+
+        // Auto-fill price when selecting item
+        inputElement.addEventListener('change', function() {
+            const selectedOption = inputElement.options[inputElement.selectedIndex];
+            const priceInput = inputElement.closest('.item-row').querySelector('input[name*="harga"]');
+            if (selectedOption && priceInput && selectedOption.dataset.price) {
+                priceInput.value = selectedOption.dataset.price;
+                // Update total price
+                const itemsContainer = inputElement.closest('#itemsContainer');
+                if (itemsContainer) {
+                    let total = 0;
+                    itemsContainer.querySelectorAll('.item-row').forEach(row => {
+                        const jumlah = parseFloat(row.querySelector('input[name="jumlah[]"]').value) || 0;
+                        const harga = parseFloat(row.querySelector('input[name="harga[]"]').value) || 0;
+                        total += jumlah * harga;
+                    });
+                    itemsContainer.querySelector('.flex.justify-end').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
+                }
+            }
+        });
     }
 </script>
 
 <style>
-    /* Toggle Switch Styles */
     .toggle-label {
         width: 3rem;
         display: block;
@@ -1061,7 +1071,6 @@
         transition: all 0.3s ease-in-out;
     }
 
-    /* Active state when on pengeluaran page */
     body.pengeluaran-page .toggle-label {
         background-color: #4f46e5;
     }
@@ -1070,7 +1079,6 @@
         transform: translateX(1.5rem);
     }
 
-    /* Hover effects */
     .toggle-label:hover {
         background-color: #a5b4fc;
     }
@@ -1080,95 +1088,31 @@
     }
 
     @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
-    .animate-slideIn {
-        animation: slideIn 0.3s ease-out forwards;
-    }
+    .animate-slideIn { animation: slideIn 0.3s ease-out forwards; }
+    .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
 
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out forwards;
-    }
+    .group:hover .group-hover\:opacity-100 { opacity: 1; }
+    .group:hover .group-hover\:visible { visibility: visible; }
 
-    .group:hover .group-hover\:block {
-        display: block;
-    }
+    .hover-scale { transition: transform 0.2s ease; }
+    .hover-scale:hover { transform: scale(1.02); }
 
-    .group:hover .group-hover\:opacity-100 {
-        opacity: 1;
-    }
-
-    .group:hover .group-hover\:visible {
-        visibility: visible;
-    }
-
-    .hover-scale {
-        transition: transform 0.2s ease;
-    }
-
-    .hover-scale:hover {
-        transform: scale(1.02);
-    }
-
-    /* Custom pagination styling */
-    .pagination {
-        display: flex;
-        justify-content: center;
-        list-style: none;
-        padding: 0;
-    }
-
-    .pagination li {
-        margin: 0 4px;
-    }
-
-    .pagination a,
-    .pagination span {
-        display: inline-block;
-        padding: 8px 12px;
-        border-radius: 6px;
-        text-decoration: none;
-    }
-
-    .pagination a {
-        color: #4f46e5;
-        border: 1px solid #e5e7eb;
-    }
-
-    .pagination a:hover {
-        background-color: #f5f3ff;
-    }
-
-    .pagination .active span {
-        background-color: #4f46e5;
-        color: white;
-    }
-
-    .pagination .disabled span {
-        color: #9ca3af;
-        border-color: #e5e7eb;
-    }
+    .pagination { display: flex; justify-content: center; list-style: none; padding: 0; }
+    .pagination li { margin: 0 4px; }
+    .pagination a, .pagination span { display: inline-block; padding: 8px 12px; border-radius: 6px; text-decoration: none; }
+    .pagination a { color: #4f46e5; border: 1px solid #e5e7eb; }
+    .pagination a:hover { background-color: #f5f3ff; }
+    .pagination .active span { background-color: #4f46e5; color: white; }
+    .pagination .disabled span { color: #9ca3af; border-color: #e5e7eb; }
 
     .autocomplete-results {
         z-index: 1000;
@@ -1186,35 +1130,17 @@
         border-bottom: 1px solid #f3f4f6;
     }
 
-    .autocomplete-results div:last-child {
-        border-bottom: none;
-    }
+    .autocomplete-results div:last-child { border-bottom: none; }
+    .autocomplete-results div:hover { background-color: #f3f4f6; }
 
-    .autocomplete-results div:hover {
-        background-color: #f3f4f6;
-    }
+    * { transition: all 0.2s ease; }
 
-    * {
-        transition: all 0.2s ease;
-    }
-
-    /* Loading animation */
     @keyframes pulse {
-        0% {
-            opacity: 0.6;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.6;
-        }
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
     }
 
-    .loading-pulse {
-        animation: pulse 1.5s infinite;
-    }
+    .loading-pulse { animation: pulse 1.5s infinite; }
 </style>
 @endsection
