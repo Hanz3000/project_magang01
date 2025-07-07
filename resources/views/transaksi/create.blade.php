@@ -1182,37 +1182,6 @@
                                     </div>
                                 </div>
 
-                                {{-- Payment Proof --}}
-                                <div class="section-title">
-                                    <i class="fas fa-camera"></i>
-                                    <span>Bukti Pembayaran</span>
-                                </div>
-
-                                <div class="file-upload-wrapper">
-                                    <input type="file" name="bukti_pembayaran" id="from_income_bukti_pembayaran" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this, 'from-income')">
-                                    
-                                    <label for="from_income_bukti_pembayaran" class="file-upload-label" id="from-income-file-upload-label">
-                                        <div class="file-upload-content text-center">
-                                            <div class="file-upload-icon">
-                                                <i class="fas fa-cloud-upload-alt"></i>
-                                            </div>
-                                            <h4 class="file-upload-title">Upload Bukti Pembayaran</h4>
-                                            <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
-                                            <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
-                                        </div>
-                                        
-                                        <div class="file-preview-container hidden" id="from-income-file-preview-container">
-                                            <img id="from-income-preview-image" src="#" alt="Preview" class="file-preview-image">
-                                            <div class="file-preview-info">
-                                                <span id="from-income-file-name" class="file-name"></span>
-                                                <button type="button" onclick="removeFromIncomePhoto()" class="remove-file-btn">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-
                                 <div class="button-group">
                                     <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
                                         <i class="fas fa-arrow-left mr-2"></i>Kembali
