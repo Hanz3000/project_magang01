@@ -215,7 +215,7 @@
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
                                 Struk
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Tanggal Keluar
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
                             </th>
@@ -249,15 +249,6 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-900">{{ $pengeluaran->tanggal->format('d M Y') }}</div>
-                            </td>
-                            <td>
-                                <div class="text-gray-900">
-                                    @if ($pengeluaran->tanggal_struk)
-                                    {{ date('d M Y', strtotime($pengeluaran->tanggal_struk)) }}
-                                    @else
-                                    <span class="text-gray-400 italic text-xs">-</span>
-                                    @endif
-                                </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-gray-700">{{ $pengeluaran->pegawai->nama ?? '-' }}</div>
@@ -352,7 +343,7 @@
                         </tr>
                         @empty
                         <tr class="animate-fadeIn">
-                            <td colspan="12" class="px-6 py-4 text-center text-gray-500">Tidak ada pengeluaran
+                            <td colspan="11" class="px-6 py-4 text-center text-gray-500">Tidak ada pengeluaran
                                 ditemukan.</td>
                         </tr>
                         @endforelse

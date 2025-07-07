@@ -12,36 +12,52 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
-        // Count totals
-        $totalStrukPemasukan = Struk::count();
-        $totalStrukPengeluaran = Pengeluaran::count();
+        $timePeriod = $request->input('time_period', 'all');
+        $bulan = $request->input('bulan', now()->month);
+        $tahun = $request->input('tahun', now()->year);
+
+        $totalStrukPemasukan = $this->getFilteredCount(Struk::query(), $timePeriod, $bulan, $tahun);
+        $totalStrukPengeluaran = $this->getFilteredCount(Pengeluaran::query(), $timePeriod, $bulan, $tahun);
         $totalStruk = $totalStrukPemasukan + $totalStrukPengeluaran;
 
-        // Get latest records
         $latestStruk = Struk::latest()->first();
         $latestPengeluaranStruk = Pengeluaran::latest()->first();
 
-        // Calculate total barang masuk dan keluar
-        $totalBarangMasuk = $this->calculateTotalBarang(Struk::class, 'items');
-        $totalBarangKeluar = $this->calculateTotalBarang(Pengeluaran::class, 'daftar_barang');
+        $totalBarangMasuk = $this->calculateTotalBarangFiltered(Struk::class, 'items', $timePeriod, $bulan, $tahun);
+        $totalBarangKeluar = $this->calculateTotalBarangFiltered(Pengeluaran::class, 'daftar_barang', $timePeriod, $bulan, $tahun);
 
-        // Process lists with proper pagination
+        $strukQuery = Struk::query();
+        $pengeluaranQuery = Pengeluaran::query();
+
+        switch ($timePeriod) {
+            case 'daily':
+                $strukQuery->whereDate('tanggal_struk', today());
+                $pengeluaranQuery->whereDate('tanggal', today());
+                break;
+            case 'weekly':
+                $strukQuery->whereBetween('tanggal_struk', [now()->startOfWeek(), now()->endOfWeek()]);
+                $pengeluaranQuery->whereBetween('tanggal', [now()->startOfWeek(), now()->endOfWeek()]);
+                break;
+            case 'monthly':
+                $strukQuery->whereMonth('tanggal_struk', $bulan)->whereYear('tanggal_struk', $tahun);
+                $pengeluaranQuery->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+                break;
+        }
+
         $barangList = $this->processAndPaginateBarangList(
-            Struk::query(),
+            $strukQuery,
             $request->only(['search', 'sort']),
             'page_barang'
         );
 
         $pengeluaranBarangList = $this->processAndPaginatePengeluaranList(
-            Pengeluaran::query(),
+            $pengeluaranQuery,
             $request->only(['search_pengeluaran', 'sort_pengeluaran']),
             'page_pengeluaran'
         );
 
-        // Generate and paginate history
         $historyBarang = $this->generateAndPaginateHistoryBarang('page_history');
 
-        // Generate labels for last 7 days
         $labels = [];
         $dataMasuk = [];
         $dataKeluar = [];
@@ -49,14 +65,12 @@ class DashboardController extends Controller
             $date = now()->subDays($i)->format('Y-m-d');
             $labels[] = now()->subDays($i)->format('d-m-Y');
 
-            // Hitung jumlah barang masuk pada tanggal ini
             $masuk = Struk::whereDate('tanggal_struk', $date)->get()->reduce(function ($carry, $struk) {
                 $items = $this->parseItems($struk->items);
                 return $carry + collect($items)->sum('jumlah');
             }, 0);
             $dataMasuk[] = $masuk;
 
-            // Hitung jumlah barang keluar pada tanggal ini
             $keluar = Pengeluaran::whereDate('tanggal', $date)->get()->reduce(function ($carry, $pengeluaran) {
                 $items = $this->parseItems($pengeluaran->daftar_barang);
                 return $carry + collect($items)->sum('jumlah');
@@ -64,7 +78,6 @@ class DashboardController extends Controller
             $dataKeluar[] = $keluar;
         }
 
-        // Return dashboard view with data
         return view('dashboard', [
             'barangList' => $barangList,
             'pengeluaranBarangList' => $pengeluaranBarangList,
@@ -76,70 +89,101 @@ class DashboardController extends Controller
             'totalPengeluaran' => $totalStrukPengeluaran,
             'totalBarangMasuk' => $totalBarangMasuk,
             'totalBarangKeluar' => $totalBarangKeluar,
-
+            'timePeriod' => $timePeriod,
+            'bulan' => $bulan,
+            'tahun' => $tahun,
+            'labels' => $labels,
+            'dataMasuk' => $dataMasuk,
+            'dataKeluar' => $dataKeluar,
         ]);
+    }
+
+    protected function getFilteredCount($query, $timePeriod, $bulan = null, $tahun = null)
+    {
+        $query = clone $query;
+        $model = $query->getModel();
+        $dateColumn = $model instanceof \App\Models\Struk ? 'tanggal_struk' : 'tanggal';
+
+        switch ($timePeriod) {
+            case 'daily':
+                $query->whereDate($dateColumn, today());
+                break;
+            case 'weekly':
+                $query->whereBetween($dateColumn, [now()->startOfWeek(), now()->endOfWeek()]);
+                break;
+            case 'monthly':
+                $query->whereMonth($dateColumn, $bulan)->whereYear($dateColumn, $tahun);
+                break;
+        }
+
+        return $query->count();
+    }
+
+    protected function calculateTotalBarangFiltered(string $model, string $itemsField, string $timePeriod, $bulan = null, $tahun = null): int
+    {
+        $query = $model::query();
+        $dateColumn = $model === \App\Models\Struk::class ? 'tanggal_struk' : 'tanggal';
+
+        switch ($timePeriod) {
+            case 'daily':
+                $query->whereDate($dateColumn, today());
+                break;
+            case 'weekly':
+                $query->whereBetween($dateColumn, [now()->startOfWeek(), now()->endOfWeek()]);
+                break;
+            case 'monthly':
+                $query->whereMonth($dateColumn, $bulan)->whereYear($dateColumn, $tahun);
+                break;
+        }
+
+        return $query->get()->reduce(function ($carry, $record) use ($itemsField) {
+            $items = $this->parseItems($record->{$itemsField});
+            return $carry + collect($items)->sum('jumlah');
+        }, 0);
     }
 
     protected function calculateTotalBarang(string $model, string $itemsField): int
     {
-        return $model::query()
-            ->get()
-            ->reduce(function ($carry, $record) use ($itemsField) {
-                $items = $this->parseItems($record->{$itemsField});
-                return $carry + collect($items)->sum('jumlah');
-            }, 0);
+        return $model::query()->get()->reduce(function ($carry, $record) use ($itemsField) {
+            $items = $this->parseItems($record->{$itemsField});
+            return $carry + collect($items)->sum('jumlah');
+        }, 0);
     }
 
     protected function processAndPaginateBarangList($query, array $filters = [], string $pageName = 'page')
     {
-        $barangList = $query->get()
-            ->flatMap(function ($struk) {
-                $items = $this->parseItems($struk->items);
+        $barangList = $query->get()->flatMap(function ($struk) {
+            $items = $this->parseItems($struk->items);
+            return collect($items)->map(function ($item) use ($struk) {
+                return [
+                    'nama' => $item['nama'],
+                    'jumlah' => (int) $item['jumlah'],
+                    'nomor_struk' => $struk->nomor_struk,
+                    'tanggal' => $struk->tanggal_struk,
+                    'tanggal_keluar' => $struk->tanggal_keluar,
+                ];
+            });
+        })->groupBy('nama')->map(function ($items, $nama) {
+            $latest = $items->sortByDesc('tanggal')->first();
 
-                return collect($items)->map(function ($item) use ($struk) {
-                    if (!isset($item['nama']) || !isset($item['jumlah'])) {
-                        return null;
-                    }
+            $latestPengeluaran = \App\Models\Pengeluaran::query()->get()->flatMap(function ($pengeluaran) {
+                return collect($this->parseItems($pengeluaran->daftar_barang))->map(function ($item) use ($pengeluaran) {
                     return [
                         'nama' => $item['nama'],
-                        'jumlah' => (int) ($item['jumlah'] ?? 0),
-                        'nomor_struk' => $struk->nomor_struk,
-                        'tanggal' => $struk->tanggal_struk,
-                        'tanggal_keluar' => $struk->tanggal_keluar, // Tambahkan baris ini
+                        'tanggal' => $pengeluaran->tanggal,
                     ];
-                })->filter();
-            })
-            ->groupBy('nama')
-            ->map(function ($items, $nama) {
-                $latest = $items->sortByDesc('tanggal')->first();
+                });
+            })->where('nama', $nama)->sortByDesc('tanggal')->first();
 
-                // Cari tanggal keluar terakhir dari tabel Pengeluaran
-                $latestPengeluaran = \App\Models\Pengeluaran::query()
-                    ->get()
-                    ->flatMap(function ($pengeluaran) {
-                        return collect($this->parseItems($pengeluaran->daftar_barang))
-                            ->map(function ($item) use ($pengeluaran) {
-                                return [
-                                    'nama' => $item['nama'] ?? null,
-                                    'tanggal' => $pengeluaran->tanggal,
-                                ];
-                            });
-                    })
-                    ->where('nama', $nama)
-                    ->sortByDesc('tanggal')
-                    ->first();
+            return [
+                'nama' => $nama,
+                'jumlah' => $items->sum('jumlah'),
+                'nomor_struk' => $latest['nomor_struk'],
+                'tanggal' => $latest['tanggal'],
+                'tanggal_keluar' => $latest['tanggal_keluar'] ?? null,
+            ];
+        })->values();
 
-                return [
-                    'nama' => $nama,
-                    'jumlah' => $items->sum('jumlah'),
-                    'nomor_struk' => $latest['nomor_struk'],
-                    'tanggal' => $latest['tanggal'],
-                    'tanggal_keluar' => $latest['tanggal_keluar'] ?? null, // Ambil dari struk
-                ];
-            })
-            ->values();
-
-        // Apply filters
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
             $barangList = $barangList->filter(function ($item) use ($search) {
@@ -148,7 +192,6 @@ class DashboardController extends Controller
             });
         }
 
-        // Apply sorting (PASTIKAN INI SETELAH GROUPBY DAN FILTER)
         $sort = $filters['sort'] ?? 'tanggal_desc';
         switch ($sort) {
             case 'nama_asc':
@@ -160,7 +203,6 @@ class DashboardController extends Controller
             case 'tanggal_asc':
                 $barangList = $barangList->sortBy('tanggal')->values();
                 break;
-            case 'tanggal_desc':
             default:
                 $barangList = $barangList->sortByDesc('tanggal')->values();
                 break;
@@ -171,25 +213,19 @@ class DashboardController extends Controller
 
     protected function processAndPaginatePengeluaranList($query, array $filters = [], string $pageName = 'page')
     {
-        $pengeluaranList = $query->get()
-            ->flatMap(function ($pengeluaran) {
-                $items = $this->parseItems($pengeluaran->daftar_barang);
-
-                return collect($items)->map(function ($item) use ($pengeluaran) {
-                    if (!isset($item['nama']) || !isset($item['jumlah'])) {
-                        return null;
-                    }
-                    return [
-                        'nama_barang' => $item['nama'] ?? '-',
-                        'jumlah' => $item['jumlah'] ?? 0,
-                        'nomor_struk' => $pengeluaran->nomor_struk,
-                        'tanggal' => $pengeluaran->tanggal,
-                        'tanggal_struk' => $pengeluaran->tanggal_struk,
-                    ];
-                })->filter(); // Remove null entries
+        $pengeluaranList = $query->get()->flatMap(function ($pengeluaran) {
+            $items = $this->parseItems($pengeluaran->daftar_barang);
+            return collect($items)->map(function ($item) use ($pengeluaran) {
+                return [
+                    'nama_barang' => $item['nama'],
+                    'jumlah' => $item['jumlah'],
+                    'nomor_struk' => $pengeluaran->nomor_struk,
+                    'tanggal' => $pengeluaran->tanggal,
+                    'tanggal_struk' => $pengeluaran->tanggal_struk,
+                ];
             });
+        });
 
-        // Apply filters
         if (!empty($filters['search_pengeluaran'])) {
             $search = strtolower($filters['search_pengeluaran']);
             $pengeluaranList = $pengeluaranList->filter(function ($item) use ($search) {
@@ -198,7 +234,6 @@ class DashboardController extends Controller
             });
         }
 
-        // Apply sorting
         $pengeluaranList = $this->sortCollection($pengeluaranList, $filters['sort_pengeluaran'] ?? null, [
             'nama_asc' => fn($c) => $c->sortBy('nama_barang'),
             'nama_desc' => fn($c) => $c->sortByDesc('nama_barang'),
@@ -211,41 +246,31 @@ class DashboardController extends Controller
 
     protected function generateAndPaginateHistoryBarang(string $pageName = 'page')
     {
-        $masuk = Struk::query()->get()
-            ->flatMap(function ($struk) {
-                return collect($this->parseItems($struk->items))
-                    ->map(function ($item) use ($struk) {
-                        if (!isset($item['nama']) || !isset($item['jumlah'])) {
-                            return null;
-                        }
-                        return [
-                            'tipe' => 'Masuk',
-                            'nama_barang' => $item['nama'],
-                            'jumlah' => (int) ($item['jumlah'] ?? 0),
-                            'nomor_struk' => $struk->nomor_struk,
-                            'tanggal' => $struk->tanggal_struk,
-                            'timestamp' => strtotime($struk->tanggal_struk),
-                        ];
-                    })->filter();
+        $masuk = Struk::query()->get()->flatMap(function ($struk) {
+            return collect($this->parseItems($struk->items))->map(function ($item) use ($struk) {
+                return [
+                    'tipe' => 'Masuk',
+                    'nama_barang' => $item['nama'],
+                    'jumlah' => (int) $item['jumlah'],
+                    'nomor_struk' => $struk->nomor_struk,
+                    'tanggal' => $struk->tanggal_struk,
+                    'timestamp' => strtotime($struk->tanggal_struk),
+                ];
             });
+        });
 
-        $keluar = Pengeluaran::query()->get()
-            ->flatMap(function ($pengeluaran) {
-                return collect($this->parseItems($pengeluaran->daftar_barang))
-                    ->map(function ($item) use ($pengeluaran) {
-                        if (!isset($item['nama']) || !isset($item['jumlah'])) {
-                            return null;
-                        }
-                        return [
-                            'tipe' => 'Keluar',
-                            'nama_barang' => $item['nama'],
-                            'jumlah' => (int) ($item['jumlah'] ?? 0),
-                            'nomor_struk' => $pengeluaran->nomor_struk,
-                            'tanggal' => $pengeluaran->tanggal,
-                            'timestamp' => strtotime($pengeluaran->tanggal),
-                        ];
-                    })->filter();
+        $keluar = Pengeluaran::query()->get()->flatMap(function ($pengeluaran) {
+            return collect($this->parseItems($pengeluaran->daftar_barang))->map(function ($item) use ($pengeluaran) {
+                return [
+                    'tipe' => 'Keluar',
+                    'nama_barang' => $item['nama'],
+                    'jumlah' => (int) $item['jumlah'],
+                    'nomor_struk' => $pengeluaran->nomor_struk,
+                    'tanggal' => $pengeluaran->tanggal,
+                    'timestamp' => strtotime($pengeluaran->tanggal),
+                ];
             });
+        });
 
         $history = $masuk->concat($keluar)
             ->sortByDesc('timestamp')
@@ -265,15 +290,13 @@ class DashboardController extends Controller
             if (json_last_error() !== JSON_ERROR_NONE || !is_array($decoded)) {
                 return [];
             }
-            return array_filter($decoded, function ($item) {
-                return is_array($item) && isset($item['nama']) && isset($item['jumlah']);
-            });
+            return array_filter($decoded, fn($item) => is_array($item) && isset($item['nama'], $item['jumlah']));
         }
+
         if (is_array($items)) {
-            return array_filter($items, function ($item) {
-                return is_array($item) && isset($item['nama']) && isset($item['jumlah']);
-            });
+            return array_filter($items, fn($item) => is_array($item) && isset($item['nama'], $item['jumlah']));
         }
+
         return [];
     }
 

@@ -288,41 +288,6 @@
             display: block;
         }
 
-        /* === EXPENSE TYPE SELECTOR === */
-        .expense-type-selector {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .expense-type-btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--border-radius);
-            background: var(--light);
-            border: 1px solid var(--gray);
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: var(--primary);
-            font-weight: 600;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .expense-type-btn.active,
-        .expense-type-btn:focus {
-            background: var(--primary);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        .expense-type-btn:hover:not(.active) {
-            background: var(--gray);
-            color: var(--dark);
-        }
-
         /* === ITEM TABLE STYLES === */
         .item-table {
             width: 100%;
@@ -696,10 +661,6 @@
                 justify-content: center;
             }
 
-            .expense-type-selector {
-                flex-direction: column;
-            }
-
             .modal-content {
                 width: 95%;
             }
@@ -766,7 +727,7 @@
 
                             <div class="section-title">
                                 <i class="fas fa-money-bill-wave"></i>
-                                <span>Buat Pemasukan Baru</span>
+                                <span>Buat Pemasukan</span>
                             </div>
 
                             <div class="form-grid">
@@ -908,273 +869,164 @@
                         </form>
                     </div>
 
-                        {{-- Manual Expense Form --}}
-                        <div id="manual-expense" class="expense-form">
-                            <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
+                    {{-- Expense Tab Content --}}
+                    <div id="expense-tab" class="tab-content">
+                        <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
+                            @csrf
 
-                                <div class="section-title">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                    <span>Buat Pengeluaran Manual</span>
-                                </div>
+                            <div class="section-title">
+                                <i class="fas fa-money-bill-wave"></i>
+                                <span>Buat Pengeluaran</span>
+                            </div>
 
-                                <div class="form-grid">
-                                    <div class="input-group">
-                                        <label for="expense_nama_toko">
-                                            <i class="fas fa-store mr-1"></i>
-                                            Nama Toko
-                                        </label>
-                                        <input type="text" name="nama_toko" id="expense_nama_toko"
-                                            placeholder="Masukkan nama toko" required>
-                                    </div>
-
-                                    <div class="input-group">
-                                        <label for="expense_nomor_struk">
-                                            <i class="fas fa-receipt mr-1"></i>
-                                            Nomor Struk
-                                        </label>
-                                        <input type="text" name="nomor_struk" id="expense_nomor_struk"
-                                            placeholder="Masukkan nomor struk" required>
-                                    </div>
-
-                                    <div class="input-group">
-                                        <label for="expense_tanggal">
-                                            <i class="fas fa-calendar-alt mr-1"></i>
-                                            Tanggal Pengeluaran
-                                        </label>
-                                        <input type="date" name="tanggal" id="expense_tanggal" required
-                                            value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
-                                    </div>
-
-                                    <div class="input-group">
-                                        <label for="pegawai_id">
-                                            <i class="fas fa-user-tie mr-1"></i>
-                                            Pegawai
-                                        </label>
-                                        <select name="pegawai_id" id="pegawai_id" required>
-                                            <option value="">Pilih Pegawai</option>
-                                            @foreach ($pegawais as $pegawai)
-                                                <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-
-                                {{-- Items --}}
-                                <div class="section-title">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    <span>Daftar Barang</span>
-                                </div>
-
-                                <table class="item-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Nama Barang</th>
-                                            <th>Jumlah</th>
-                                            <th>Harga Satuan</th>
-                                            <th>Subtotal</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="expense-items-container">
-                                        <tr class="item-row" data-item="0">
-                                            <td>
-                                                <div class="input-group">
-                                                    <input type="text" name="items[0][nama]" placeholder="Nama barang"
-                                                        required>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="input-group">
-                                                    <input type="number" name="items[0][jumlah]" class="expense-jumlah"
-                                                        min="1" value="1" required>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="input-group">
-                                                    <input type="number" name="items[0][harga]" class="expense-harga"
-                                                        min="0" placeholder="0" required>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="subtotal-display" id="expense-subtotal-0">Rp 0</div>
-                                                <input type="hidden" name="items[0][subtotal]" class="expense-subtotal"
-                                                    value="0">
-                                            </td>
-                                            <td>
-                                                <button type="button" onclick="removeExpenseItem(this)"
-                                                    class="btn btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <div class="text-center mb-6">
-                                    <button type="button" onclick="addExpenseItem()" class="btn btn-secondary">
-                                        <i class="fas fa-plus mr-2"></i>Tambah Barang
-                                    </button>
-                                </div>
-
-                                <div class="total-display">
-                                    <strong>Total Pengeluaran:</strong> <span id="expense-total">Rp 0</span>
-                                    <input type="hidden" name="total" id="expense_total" value="0">
-                                </div>
-
-                                {{-- Payment Proof --}}
-                                <div class="section-title">
-                                    <i class="fas fa-camera"></i>
-                                    <span>Bukti Pembayaran</span>
-                                </div>
-
-                                <div class="file-upload-wrapper">
-                                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this, 'expense')">
-                                    
-                                    <label for="bukti_pembayaran" class="file-upload-label" id="expense-file-upload-label">
-                                        <div class="file-upload-content text-center">
-                                            <div class="file-upload-icon">
-                                                <i class="fas fa-cloud-upload-alt"></i>
-                                            </div>
-                                            <h4 class="file-upload-title">Upload Bukti Pembayaran</h4>
-                                            <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
-                                            <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
-                                        </div>
-                                        
-                                        <div class="file-preview-container hidden" id="expense-file-preview-container">
-                                            <img id="expense-preview-image" src="#" alt="Preview" class="file-preview-image">
-                                            <div class="file-preview-info">
-                                                <span id="expense-file-name" class="file-name"></span>
-                                                <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
-                                                    <i class="fas fa-trash"></i> Hapus
-                                                </button>
-                                            </div>
-                                        </div>
+                            <div class="form-grid">
+                                <div class="input-group">
+                                    <label for="expense_nama_toko">
+                                        <i class="fas fa-store mr-1"></i>
+                                        Nama Toko
                                     </label>
+                                    <input type="text" name="nama_toko" id="expense_nama_toko"
+                                        placeholder="Masukkan nama toko" required>
                                 </div>
 
-                                <div class="button-group">
-                                    <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left mr-2"></i>Kembali
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save mr-2"></i>Simpan Pengeluaran
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {{-- Expense from Income Form --}}
-                        <div id="from-income-expense" class="expense-form hidden">
-                            <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                <input type="hidden" name="from_income" value="1">
-
-                                <div class="section-title">
-                                    <i class="fas fa-money-bill-wave"></i>
-                                    <span>Buat Pengeluaran dari Pemasukan</span>
+                                <div class="input-group">
+                                    <label for="expense_nomor_struk">
+                                        <i class="fas fa-receipt mr-1"></i>
+                                        Nomor Struk
+                                    </label>
+                                    <input type="text" name="nomor_struk" id="expense_nomor_struk"
+                                        placeholder="Masukkan nomor struk" required>
                                 </div>
 
-                                <div class="form-grid">
-                                    <div class="input-group">
-                                        <label for="struk_id">
-                                            <i class="fas fa-receipt mr-1"></i>
-                                            Pilih Struk Pemasukan
-                                        </label>
-                                        <select name="struk_id" id="struk_id" required>
-                                            <option value="">Pilih Struk</option>
-                                            @foreach ($struks as $struk)
-                                                <option value="{{ $struk->id }}"
-                                                    data-total="{{ collect(json_decode($struk->items, true))->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0)) }}"
-                                                    data-toko="{{ $struk->nama_toko }}"
-                                                    data-nomor="{{ $struk->nomor_struk }}"
-                                                    data-tanggal="{{ $struk->tanggal_struk }}"
-                                                    data-keluar="{{ $struk->tanggal_keluar }}">
-                                                    {{ $struk->nama_toko }} - {{ $struk->nomor_struk }}
-                                                    (Rp{{ number_format(collect(json_decode($struk->items, true))->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0)), 0, ',', '.') }})
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                <div class="input-group">
+                                    <label for="expense_tanggal">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        Tanggal Pengeluaran
+                                    </label>
+                                    <input type="date" name="tanggal" id="expense_tanggal" required
+                                        value="{{ old('tanggal', date('Y-m-d')) }}">
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="pegawai_id">
+                                        <i class="fas fa-user-tie mr-1"></i>
+                                        Pegawai
+                                    </label>
+                                    <select name="pegawai_id" id="pegawai_id" required>
+                                        <option value="">Pilih Pegawai</option>
+                                        @foreach ($pegawais as $pegawai)
+                                            <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            {{-- Items --}}
+                            <div class="section-title">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>Daftar Barang</span>
+                            </div>
+
+                            <table class="item-table">
+                                <thead>
+                                    <tr>
+                                        <th>Nama Barang</th>
+                                        <th>Jumlah</th>
+                                        <th>Harga Satuan</th>
+                                        <th>Subtotal</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead> <tbody id="income-items-container">
+                                    <tr class="item-row" data-item="0">
+                                        <td>
+                                            <div class="input-group">
+                                                <select name="items[0][nama]" class="select-barang" required>
+                                                    <option value="">Pilih Barang</option>
+                                                    @foreach ($barangList as $barang)
+                                                        <option value="{{ $barang->nama_barang }}">
+                                                            {{ $barang->nama_barang }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                        </td>
+                                            <div class="input-group">
+                                                <input type="number" name="items[0][jumlah]" class="expense-jumlah"
+                                                    min="1" value="1" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group">
+                                                <input type="number" name="items[0][harga]" class="expense-harga"
+                                                    min="0" placeholder="0" required>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="subtotal-display" id="expense-subtotal-0">Rp 0</div>
+                                            <input type="hidden" name="items[0][subtotal]" class="expense-subtotal"
+                                                value="0">
+                                        </td>
+                                        <td>
+                                            <button type="button" onclick="removeExpenseItem(this)"
+                                                class="btn btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="text-center mb-6">
+                                <button type="button" onclick="addExpenseItem()" class="btn btn-secondary">
+                                    <i class="fas fa-plus mr-2"></i>Tambah Barang
+                                </button>
+                            </div>
+
+                            <div class="total-display">
+                                <strong>Total Pengeluaran:</strong> <span id="expense-total">Rp 0</span>
+                                <input type="hidden" name="total" id="expense_total" value="0">
+                            </div>
+
+                            {{-- Payment Proof --}}
+                            <div class="section-title">
+                                <i class="fas fa-camera"></i>
+                                <span>Bukti Pembayaran</span>
+                            </div>
+
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this, 'expense')">
+                                
+                                <label for="bukti_pembayaran" class="file-upload-label" id="expense-file-upload-label">
+                                    <div class="file-upload-content text-center">
+                                        <div class="file-upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <h4 class="file-upload-title">Upload Bukti Pembayaran</h4>
+                                        <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
+                                        <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
                                     </div>
-
-                                    <div class="input-group">
-                                        <label for="from_income_pegawai_id">
-                                            <i class="fas fa-user-tie mr-1"></i>
-                                            Pegawai
-                                        </label>
-                                        <select name="pegawai_id" id="from_income_pegawai_id" required>
-                                            <option value="">Pilih Pegawai</option>
-                                            @foreach ($pegawais as $pegawai)
-                                                <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
-                                            @endforeach
-                                        </select>
+                                    
+                                    <div class="file-preview-container hidden" id="expense-file-preview-container">
+                                        <img id="expense-preview-image" src="#" alt="Preview" class="file-preview-image">
+                                        <div class="file-preview-info">
+                                            <span id="expense-file-name" class="file-name"></span>
+                                            <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </div>
                                     </div>
+                                </label>
+                            </div>
 
-                                    <div class="input-group">
-                                        <label for="from_income_tanggal_struk">
-                                            <i class="fas fa-calendar-day mr-1"></i>
-                                            Tanggal Masuk (Pemasukan)
-                                        </label>
-                                        <input type="date" id="from_income_tanggal_struk" name="tanggal_struk"
-                                            required>
-                                    </div>
-
-                                    <div class="input-group">
-                                        <label for="from_income_tanggal">
-                                            <i class="fas fa-calendar-alt mr-1"></i>
-                                            Tanggal Pengeluaran
-                                        </label>
-                                        <input type="date" name="tanggal" id="from_income_tanggal" required
-                                            value="{{ old('tanggal', $income->tanggal_keluar ?? date('Y-m-d')) }}">
-                                    </div>
-
-                                    <div class="input-group">
-                                        <label for="from_income_total">
-                                            <i class="fas fa-coins mr-1"></i>
-                                            Total Pemasukan
-                                        </label>
-                                        <input type="text" id="from_income_total" readonly>
-                                    </div>
-                                </div>
-
-                                {{-- Items Preview --}}
-                                <div class="section-title">
-                                    <i class="fas fa-shopping-cart"></i>
-                                    <span>Daftar Barang</span>
-                                </div>
-
-                                <div id="income-items-preview" class="mb-6">
-                                    <div class="overflow-x-auto">
-                                        <table class="item-table">
-                                            <thead>
-                                                <tr>
-                                                    <th>Nama Barang</th>
-                                                    <th>Jumlah</th>
-                                                    <th>Harga Satuan</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Gambar</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="items-list">
-                                                <tr>
-                                                    <td colspan="5" class="text-center text-gray-500">Pilih
-                                                        struk untuk melihat daftar barang</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-
-                                <div class="button-group">
-                                    <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
-                                        <i class="fas fa-arrow-left mr-2"></i>Kembali
-                                    </a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save mr-2"></i>Simpan Pengeluaran
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
+                            <div class="button-group">
+                                <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left mr-2"></i>Kembali
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save mr-2"></i>Simpan Pengeluaran
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -1219,16 +1071,11 @@
                     fileNameId = '#file-name';
                     containerId = '#file-preview-container';
                     labelId = '#file-upload-label';
-                } else if (type === 'expense') {
+                } else {
                     previewId = '#expense-preview-image';
                     fileNameId = '#expense-file-name';
                     containerId = '#expense-file-preview-container';
                     labelId = '#expense-file-upload-label';
-                } else { // from-income
-                    previewId = '#from-income-preview-image';
-                    fileNameId = '#from-income-file-name';
-                    containerId = '#from-income-file-preview-container';
-                    labelId = '#from-income-file-upload-label';
                 }
 
                 $(previewId).attr('src', e.target.result);
@@ -1254,14 +1101,6 @@
             $('#expense-file-name').text('');
             $('#expense-file-preview-container').addClass('hidden');
             $('#expense-file-upload-label').removeClass('has-file');
-        }
-
-        function removeFromIncomePhoto() {
-            $('#from_income_bukti_pembayaran').val('');
-            $('#from-income-preview-image').attr('src', '#');
-            $('#from-income-file-name').text('');
-            $('#from-income-file-preview-container').addClass('hidden');
-            $('#from-income-file-upload-label').removeClass('has-file');
         }
 
         // Image modal functions
@@ -1295,12 +1134,7 @@
                     width: '100%'
                 });
 
-                $('#struk_id').select2({
-                    placeholder: "Pilih struk...",
-                    width: '100%'
-                });
-
-                $('#pegawai_id, #from_income_pegawai_id').select2({
+                $('#pegawai_id').select2({
                     placeholder: "Pilih pegawai...",
                     width: '100%'
                 });
@@ -1320,54 +1154,6 @@
                 $('#' + tabId).addClass('active');
             });
 
-            // Expense type switching
-            $('.expense-type-btn').click(function() {
-                const expenseType = $(this).data('expense-type');
-
-                // Update active button
-                $('.expense-type-btn').removeClass('active');
-                $(this).addClass('active');
-
-                // Show corresponding form
-                $('.expense-form').addClass('hidden');
-                $(`#${expenseType}-expense`).removeClass('hidden');
-            });
-
-            // Update total when struk is selected
-            $('#struk_id').on('change', function() {
-                const selectedOption = $(this).find('option:selected');
-                const total = selectedOption.data('total');
-                const strukId = selectedOption.val();
-                const tanggalKeluar = selectedOption.data('keluar');
-                const tanggalStruk = selectedOption.data('tanggal');
-
-                if (total) {
-                    $('#from_income_total').val(formatRupiah(total));
-                } else {
-                    $('#from_income_total').val('');
-                }
-
-                if (tanggalKeluar) {
-                    $('#from_income_tanggal').val(tanggalKeluar);
-                } else {
-                    $('#from_income_tanggal').val('');
-                }
-
-                if (tanggalStruk) {
-                    $('#from_income_tanggal_struk').val(tanggalStruk);
-                } else {
-                    $('#from_income_tanggal_struk').val('');
-                }
-
-                if (strukId) {
-                    fetchStrukItems(strukId);
-                } else {
-                    $('#items-list').html(
-                        '<tr><td colspan="5" class="text-center text-gray-500">Pilih struk untuk melihat daftar barang</td></tr>'
-                    );
-                }
-            });
-
             // Initialize event listeners for existing income rows
             $('#income-items-container .item-row').each(function() {
                 const row = $(this);
@@ -1384,65 +1170,6 @@
                 });
             });
         });
-
-        // Fetch struk items for preview
-        function fetchStrukItems(strukId) {
-            $.ajax({
-                url: `/struks/${strukId}/items`,
-                method: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    const items = data.items;
-                    const fotoStruk = data.foto_struk;
-
-                    if (items.length > 0) {
-                        let html = '';
-                        items.forEach(item => {
-                            const subtotal = (item.jumlah || 0) * (item.harga || 0);
-                            const imageUrl = item.gambar ?
-                                `/storage/${item.gambar}` :
-                                (fotoStruk ? `/storage/struk_foto/${fotoStruk}` : '');
-
-                            const gambar = imageUrl ?
-                                `<a href="#" onclick="openImageModal('${imageUrl}', '${item.nama || 'Struk'}')" class="inline-block">
-                                    <img src="${imageUrl}" alt="${item.nama}" class="w-10 h-10 object-cover rounded mx-auto cursor-pointer hover:opacity-75">
-                                </a>` :
-                                '<span class="text-gray-400 italic text-xs">Tidak ada gambar</span>';
-
-                            html += `
-                            <tr class="border-b border-gray-200 hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="font-medium text-gray-900">${item.nama || '-'}</div>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                    ${item.jumlah || '-'}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-gray-500">
-                                    ${formatRupiah(item.harga || 0)}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-indigo-600">
-                                    ${formatRupiah(subtotal)}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-center">
-                                    ${gambar}
-                                </td>
-                            </tr>
-                            `;
-                        });
-                        $('#items-list').html(html);
-                    } else {
-                        $('#items-list').html(
-                            '<tr><td colspan="5" class="text-center text-gray-500">Tidak ada barang dalam struk ini</td></tr>'
-                        );
-                    }
-                },
-                error: function() {
-                    $('#items-list').html(
-                        '<tr><td colspan="5" class="text-center text-red-500">Gagal memuat daftar barang</td></tr>'
-                    );
-                }
-            });
-        }
 
         // Income items management
         let incomeItemIndex = 1;
