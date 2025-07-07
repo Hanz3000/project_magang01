@@ -9,7 +9,7 @@ class MasterBarangController extends Controller
 {
     public function index(Request $request)
     {
-        $query = \App\Models\Barang::query();
+        $query = Barang::query();
 
         if ($request->filled('q')) {
             $query->where('nama_barang', 'like', '%' . $request->q . '%');
@@ -17,8 +17,8 @@ class MasterBarangController extends Controller
 
         $barangs = $query->get();
 
-        return view('master_barang.index', compact('barangs'))  ->with('success', 'Barang berhasil ditambahkan');
-    }   
+        return view('master_barang.index', compact('barangs'))->with('success', 'Barang berhasil ditambahkan');
+    }
 
     public function create()
     {
@@ -28,19 +28,38 @@ class MasterBarangController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255',
+            'nama_barang' => 'required|string|max:255|unique:master_barangs,nama_barang',
         ]);
 
-        Barang::create([
-            'nama_barang' => $request->nama_barang
-        ]);
+        // Generate kode unik
+        $namaBarang = strtoupper($request->nama_barang);
+        $words = preg_split('/[\s\-_,.]+/', $namaBarang);
+        $inisial = '';
 
-        // Tambahkan pengecekan action
-        if ($request->has('action') && $request->action === 'save_and_continue') {
-            return redirect()->back()->with('created', 'Barang berhasil ditambahkan. Silakan tambah barang baru.');
+        foreach ($words as $word) {
+            if (!is_numeric($word)) {
+                $inisial .= substr($word, 0, 1); // ambil 1 huruf pertama tiap kata
+            }
         }
 
-        return redirect()->route('master-barang.index')->with('created', 'Barang berhasil ditambahkan.');
+        // Format timestamp: ymdHis (misal: 250707231501)
+        $timestamp = now()->format('ymdHis');
+
+        // ID acak 3 huruf
+        $randomStr = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
+
+        // Gabungkan jadi kode unik
+        $kodeBarang = $inisial . '-' . $timestamp . '-' . $randomStr;
+
+        Barang::create([
+            'nama_barang' => $request->nama_barang,
+            'kode_barang' => $kodeBarang,
+        ]);
+
+
+        return $request->action === 'save_and_continue'
+            ? redirect()->back()->with('created', 'Barang berhasil ditambahkan. Silakan tambah lagi.')
+            : redirect()->route('master-barang.index')->with('created', 'Barang berhasil ditambahkan.');
     }
 
     public function edit(string $id)
@@ -52,16 +71,36 @@ class MasterBarangController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'nama_barang' => 'required|string|max:255',
+            'nama_barang' => 'required|string|max:255|unique:master_barangs,nama_barang,' . $id,
         ]);
 
         $barang = Barang::findOrFail($id);
+
+        // Generate ulang kode_barang
+        $namaBarang = strtoupper($request->nama_barang);
+        $words = preg_split('/[\s\-_,.]+/', $namaBarang);
+        $inisial = '';
+
+        foreach ($words as $word) {
+            if (!is_numeric($word)) {
+                $inisial .= substr($word, 0, 1);
+            }
+        }
+
+        $timestamp = now()->format('ymdHis'); // contoh: 250707162034
+        $randomStr = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3)); // contoh: F57
+
+        $kodeBarang = $inisial . '-' . $timestamp . '-' . $randomStr;
+
+        // Update barang
         $barang->update([
-            'nama_barang' => $request->nama_barang
+            'nama_barang' => $request->nama_barang,
+            'kode_barang' => $kodeBarang,
         ]);
 
-        return redirect()->route('master-barang.index')->with('updated', 'Barang berhasil diperbarui.');
+        return redirect()->route('master-barang.index')->with('updated', 'Barang berhasil diperbarui dengan kode baru.');
     }
+
 
     public function destroy(string $id)
     {
@@ -76,7 +115,7 @@ class MasterBarangController extends Controller
         $ids = $request->input('ids');
 
         if ($ids) {
-            \App\Models\Barang::whereIn('id', $ids)->delete();
+            Barang::whereIn('id', $ids)->delete();
             return redirect()->route('master-barang.index')->with('success', 'Barang terpilih berhasil dihapus.');
         }
 

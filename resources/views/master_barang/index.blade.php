@@ -63,6 +63,8 @@
                                 </div>
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NAMA BARANG</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">KODE BARANG</th>
+
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">AKSI</th>
                         </tr>
                     </thead>
@@ -77,6 +79,8 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $barang->nama_barang }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ $barang->kode_barang }}</td>
+
                             <td class="px-6 py-4 whitespace-nowrap text-sm">
                                 <div class="flex items-center justify-center space-x-2">
                                     <a href="{{ route('master-barang.edit', $barang->id) }}"

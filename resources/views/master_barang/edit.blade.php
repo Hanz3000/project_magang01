@@ -11,13 +11,13 @@
 
     {{-- Error Validasi --}}
     @if ($errors->any())
-        <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded mb-6">
-            <ul class="list-disc list-inside text-sm">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
+    <div class="bg-red-50 border-l-4 border-red-400 text-red-700 p-4 rounded mb-6">
+        <ul class="list-disc list-inside text-sm">
+            @foreach ($errors->all() as $error)
+            <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
     @endif
 
     <form action="{{ route('master-barang.update', $barang->id) }}" method="POST" class="space-y-4">
@@ -27,18 +27,24 @@
         <div>
             <label for="nama_barang" class="block text-sm font-medium text-gray-700 mb-1">Nama Barang</label>
             <input type="text" name="nama_barang" id="nama_barang"
-                   value="{{ old('nama_barang', $barang->nama_barang) }}"
-                   placeholder="Contoh: Bolpoin Hitam"
-                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+                value="{{ old('nama_barang', $barang->nama_barang) }}"
+                placeholder="Contoh: Bolpoin Hitam"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
         </div>
+        <div>
+            <label for="kode_barang" class="block text-sm font-medium text-gray-700 mb-1">Kode Barang (otomatis diubah)</label>
+            <input type="text" id="kode_barang" value="{{ $barang->kode_barang }}"
+                class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-600" readonly>
+        </div>
+
 
         <div class="flex justify-end gap-2 pt-4">
             <a href="{{ route('master-barang.index') }}"
-               class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                class="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Batal
             </a>
             <button type="submit"
-                    class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                 Simpan
             </button>
         </div>
