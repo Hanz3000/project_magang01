@@ -89,9 +89,9 @@
 
                     <div class="flex items-center gap-2 mt-2 sm:mt-0">
                         <div class="relative inline-block w-12 align-middle select-none">
-                            <input type="checkbox" id="toggle-pengeluaran" class="hidden" {{ $isPemasukan ? '' : 'checked' }}>
-                            <label for="toggle-pengeluaran"
-                                title="Lihat Data Pemasukan"
+                            <input type="checkbox" id="toggle-pengeluaran" class="hidden"
+                                {{ $isPemasukan ? '' : 'checked' }}>
+                            <label for="toggle-pengeluaran" title="Lihat Data Pemasukan"
                                 class="block h-6 rounded-full cursor-pointer transition-colors duration-300 ease-in-out
     {{ !$isPemasukan ? 'bg-indigo-400' : 'bg-gray-300' }}">
 
@@ -116,29 +116,44 @@
 
                     <!-- Export Button -->
                     <div class="relative group">
-                        <button class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
+                        <button
+                            class="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors shadow-sm">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                             </svg>
                             Ekspor
                         </button>
-                        <div class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
-                            <a href="{{ route('struks.export.excel') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format Excel</a>
-                            <a href="{{ route('struks.export.csv') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format CSV</a>
+                        <div
+                            class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 origin-top-right">
+                            <a href="{{ route('struks.export.excel') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
+                                Excel</a>
+                            <a href="{{ route('struks.export.csv') }}"
+                                class="block px-4 py-2 text-sm text-gray-700 hover:bg-indigo-50 hover:text-indigo-600">Format
+                                CSV</a>
                         </div>
                     </div>
                     <!-- Bulk Actions ... (lanjutkan seperti semula) -->
-                    <div id="bulkActionsContainer" class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
-                        <span id="selectedCount" class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0 dipilih</span>
-                        <button onclick="confirmBulkDelete()" class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
+                    <div id="bulkActionsContainer"
+                        class="hidden flex items-center gap-2 bg-red-50 rounded-lg p-1 border border-red-100">
+                        <span id="selectedCount"
+                            class="px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-md">0 dipilih</span>
+                        <button onclick="confirmBulkDelete()"
+                            class="flex items-center gap-2 px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors text-sm">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                </path>
                             </svg>
                             Hapus
                         </button>
-                        <button onclick="clearSelection()" class="p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors" title="Batal">
+                        <button onclick="clearSelection()"
+                            class="p-1 text-red-400 hover:text-red-600 rounded-full hover:bg-red-100 transition-colors"
+                            title="Batal">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
                             </svg>
                         </button>
                     </div>
@@ -160,7 +175,7 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-800">Data Pengeluaran</h3>
+                            <h3 class="text-lg font-semibold text-gray-800">Data Struk Pengeluaran</h3>
                             <p class="text-sm text-gray-500">{{ $pengeluarans->total() }} struk ditemukan</p>
                         </div>
                     </div>
@@ -200,13 +215,16 @@
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
                                 Struk
                             </th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk
+                            </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
                             </th>
-                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Jumlah
+                            </th>
                             <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total
                             </th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Struk
@@ -249,7 +267,8 @@
                             <td class="px-6 py-4 whitespace-nowrap align-top">
                                 @foreach ($pengeluaran->daftar_barang as $item)
                                 <div class="flex items-center mb-1">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle"></span>
+                                    <span
+                                        class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle"></span>
                                     <span class="text-gray-700">{{ $item['nama'] }}</span>
                                 </div>
                                 @endforeach
@@ -266,19 +285,23 @@
                                 @php
                                 $imagePath = null;
                                 if ($pengeluaran->bukti_pembayaran) {
-                                $imagePath = strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
+                                $imagePath =
+                                strpos($pengeluaran->bukti_pembayaran, 'storage/') === 0
                                 ? $pengeluaran->bukti_pembayaran
                                 : 'storage/' . $pengeluaran->bukti_pembayaran;
                                 } elseif ($pengeluaran->income && $pengeluaran->income->bukti_pembayaran) {
-                                $imagePath = strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
+                                $imagePath =
+                                strpos($pengeluaran->income->bukti_pembayaran, 'storage/') === 0
                                 ? $pengeluaran->income->bukti_pembayaran
                                 : 'storage/' . $pengeluaran->income->bukti_pembayaran;
                                 }
                                 @endphp
 
                                 @if ($imagePath)
-                                <button onclick="openModal('{{ asset($imagePath) }}')" class="text-indigo-600 hover:text-indigo-900">
-                                    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <button onclick="openModal('{{ asset($imagePath) }}')"
+                                    class="text-indigo-600 hover:text-indigo-900">
+                                    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
                                         </path>
@@ -315,23 +338,17 @@
                                         </svg>
 
                                     </a>
-                                    <form action="{{ route('pengeluarans.destroy', $pengeluaran->id) }}"
-                                        method="POST"
-                                        onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit"
-                                            class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
-                                            title="Hapus">
-                                            <svg class="w-5 h-5" fill="none" stroke="currentColor"
-                                                viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round"
-                                                    stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                                </path>
-                                            </svg>
-                                        </button>
-                                    </form>
+                                    <button
+                                        onclick="confirmSingleDelete('{{ route('pengeluarans.destroy', $pengeluaran->id) }}')"
+                                        class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors"
+                                        title="Hapus">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
+                                            </path>
+                                        </svg>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -461,6 +478,51 @@
     </div>
 </div>
 
+<!-- Single Delete Confirmation Modal -->
+<div id="singleDeleteModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+            <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+        </div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div
+            class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div
+                        class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                            </path>
+                        </svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Konfirmasi Penghapusan</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">Apakah Anda yakin ingin menghapus struk ini?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <form id="singleDeleteForm" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit"
+                        class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Hapus
+                    </button>
+                </form>
+                <button type="button" onclick="closeSingleDeleteModal()"
+                    class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const selectAll = document.getElementById('selectAll');
@@ -474,7 +536,7 @@
             const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
             if (selectedCheckboxes.length > 0) {
                 bulkActions.classList.remove('hidden');
-                selectedCount.textContent = ${selectedCheckboxes.length} dipilih;
+                selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
                 selectedIdsInput.value = JSON.stringify(selectedIds);
             } else {
                 bulkActions.classList.add('hidden');
@@ -483,8 +545,10 @@
 
             // Update select all checkbox
             if (selectAll) {
-                selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length && rowCheckboxes.length > 0;
-                selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
+                selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length && rowCheckboxes.length >
+                    0;
+                selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length <
+                    rowCheckboxes.length;
             }
         }
 
@@ -527,7 +591,7 @@
                 return;
             }
             const count = selectedIds.split(',').length;
-            if (confirm(Apakah Anda yakin ingin menghapus ${count} data yang dipilih?)) {
+            if (confirm(`Apakah Anda yakin ingin menghapus ${count} data yang dipilih?`)) {
                 document.getElementById('bulkDeleteForm').submit();
             }
         };
@@ -578,6 +642,7 @@
         }
     });
 
+    // Fungsi untuk modal image preview
     function openModal(imageSrc) {
         document.getElementById('modalImage').src = imageSrc;
         document.getElementById('imageModal').classList.remove('hidden');
@@ -598,6 +663,42 @@
             closeModal();
         }
     });
+
+    // Fungsi untuk modal single delete
+    function confirmSingleDelete(deleteUrl) {
+        const modal = document.getElementById('singleDeleteModal');
+        const form = document.getElementById('singleDeleteForm');
+        form.action = deleteUrl;
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeSingleDeleteModal() {
+        document.getElementById('singleDeleteModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    document.getElementById('singleDeleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeSingleDeleteModal();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !document.getElementById('singleDeleteModal').classList.contains('hidden')) {
+            closeSingleDeleteModal();
+        }
+    });
+
+    // Fungsi untuk modal bulk delete
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function submitBulkDelete() {
+        document.getElementById('bulkDeleteForm').submit();
+    }
 </script>
 
 <style>
