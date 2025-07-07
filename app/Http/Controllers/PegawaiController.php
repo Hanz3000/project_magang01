@@ -8,21 +8,23 @@ use App\Models\Pegawai;
 class PegawaiController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = \App\Models\Pegawai::query();
+{
+    $query = Pegawai::query();
 
-        if ($request->filled('q')) {
-            $q = $request->q;
-            $query->where(function ($sub) use ($q) {
-                $sub->where('nama', 'like', "%$q%")
-                    ->orWhere('nip', 'like', "%$q%");
-            });
-        }
-
-        $pegawais = $query->get();
-
-        return view('pegawai.index', compact('pegawais'));
+    if ($request->filled('q')) {
+        $q = $request->q;
+        $query->where(function ($sub) use ($q) {
+            $sub->where('nama', 'like', "%$q%")
+                ->orWhere('nip', 'like', "%$q%");
+        });
     }
+
+    // Urutkan berdasarkan waktu update terbaru
+    $pegawais = $query->orderBy('updated_at', 'desc')->get();
+
+    return view('pegawai.index', compact('pegawais'));
+}
+
 
     public function create()
     {
@@ -60,23 +62,29 @@ class PegawaiController extends Controller
         return view('pegawai.edit', compact('pegawai'));
     }
 
-    public function update(Request $request, Pegawai $pegawai)
-    {
-        // Validasi input saat update, abaikan unique jika NIP tidak diubah
-        $request->validate([
-    'nama' => 'required|string|max:255',
-    'nip' => 'required|numeric|digits_between:5,20|unique:pegawais,nip,' . $pegawai->id,
-], [
-    'nip.required' => 'NIP wajib diisi.',
-    'nip.numeric' => 'NIP harus berupa angka.',
-    'nip.digits_between' => 'NIP harus terdiri dari minimal 5 hingga maksimal 20 digit.',
-    'nip.unique' => 'NIP sudah digunakan.',
-]);
+   public function update(Request $request, Pegawai $pegawai)
+{
+    $request->validate([
+        'nama' => 'required|string|max:255',
+        'nip' => 'required|numeric|digits_between:5,20|unique:pegawais,nip,' . $pegawai->id,
+    ], [
+        'nip.required' => 'NIP wajib diisi.',
+        'nip.numeric' => 'NIP harus berupa angka.',
+        'nip.digits_between' => 'NIP harus terdiri dari minimal 5 hingga maksimal 20 digit.',
+        'nip.unique' => 'NIP sudah digunakan.',
+    ]);
 
-        return redirect()
-            ->route('pegawai.index')
-            ->with('updated', 'Data pegawai berhasil diperbarui.');
-    }
+    // Simpan perubahan ke database
+    $pegawai->update([
+        'nama' => $request->nama,
+        'nip' => $request->nip,
+    ]);
+
+    return redirect()
+        ->route('pegawai.index')
+        ->with('updated', 'Data pegawai berhasil diperbarui.');
+}
+
 
     public function destroy(Pegawai $pegawai)
     {
