@@ -6,8 +6,7 @@
     {{-- Font Awesome --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     {{-- Google Fonts --}}
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -341,6 +340,7 @@
         .item-table td {
             padding: 1rem 1.25rem;
             text-align: left;
+            vertical-align: middle;
         }
 
         .item-table th {
@@ -363,48 +363,109 @@
             background: rgba(79, 70, 229, 0.03);
         }
 
-        /* === FILE UPLOAD STYLES === */
-        .file-upload-container {
+        /* Perbaikan untuk subtotal agar tidak turun ke bawah */
+        .subtotal-display {
+            white-space: nowrap;
+            padding: 0.5rem 0;
+        }
+
+        /* === ENHANCED FILE UPLOAD STYLES === */
+        .file-upload-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-upload-label {
+            display: block;
             border: 2px dashed var(--gray);
             border-radius: var(--border-radius);
             padding: 2.5rem;
             text-align: center;
             cursor: pointer;
             background: var(--light);
-            transition: var(--transition);
-            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .file-upload-container:hover {
+        .file-upload-label:hover {
             border-color: var(--primary);
             background: rgba(79, 70, 229, 0.05);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
         }
 
-        .file-upload-container i {
+        .file-upload-icon {
+            font-size: 2.5rem;
             color: var(--primary);
             margin-bottom: 1rem;
-            font-size: 2.5rem;
+            transition: all 0.3s ease;
         }
 
-        .file-upload-container p {
-            margin: 0.5rem 0;
+        .file-upload-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .file-upload-description {
             color: var(--secondary);
+            margin-bottom: 0.25rem;
         }
 
-        .file-upload-container .file-info {
+        .file-upload-requirements {
+            color: var(--secondary-light);
+            font-size: 0.875rem;
+        }
+
+        .file-preview-container {
             margin-top: 1.5rem;
-            display: none;
+            animation: fadeIn 0.3s ease;
         }
 
-        .file-preview {
-            display: none;
-            margin-bottom: 1rem;
-        }
-
-        .file-preview img {
-            max-width: 150px;
+        .file-preview-image {
+            max-width: 100%;
+            max-height: 200px;
             border-radius: calc(var(--border-radius) - 0.25rem);
             box-shadow: var(--shadow-sm);
+            margin: 0 auto;
+            display: block;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--gray);
+        }
+
+        .file-preview-image:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow);
+        }
+
+        .file-preview-info {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .file-name {
+            font-size: 0.875rem;
+            color: var(--secondary-dark);
+            max-width: 200px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .remove-file-btn {
@@ -417,11 +478,26 @@
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius);
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .remove-file-btn:hover {
             color: #991b1b;
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .file-upload-label.has-file .file-upload-content {
+            display: none;
+        }
+
+        .file-upload-label.has-file .file-preview-container {
+            display: block;
+        }
+
+        .hidden {
+            display: none;
         }
 
         .total-display {
@@ -507,11 +583,6 @@
             width: 100% !important;
         }
 
-        /* === HIDDEN UTILITY === */
-        .hidden {
-            display: none !important;
-        }
-
         /* === MODAL STYLES === */
         .modal-overlay {
             position: fixed;
@@ -587,6 +658,12 @@
             max-height: 70vh;
             object-fit: contain;
             border-radius: calc(var(--border-radius) - 0.25rem);
+        }
+
+        /* === ANIMATIONS === */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* === RESPONSIVE ADJUSTMENTS === */
@@ -801,28 +878,29 @@
                                 <span>Foto Struk</span>
                             </div>
 
-                            <div class="file-upload-container" onclick="document.getElementById('foto_struk').click()">
-                                <input type="file" name="foto_struk" id="foto_struk" accept="image/*"
-                                    style="display: none;">
-                                <div>
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Klik untuk upload foto struk</p>
-                                    <p>Format: JPG, PNG (Maks. 2MB)</p>
-                                </div>
-                            </div>
-
-                            {{-- Preview muncul di bawahnya --}}
-                            <div id="file-preview-wrapper" class="mt-4 text-center hidden">
-                                <img id="preview-image" src="#" alt="Preview"
-                                    class="mx-auto rounded-lg shadow cursor-pointer"
-                                    style="max-width:180px;max-height:180px;"
-                                    onclick="openImageModal(this.src, 'Foto Struk')">
-                                <div class="mt-2">
-                                    <span id="file-name" class="text-sm text-gray-600"></span>
-                                    <button type="button" onclick="removePhoto()" class="remove-file-btn ml-2">
-                                        <i class="fas fa-times"></i> Hapus
-                                    </button>
-                                </div>
+                            <div class="file-upload-wrapper">
+                                <input type="file" name="foto_struk" id="foto_struk" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this)">
+                                
+                                <label for="foto_struk" class="file-upload-label" id="file-upload-label">
+                                    <div class="file-upload-content text-center">
+                                        <div class="file-upload-icon">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                        </div>
+                                        <h4 class="file-upload-title">Upload Foto Struk</h4>
+                                        <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
+                                        <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
+                                    </div>
+                                    
+                                    <div class="file-preview-container hidden" id="file-preview-container">
+                                        <img id="preview-image" src="#" alt="Preview" class="file-preview-image">
+                                        <div class="file-preview-info">
+                                            <span id="file-name" class="file-name"></span>
+                                            <button type="button" onclick="removePhoto()" class="remove-file-btn">
+                                                <i class="fas fa-trash"></i> Hapus
+                                            </button>
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
 
                             <div class="button-group">
@@ -849,8 +927,7 @@
 
                         {{-- Manual Expense Form --}}
                         <div id="manual-expense" class="expense-form">
-                            <form action="{{ route('pengeluarans.store') }}" method="POST"
-                                enctype="multipart/form-data">
+                            <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
 
                                 <div class="section-title">
@@ -968,25 +1045,29 @@
                                     <span>Bukti Pembayaran</span>
                                 </div>
 
-                                <div class="file-upload-container"
-                                    onclick="document.getElementById('bukti_pembayaran').click()">
-                                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*"
-                                        style="display: none;">
-                                    <div>
-                                        <i class="fas fa-cloud-upload-alt"></i>
-                                        <p>Klik untuk upload bukti pembayaran</p>
-                                        <p>Format: JPG, PNG (Maks. 2MB)</p>
-                                    </div>
-                                    <div class="file-preview" id="expense-file-preview">
-                                        <img id="expense-preview-image" src="#" alt="Preview" class="hidden"
-                                            style="max-width:150px; border-radius:12px; margin:0 auto;">
-                                    </div>
-                                    <div class="file-info hidden">
-                                        <span id="expense-file-name"></span>
-                                        <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
-                                            <i class="fas fa-times"></i> Hapus
-                                        </button>
-                                    </div>
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this, 'expense')">
+                                    
+                                    <label for="bukti_pembayaran" class="file-upload-label" id="expense-file-upload-label">
+                                        <div class="file-upload-content text-center">
+                                            <div class="file-upload-icon">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                            </div>
+                                            <h4 class="file-upload-title">Upload Bukti Pembayaran</h4>
+                                            <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
+                                            <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
+                                        </div>
+                                        
+                                        <div class="file-preview-container hidden" id="expense-file-preview-container">
+                                            <img id="expense-preview-image" src="#" alt="Preview" class="file-preview-image">
+                                            <div class="file-preview-info">
+                                                <span id="expense-file-name" class="file-name"></span>
+                                                <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </label>
                                 </div>
 
                                 <div class="button-group">
@@ -1000,10 +1081,9 @@
                             </form>
                         </div>
 
-                        {{-- Expense From Income Form --}}
+                        {{-- Expense from Income Form --}}
                         <div id="from-income-expense" class="expense-form hidden">
-                            <form action="{{ route('pengeluarans.store') }}" method="POST"
-                                enctype="multipart/form-data">
+                            <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="from_income" value="1">
 
@@ -1103,7 +1183,35 @@
                                 </div>
 
                                 {{-- Payment Proof --}}
+                                <div class="section-title">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Bukti Pembayaran</span>
+                                </div>
 
+                                <div class="file-upload-wrapper">
+                                    <input type="file" name="bukti_pembayaran" id="from_income_bukti_pembayaran" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this, 'from-income')">
+                                    
+                                    <label for="from_income_bukti_pembayaran" class="file-upload-label" id="from-income-file-upload-label">
+                                        <div class="file-upload-content text-center">
+                                            <div class="file-upload-icon">
+                                                <i class="fas fa-cloud-upload-alt"></i>
+                                            </div>
+                                            <h4 class="file-upload-title">Upload Bukti Pembayaran</h4>
+                                            <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
+                                            <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
+                                        </div>
+                                        
+                                        <div class="file-preview-container hidden" id="from-income-file-preview-container">
+                                            <img id="from-income-preview-image" src="#" alt="Preview" class="file-preview-image">
+                                            <div class="file-preview-info">
+                                                <span id="from-income-file-name" class="file-name"></span>
+                                                <button type="button" onclick="removeFromIncomePhoto()" class="remove-file-btn">
+                                                    <i class="fas fa-trash"></i> Hapus
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
 
                                 <div class="button-group">
                                     <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
@@ -1126,7 +1234,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title" id="modalImageTitle"></h3>
-                <button class="modal-close" onclick="closeImageModal()">&times;</button>
+                <button class="modal-close" onclick="closeImageModal()">×</button>
             </div>
             <div class="modal-body">
                 <img id="modalImageContent" src="" alt="" class="modal-image">
@@ -1145,23 +1253,38 @@
             return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         }
 
-        // Image preview function
-        function previewImage(event, previewId, fileNameId, previewContainerId) {
-            const input = event.target;
+        // Preview uploaded image
+        function previewUploadedImage(input, type = 'income') {
             const file = input.files[0];
+            if (!file) return;
 
-            if (file) {
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-                    $(previewId).attr('src', e.target.result).removeClass('hidden');
-                    $(fileNameId).text(file.name);
-                    $(previewContainerId).closest('.file-upload-container').find('.file-preview, .file-info')
-                        .removeClass('hidden');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let previewId, fileNameId, containerId, labelId;
+                
+                if (type === 'income') {
+                    previewId = '#preview-image';
+                    fileNameId = '#file-name';
+                    containerId = '#file-preview-container';
+                    labelId = '#file-upload-label';
+                } else if (type === 'expense') {
+                    previewId = '#expense-preview-image';
+                    fileNameId = '#expense-file-name';
+                    containerId = '#expense-file-preview-container';
+                    labelId = '#expense-file-upload-label';
+                } else { // from-income
+                    previewId = '#from-income-preview-image';
+                    fileNameId = '#from-income-file-name';
+                    containerId = '#from-income-file-preview-container';
+                    labelId = '#from-income-file-upload-label';
                 }
 
-                reader.readAsDataURL(file);
-            }
+                $(previewId).attr('src', e.target.result);
+                $(fileNameId).text(file.name);
+                $(containerId).removeClass('hidden');
+                $(labelId).addClass('has-file');
+            };
+            reader.readAsDataURL(file);
         }
 
         // Remove photo functions
@@ -1169,29 +1292,31 @@
             $('#foto_struk').val('');
             $('#preview-image').attr('src', '#');
             $('#file-name').text('');
-            $('#file-preview-wrapper').addClass('hidden');
+            $('#file-preview-container').addClass('hidden');
+            $('#file-upload-label').removeClass('has-file');
         }
 
         function removeExpensePhoto() {
             $('#bukti_pembayaran').val('');
-            $('#expense-preview-image').attr('src', '#').addClass('hidden');
+            $('#expense-preview-image').attr('src', '#');
             $('#expense-file-name').text('');
-            $('.file-preview, .file-info').addClass('hidden');
+            $('#expense-file-preview-container').addClass('hidden');
+            $('#expense-file-upload-label').removeClass('has-file');
         }
 
         function removeFromIncomePhoto() {
             $('#from_income_bukti_pembayaran').val('');
-            $('#from-income-preview-image').attr('src', '#').addClass('hidden');
+            $('#from-income-preview-image').attr('src', '#');
             $('#from-income-file-name').text('');
-            $('.file-preview, .file-info').addClass('hidden');
+            $('#from-income-file-preview-container').addClass('hidden');
+            $('#from-income-file-upload-label').removeClass('has-file');
         }
 
         // Image modal functions
         function openImageModal(imageUrl, title) {
             if (!imageUrl) return;
-
             $('#modalImageContent').attr('src', imageUrl);
-            $('#modalImageTitle').text(title || 'Gambar Barang');
+            $('#modalImageTitle').text(title || 'Gambar');
             $('#imageModal').addClass('active');
             $('body').css('overflow', 'hidden');
         }
@@ -1261,84 +1386,33 @@
                 const selectedOption = $(this).find('option:selected');
                 const total = selectedOption.data('total');
                 const strukId = selectedOption.val();
+                const tanggalKeluar = selectedOption.data('keluar');
+                const tanggalStruk = selectedOption.data('tanggal');
 
                 if (total) {
                     $('#from_income_total').val(formatRupiah(total));
-
-                    // Fetch and display items
-                    if (strukId) {
-                        fetchStrukItems(strukId);
-                    }
                 } else {
                     $('#from_income_total').val('');
+                }
+
+                if (tanggalKeluar) {
+                    $('#from_income_tanggal').val(tanggalKeluar);
+                } else {
+                    $('#from_income_tanggal').val('');
+                }
+
+                if (tanggalStruk) {
+                    $('#from_income_tanggal_struk').val(tanggalStruk);
+                } else {
+                    $('#from_income_tanggal_struk').val('');
+                }
+
+                if (strukId) {
+                    fetchStrukItems(strukId);
+                } else {
                     $('#items-list').html(
                         '<tr><td colspan="5" class="text-center text-gray-500">Pilih struk untuk melihat daftar barang</td></tr>'
                     );
-                }
-            });
-
-            // Preview setelah upload
-            $('#foto_struk').change(function(e) {
-                const input = e.target;
-                const file = input.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        $('#preview-image').attr('src', ev.target.result);
-                        $('#file-preview-wrapper').removeClass('hidden');
-                    }
-                    reader.readAsDataURL(file);
-                    $('#file-name').text(file.name);
-                }
-            });
-
-            // Hapus preview
-            function removePhoto() {
-                $('#foto_struk').val('');
-                $('#preview-image').attr('src', '#');
-                $('#file-name').text('');
-                $('#file-preview-wrapper').addClass('hidden');
-            }
-
-            // Modal detail gambar (sudah ada di kode kamu)
-            function openImageModal(imageUrl, title) {
-                if (!imageUrl) return;
-                $('#modalImageContent').attr('src', imageUrl);
-                $('#modalImageTitle').text(title || 'Gambar');
-                $('#imageModal').addClass('active');
-                $('body').css('overflow', 'hidden');
-            }
-
-            // File upload preview for expense
-            $('#bukti_pembayaran').change(function(e) {
-                const input = e.target;
-                const file = input.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        $('#expense-preview-image').attr('src', ev.target.result).removeClass('hidden');
-                        $('#expense-file-preview').show();
-                    }
-                    reader.readAsDataURL(file);
-                    $('#expense-file-name').text(file.name);
-                    $('.file-info').removeClass('hidden');
-                }
-            });
-
-            // File upload preview for from-income form
-            $('#from_income_bukti_pembayaran').change(function(e) {
-                const input = e.target;
-                const file = input.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(ev) {
-                        $('#from-income-preview-image').attr('src', ev.target.result).removeClass(
-                            'hidden');
-                        $('#from-income-file-preview').show();
-                    }
-                    reader.readAsDataURL(file);
-                    $('#from-income-file-name').text(file.name);
-                    $('.file-info').removeClass('hidden');
                 }
             });
 
@@ -1356,25 +1430,6 @@
                 row.find('.expense-jumlah, .expense-harga').on('input', function() {
                     updateExpenseSubtotal(row);
                 });
-            });
-
-            // Set tanggal keluar when selecting a struk
-            $('#struk_id').on('change', function() {
-                const selectedOption = $(this).find('option:selected');
-                const tanggalKeluar = selectedOption.data('keluar');
-                const tanggalStruk = selectedOption.data('tanggal');
-
-                if (tanggalKeluar) {
-                    $('#from_income_tanggal').val(tanggalKeluar);
-                } else {
-                    $('#from_income_tanggal').val('');
-                }
-
-                if (tanggalStruk) {
-                    $('#from_income_tanggal_struk').val(tanggalStruk);
-                } else {
-                    $('#from_income_tanggal_struk').val('');
-                }
             });
         });
 
@@ -1398,8 +1453,8 @@
 
                             const gambar = imageUrl ?
                                 `<a href="#" onclick="openImageModal('${imageUrl}', '${item.nama || 'Struk'}')" class="inline-block">
-                                <img src="${imageUrl}" alt="${item.nama}" class="w-10 h-10 object-cover rounded mx-auto cursor-pointer hover:opacity-75">
-                            </a>` :
+                                    <img src="${imageUrl}" alt="${item.nama}" class="w-10 h-10 object-cover rounded mx-auto cursor-pointer hover:opacity-75">
+                                </a>` :
                                 '<span class="text-gray-400 italic text-xs">Tidak ada gambar</span>';
 
                             html += `
@@ -1420,7 +1475,7 @@
                                     ${gambar}
                                 </td>
                             </tr>
-                        `;
+                            `;
                         });
                         $('#items-list').html(html);
                     } else {
@@ -1475,7 +1530,7 @@
                     </button>
                 </td>
             </tr>
-        `);
+            `);
 
             container.append(newRow);
 
@@ -1556,7 +1611,7 @@
                     </button>
                 </td>
             </tr>
-        `);
+            `);
 
             container.append(newRow);
 
