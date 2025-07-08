@@ -29,6 +29,7 @@ class MasterBarangController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255|unique:master_barangs,nama_barang',
+            'jumlah' => 'required|integer|min:1',
         ]);
 
         // Generate kode unik
@@ -38,24 +39,19 @@ class MasterBarangController extends Controller
 
         foreach ($words as $word) {
             if (!is_numeric($word)) {
-                $inisial .= substr($word, 0, 1); // ambil 1 huruf pertama tiap kata
+                $inisial .= substr($word, 0, 1);
             }
         }
 
-        // Format timestamp: ymdHis (misal: 250707231501)
         $timestamp = now()->format('ymdHis');
-
-        // ID acak 3 huruf
         $randomStr = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
-
-        // Gabungkan jadi kode unik
         $kodeBarang = $inisial . '-' . $timestamp . '-' . $randomStr;
 
         Barang::create([
             'nama_barang' => $request->nama_barang,
             'kode_barang' => $kodeBarang,
+            'jumlah' => $request->jumlah,
         ]);
-
 
         return $request->action === 'save_and_continue'
             ? redirect()->back()->with('created', 'Barang berhasil ditambahkan. Silakan tambah lagi.')
@@ -72,11 +68,11 @@ class MasterBarangController extends Controller
     {
         $request->validate([
             'nama_barang' => 'required|string|max:255|unique:master_barangs,nama_barang,' . $id,
+            'jumlah' => 'required|integer|min:1',
         ]);
 
         $barang = Barang::findOrFail($id);
 
-        // Generate ulang kode_barang
         $namaBarang = strtoupper($request->nama_barang);
         $words = preg_split('/[\s\-_,.]+/', $namaBarang);
         $inisial = '';
@@ -87,20 +83,18 @@ class MasterBarangController extends Controller
             }
         }
 
-        $timestamp = now()->format('ymdHis'); // contoh: 250707162034
-        $randomStr = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3)); // contoh: F57
-
+        $timestamp = now()->format('ymdHis');
+        $randomStr = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
         $kodeBarang = $inisial . '-' . $timestamp . '-' . $randomStr;
 
-        // Update barang
         $barang->update([
             'nama_barang' => $request->nama_barang,
             'kode_barang' => $kodeBarang,
+            'jumlah' => $request->jumlah,
         ]);
 
         return redirect()->route('master-barang.index')->with('updated', 'Barang berhasil diperbarui dengan kode baru.');
     }
-
 
     public function destroy(string $id)
     {

@@ -31,6 +31,14 @@
                 oncopy="return false" oncut="return false" onpaste="return false">
         </div>
 
+        <div>
+            <label for="jumlah" class="block font-semibold mb-1">Jumlah</label>
+            <input type="number" name="jumlah" id="jumlah" min="1"
+                class="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring focus:border-blue-400"
+                placeholder="Contoh: 10"
+                value="{{ old('jumlah') }}" required>
+        </div>
+
         <div class="flex justify-end space-x-2">
             <a href="{{ route('master-barang.index') }}"
                 class="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400 transition">
