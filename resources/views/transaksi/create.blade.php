@@ -289,51 +289,6 @@
         display: block;
     }
 
-    /* === ITEM TABLE STYLES === */
-    .item-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-bottom: 1.5rem;
-        background: #fff;
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray);
-    }
-
-    .item-table th,
-    .item-table td {
-        padding: 1rem 1.25rem;
-        text-align: left;
-        vertical-align: middle;
-    }
-
-    .item-table th {
-        background: var(--light);
-        color: var(--secondary-dark);
-        font-weight: 600;
-        border-bottom: 1px solid var(--gray);
-    }
-
-    .item-table td {
-        border-bottom: 1px solid var(--gray);
-        color: var(--dark);
-    }
-
-    .item-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .item-table tr:hover td {
-        background: rgba(79, 70, 229, 0.03);
-    }
-
-    /* Perbaikan untuk subtotal agar tidak turun ke bawah */
-    .subtotal-display {
-        white-space: nowrap;
-        padding: 0.5rem 0;
-    }
 
     /* === ENHANCED FILE UPLOAD STYLES === */
     .file-upload-wrapper {
@@ -688,6 +643,144 @@
             padding: 0.75rem;
         }
     }
+
+    /* === IMPROVED ITEM TABLE STYLES === */
+    .item-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 1.5rem;
+        background: #fff;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray);
+        table-layout: fixed;
+    }
+
+    /* Perbaikan alignment untuk kolom Barang */
+    .item-table td:nth-child(1) .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .item-table td:nth-child(1) .select2-container {
+        margin-top: 0;
+    }
+
+    /* Pastikan teks barang tidak keluar dari container */
+    .item-table .select2-selection__rendered {
+        white-space: normal;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .item-table th:nth-child(2),
+    .item-table td:nth-child(2) {
+        width: 15%;
+        /* Lebar kolom Jumlah */
+    }
+
+    .item-table th:nth-child(3),
+    .item-table td:nth-child(3) {
+        width: 20%;
+        /* Lebar kolom Harga Satuan */
+    }
+
+    .item-table th:nth-child(4),
+    .item-table td:nth-child(4) {
+        width: 20%;
+        /* Lebar kolom Subtotal */
+    }
+
+    .item-table th:nth-child(5),
+    .item-table td:nth-child(5) {
+        width: 10%;
+        /* Lebar kolom Aksi */
+    }
+
+    .item-table th {
+        background: var(--light);
+        color: var(--secondary-dark);
+        font-weight: 600;
+        border-bottom: 1px solid var(--gray);
+        padding: 0.75rem 1rem;
+        /* Padding lebih kecil untuk header */
+        text-align: center;
+        /* Tengahkan teks header */
+    }
+
+    .item-table td {
+        border-bottom: 1px solid var(--gray);
+        color: var(--dark);
+        padding: 0.75rem 1rem;
+        /* Padding lebih kecil untuk sel */
+        vertical-align: middle;
+    }
+
+    /* Perbaikan untuk input group dalam tabel */
+    .item-table .input-group {
+        margin-bottom: 0;
+    }
+
+    .item-table .input-group input {
+        padding: 0.5rem 0.75rem;
+        /* Padding lebih kecil untuk input */
+        font-size: 0.875rem;
+    }
+
+    /* Perbaikan untuk select2 dalam tabel */
+    .item-table .select2-container--default .select2-selection--single {
+        height: 40px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Perbaikan untuk tombol hapus */
+    .item-table .btn-danger {
+        padding: 0.5rem;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .item-table .btn-danger i {
+        margin: 0;
+    }
+
+    /* Perbaikan untuk stok info */
+    .stok-info {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--secondary);
+        margin-top: 0.25rem;
+        text-align: left;
+    }
+
+    /* Perbaikan untuk subtotal */
+    .subtotal-display {
+        white-space: nowrap;
+        text-align: right;
+        padding: 0;
+        font-weight: 500;
+    }
+
+    /* Perataan tengah untuk kolom jumlah dan aksi */
+    .item-table td:nth-child(2),
+    .item-table td:nth-child(5) {
+        text-align: center;
+    }
+
+    /* Perataan kanan untuk kolom harga dan subtotal */
+    .item-table td:nth-child(3),
+    .item-table td:nth-child(4) {
+        text-align: right;
+    }
 </style>
 
 <!-- Income/Expense Form -->
@@ -789,29 +882,25 @@
                             <tr class="item-row" data-item="0">
                                 <td>
                                     <div class="input-group">
-                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStok(this)">
+                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStokIncome(this)">
                                             <option value="">Pilih Barang</option>
                                             @foreach ($barangList as $barang)
                                             <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
                                                 {{ $barang->nama_barang }} ({{ $barang->kode_barang }}) - Stok: {{ $barang->jumlah }}
                                             </option>
-
                                             @endforeach
                                         </select>
-                                        <span class="text-sm text-gray-500 stok-info">Stok: -</span>
-
+                                        <span class="stok-info">Stok: -</span>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="items[0][jumlah]" class="jumlah" min="1"
-                                            value="1" required>
+                                        <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="items[0][harga]" class="harga" min="0"
-                                            required placeholder="0">
+                                        <input type="number" name="items[0][harga]" class="harga" min="0" required placeholder="0">
                                     </div>
                                 </td>
                                 <td>
@@ -947,11 +1036,12 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="income-items-container">
+                        <tbody id="expense-items-container">
                             <tr class="item-row" data-item="0">
                                 <td>
                                     <div class="input-group">
-                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStok(this)">
+                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStokExpense(this)">
+
                                             <option value="">Pilih Barang</option>
                                             @foreach ($barangList as $barang)
                                             <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
@@ -978,7 +1068,8 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="subtotal-display" id="subtotal-0">Rp 0</div>
+                                    <div class="subtotal-display" id="expense-subtotal-0">Rp 0</div>
+
                                     <input type="hidden" name="items[0][subtotal]" class="subtotal" value="0">
                                 </td>
                                 <td>
@@ -1065,7 +1156,7 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    function updateExpenseStok(selectElement) {
+    function updateStokExpense(selectElement) { //pengeluaran 
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
 
@@ -1073,18 +1164,55 @@
         const jumlahInput = row.querySelector('.jumlah');
         const stokInfo = row.querySelector('.stok-info');
 
-        const jumlah = parseInt(jumlahInput.value) || 0;
-        const stokSisa = stokAsli - jumlah;
+        const jumlah = parseInt(jumlahInput?.value || 0);
+        const sisa = stokAsli - jumlah;
 
-        stokInfo.textContent = `Stok: ${stokSisa >= 0 ? stokSisa : 0}`;
+        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
 
-        // Validasi saat barang dipilih, langsung periksa
-        if (jumlah > stokAsli) {
-            alert('Jumlah melebihi stok yang tersedia!');
-            jumlahInput.value = stokAsli;
-            stokInfo.textContent = `Stok: 0`;
-        }
+        // Tambahkan listener real-time jika belum
+        jumlahInput.addEventListener('input', () => {
+            const inputJumlah = parseInt(jumlahInput.value) || 0;
+            const sisaBaru = stokAsli - inputJumlah;
+
+            if (inputJumlah > stokAsli) {
+                alert("Jumlah melebihi stok tersedia!");
+                jumlahInput.value = stokAsli;
+                stokInfo.textContent = `Stok: 0`;
+            } else {
+                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
+            }
+        });
     }
+
+
+    function updateStokIncome(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
+
+        const row = selectElement.closest('tr');
+        const jumlahInput = row.querySelector('.jumlah');
+        const stokInfo = row.querySelector('.stok-info');
+
+        const jumlah = parseInt(jumlahInput?.value || 0);
+        const sisa = stokAsli - jumlah;
+
+        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
+
+        // Tambahkan listener real-time juga
+        jumlahInput.addEventListener('input', () => {
+            const newJumlah = parseInt(jumlahInput.value) || 0;
+            const sisaBaru = stokAsli - newJumlah;
+
+            if (newJumlah > stokAsli) {
+                alert("Jumlah melebihi stok tersedia!");
+                jumlahInput.value = stokAsli;
+                stokInfo.textContent = `Stok: 0`;
+            } else {
+                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
+            }
+        });
+    }
+
 
     function onJumlahChange(input) {
         const row = input.closest('tr');
@@ -1104,6 +1232,7 @@
             stokInfo.textContent = `Stok: ${stokSisa >= 0 ? stokSisa : 0}`;
         }
     }
+
 
 
 
@@ -1257,63 +1386,96 @@
                 updateExpenseSubtotal(row);
             });
         });
+
+        $('#expense-items-container .item-row').each(function() {
+            const row = $(this);
+            row.find('.jumlah, .harga').on('input', function() {
+                updateExpenseSubtotal(row);
+            });
+        });
+
     });
 
     // Income items management
-    let incomeItemIndex = 1;
+
+    let incomeIndex = 1;
+
+    function updateStok(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        const stok = selectedOption.getAttribute('data-stok') || '-';
+        const infoSpan = select.closest('.input-group').querySelector('.stok-info');
+        if (infoSpan) {
+            infoSpan.textContent = 'Stok: ' + stok;
+        }
+    }
+
 
     function addIncomeItem() {
-        const container = $('#income-items-container');
+        const container = document.getElementById('income-items-container');
+        const oldRow = container.querySelector('.item-row');
+        const newRow = oldRow.cloneNode(true);
+        newRow.innerHTML = newRow.innerHTML.replace(/id="subtotal-0"/g, `id="subtotal-${incomeIndex}"`);
 
-        const newRow = $(`
-            <tr class="item-row" data-item="${incomeItemIndex}">
-                <td>
-                    <div class="input-group">
-                        <select name="items[${incomeItemIndex}][kode]" class="select-barang" required>
-                            <option value="">Pilih Barang</option>
-                            @foreach ($barangList as $barang)
-                                <option value="{{ $barang->nama_barang }}">{{ $barang->kode_barang }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="number" name="items[${incomeItemIndex}][jumlah]" class="jumlah" min="1" value="1" required>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="number" name="items[${incomeItemIndex}][harga]" class="harga" min="0" required placeholder="0">
-                    </div>
-                </td>
-                <td>
-                    <div class="subtotal-display" id="subtotal-${incomeItemIndex}">Rp 0</div>
-                    <input type="hidden" name="items[${incomeItemIndex}][subtotal]" class="subtotal" value="0">
-                </td>
-                <td>
-                    <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-            `);
 
-        container.append(newRow);
+        // Ganti semua index [0] → [incomeIndex]
+        const regex = /\[0\]/g;
+        newRow.innerHTML = newRow.innerHTML.replace(regex, `[${incomeIndex}]`);
+        newRow.setAttribute('data-item', incomeIndex);
 
-        // Reinitialize Select2 for new elements
-        $('.select-barang').select2({
+        // Reset input
+        const inputs = newRow.querySelectorAll('input');
+        inputs.forEach(input => {
+            if (input.type === 'number') input.value = input.classList.contains('jumlah') ? 1 : 0;
+            if (input.type === 'hidden') input.value = 0;
+        });
+
+        // Reset select dropdown
+        const select = newRow.querySelector('.select-barang');
+        select.selectedIndex = 0;
+
+        // Hapus Select2 lama
+        $(select).next('.select2-container').remove();
+
+        // Tambahkan ulang event onchange
+        select.addEventListener('change', function() {
+            updateStokIncome(this);
+        });
+
+        // Inisialisasi ulang Select2
+        $(select).select2({
             placeholder: "Pilih barang...",
             width: '100%'
         });
 
-        // Initialize event listeners for the new row
-        newRow.find('.jumlah, .harga').on('input', function() {
-            updateIncomeSubtotal(newRow);
+        // Reset stok info
+        const stokInfo = newRow.querySelector('.stok-info');
+        if (stokInfo) stokInfo.textContent = 'Stok: -';
+
+        // Tambahkan event listener untuk input jumlah & harga
+        newRow.querySelector('.jumlah').addEventListener('input', function() {
+            updateIncomeSubtotal($(newRow));
         });
 
-        incomeItemIndex++;
+        newRow.querySelector('.harga').addEventListener('input', function() {
+            updateIncomeSubtotal($(newRow));
+        });
+
+        container.appendChild(newRow);
+        incomeIndex++;
     }
+
+
+
+
+    function removeIncomeItem(btn) {
+        const row = btn.closest('.item-row');
+        const container = document.getElementById('income-items-container');
+        if (container.querySelectorAll('.item-row').length > 1) {
+            row.remove();
+        }
+    }
+
+
 
     function removeIncomeItem(button) {
         const row = $(button).closest('.item-row');
@@ -1335,6 +1497,7 @@
         updateIncomeTotal();
     }
 
+
     function updateIncomeTotal() {
         let total = 0;
         $('.subtotal').each(function() {
@@ -1345,50 +1508,55 @@
         $('#income-total').text(formatRupiah(total));
     }
 
-    // Expense items management
     let expenseItemIndex = 1;
 
     function addExpenseItem() {
         const container = $('#expense-items-container');
+        const oldRow = container.find('.item-row').first();
+        const newRow = oldRow.clone();
 
-        const newRow = $(`
-            <tr class="item-row" data-item="${expenseItemIndex}">
-                <td>
-                    <div class="input-group">
-                        <input type="text" name="items[${expenseItemIndex}][nama]" placeholder="Nama barang" required>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="number" name="items[${expenseItemIndex}][jumlah]" class="expense-jumlah" min="1" value="1" required>
-                    </div>
-                </td>
-                <td>
-                    <div class="input-group">
-                        <input type="number" name="items[${expenseItemIndex}][harga]" class="expense-harga" min="0" placeholder="0" required>
-                    </div>
-                </td>
-                <td>
-                    <div class="subtotal-display" id="expense-subtotal-${expenseItemIndex}">Rp 0</div>
-                    <input type="hidden" name="items[${expenseItemIndex}][subtotal]" class="expense-subtotal" value="0">
-                </td>
-                <td>
-                    <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </td>
-            </tr>
-            `);
+        // Ganti index
+        newRow.attr('data-item', expenseItemIndex);
+        newRow.html(newRow.html().replace(/\[0\]/g, `[${expenseItemIndex}]`));
+        newRow.find('[id^="expense-subtotal-"]').attr('id', `expense-subtotal-${expenseItemIndex}`);
 
-        container.append(newRow);
+        // Reset input
+        newRow.find('input').each(function() {
+            if (this.type === 'number') {
+                this.value = this.classList.contains('jumlah') ? 1 : 0;
+            } else if (this.type === 'hidden') {
+                this.value = 0;
+            }
+        });
 
-        // Initialize event listeners for the new row
-        newRow.find('.expense-jumlah, .expense-harga').on('input', function() {
+        // Reset select
+        const select = newRow.find('.select-barang');
+        select.val('');
+        select.next('.select2-container').remove(); // Hapus Select2 lama
+
+        // Tambah kembali Select2
+        select.select2({
+            placeholder: "Pilih barang...",
+            width: '100%'
+        });
+
+        // Reset stok info
+        newRow.find('.stok-info').text('Stok: -');
+
+        // Tambah event listener
+        newRow.find('.jumlah, .harga').on('input', function() {
             updateExpenseSubtotal(newRow);
         });
 
+        select.on('change', function() {
+            updateStokExpense(this);
+        });
+
+        container.append(newRow);
         expenseItemIndex++;
     }
+
+
 
     function removeExpenseItem(button) {
         const row = $(button).closest('.item-row');
@@ -1400,19 +1568,21 @@
 
     function updateExpenseSubtotal(row) {
         const itemId = row.data('item');
-        const quantity = parseFloat(row.find('.expense-jumlah').val()) || 0;
-        const price = parseFloat(row.find('.expense-harga').val()) || 0;
-        const subtotal = quantity * price;
+        const jumlah = parseFloat(row.find('.jumlah').val()) || 0;
+        const harga = parseFloat(row.find('.harga').val()) || 0;
+        const subtotal = jumlah * harga;
 
+        // Update tampilan subtotal
         $(`#expense-subtotal-${itemId}`).text(formatRupiah(subtotal));
-        row.find('.expense-subtotal').val(subtotal);
+        row.find('.subtotal').val(subtotal);
 
         updateExpenseTotal();
     }
 
+
     function updateExpenseTotal() {
         let total = 0;
-        $('.expense-subtotal').each(function() {
+        $('#expense-items-container .subtotal').each(function() {
             total += parseFloat($(this).val()) || 0;
         });
 

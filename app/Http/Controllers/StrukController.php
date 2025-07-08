@@ -325,6 +325,7 @@ try {
         $struk->items = json_encode($items);
         $struk->total_harga = $total;
         $struk->save();
+        
 
         DB::commit();
         return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
@@ -437,11 +438,19 @@ try {
 
 
     public function getItems(Struk $struk)
-    {
-        $items = json_decode($struk->items, true);
-        return response()->json([
-            'items' => $items,
-            'foto_struk' => $struk->foto_struk
-        ]);
-    }
+{
+    $items = json_decode($struk->items, true);
+    $barangList = Barang::all()->keyBy('kode_barang');
+    
+    // Tambahkan nama_barang ke setiap item
+    $items = array_map(function($item) use ($barangList) {
+        $item['nama_barang'] = $barangList[$item['nama']]->nama_barang ?? $item['nama'];
+        return $item;
+    }, $items);
+    
+    return response()->json([
+        'items' => $items,
+        'foto_struk' => $struk->foto_struk
+    ]);
+}
 }
