@@ -27,11 +27,21 @@ class StrukController extends Controller
         }
 
         $struks = $query->latest()->paginate(10);
-        $barangList = Barang::all();
-
-        return view('struks.index', compact('struks', 'barangList'));
-    }
-
+    $barangList = Barang::all()->keyBy('kode_barang');
+    
+    // Transform items untuk menyertakan nama barang
+    $struks->getCollection()->transform(function($struk) use ($barangList) {
+        $items = json_decode($struk->items, true);
+        $items = array_map(function($item) use ($barangList) {
+            $item['nama_barang'] = $barangList[$item['nama']]->nama_barang ?? $item['nama'];
+            return $item;
+        }, $items);
+        $struk->items = json_encode($items);
+        return $struk;
+    });
+    
+    return view('struks.index', compact('struks', 'barangList'));
+}
     public function create()
     {
         $barangList = Barang::all();

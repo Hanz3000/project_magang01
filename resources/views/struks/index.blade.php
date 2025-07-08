@@ -196,7 +196,9 @@
                                     <div class="flex items-start">
                                         <span
                                             class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
-                                        <span class="text-gray-700 break-words">{{ $item['nama'] ?? '-' }}</span>
+                                        <span class="text-gray-700 break-words">
+                                            {{ $item['nama_barang'] }}
+                                        </span>
                                     </div>
                                     @endforeach
                                 </div>
