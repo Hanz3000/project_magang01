@@ -138,44 +138,47 @@ class StrukController extends Controller
             $validatedData['foto_struk'] = $struk->foto_struk;
         }
 
-        DB::beginTransaction();
-        try {
-            // 1. Rollback stok dari item lama
-            $oldItems = json_decode($struk->items, true);
-            foreach ($oldItems as $item) {
-                $barang = Barang::where('kode_barang', $item['nama'])->first();
-                if ($barang) {
-                    $barang->jumlah -= $item['jumlah'];
-                    $barang->save();
-                }
-            }
-
-            // 2. Tambahkan stok baru
-            foreach ($validatedData['items'] as $item) {
-                $barang = Barang::where('kode_barang', $item['nama'])->first();
-                if ($barang) {
-                    $barang->jumlah += $item['jumlah'];
-                    $barang->save();
-                }
-            }
-
-            // 3. Update struk
-            $struk->update([
-                'nama_toko'      => $validatedData['nama_toko'],
-                'nomor_struk'    => $validatedData['nomor_struk'],
-                'tanggal_struk'  => $validatedData['tanggal_struk'],
-                'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
-                'items'          => json_encode($validatedData['items']),
-                'total_harga'    => $validatedData['total_harga'],
-                'foto_struk'     => $validatedData['foto_struk']
-            ]);
-
-            DB::commit();
-            return redirect()->route('struks.index')->with('updated', 'Struk berhasil diperbarui!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors('Gagal mengupdate struk: ' . $e->getMessage());
+        // Di method update()
+DB::beginTransaction();
+try {
+    // 1. Kembalikan stok dari item lama
+    $oldItems = json_decode($struk->items, true);
+    foreach ($oldItems as $item) {
+        $barang = Barang::where('kode_barang', $item['nama'])->first();
+        if ($barang) {
+            $barang->increment('jumlah', $item['jumlah']);
         }
+    }
+
+    // 2. Kurangi stok baru
+    foreach ($validatedData['items'] as $item) {
+        $barang = Barang::where('kode_barang', $item['nama'])->first();
+        if ($barang) {
+            if ($barang->jumlah < $item['jumlah']) {
+                DB::rollBack();
+                return back()->withErrors(['Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah]);
+            }
+            $barang->decrement('jumlah', $item['jumlah']);
+        }
+    }
+
+    // 3. Update struk
+    $struk->update([
+        'nama_toko' => $validatedData['nama_toko'],
+        'nomor_struk' => $validatedData['nomor_struk'],
+        'tanggal_struk' => $validatedData['tanggal_struk'],
+        'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
+        'items' => json_encode($validatedData['items']),
+        'total_harga' => $validatedData['total_harga'],
+        'foto_struk' => $validatedData['foto_struk']
+    ]);
+
+    DB::commit();
+    return redirect()->route('struks.index')->with('updated', 'Struk berhasil diperbarui!');
+} catch (\Exception $e) {
+    DB::rollBack();
+    return back()->withErrors('Gagal mengupdate struk: ' . $e->getMessage());
+}
     }
 
 
@@ -187,6 +190,31 @@ class StrukController extends Controller
         }
         $struk->delete();
         return redirect()->route('struks.index')->with('deleted', 'Struk berhasil dihapus!');
+
+    
+        DB::beginTransaction();
+try {
+    // Kembalikan stok barang
+    $items = json_decode($struk->items, true);
+    foreach ($items as $item) {
+        $barang = Barang::where('kode_barang', $item['nama'])->first();
+        if ($barang) {
+            $barang->increment('jumlah', $item['jumlah']);
+        }
+    }
+
+    if ($struk->foto_struk) {
+        Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
+    }
+    
+    $struk->delete();
+    
+    DB::commit();
+    return redirect()->route('struks.index')->with('deleted', 'Struk berhasil dihapus!');
+} catch (\Exception $e) {
+    DB::rollBack();
+    return back()->withErrors('Gagal menghapus struk: ' . $e->getMessage());
+}
     }
 
     public function show(Struk $struk)
@@ -241,25 +269,54 @@ class StrukController extends Controller
     }
 
     public function updateItems(Request $request, $id)
-    {
-        $struk = Struk::findOrFail($id);
+{
+    $struk = Struk::findOrFail($id);
+    
+    $request->validate([
+        'nama.*' => 'required|string|max:255',
+        'jumlah.*' => 'required|integer|min:1',
+        'harga.*' => 'required|numeric|min:0',
+    ]);
 
-        $request->validate([
-            'nama.*' => 'required|string|max:255',
-            'jumlah.*' => 'required|integer|min:1',
-            'harga.*' => 'required|numeric|min:0',
-        ]);
+    DB::beginTransaction();
+    try {
+        // 1. Kembalikan stok lama
+        $oldItems = json_decode($struk->items, true);
+        foreach ($oldItems as $item) {
+            $barang = Barang::where('kode_barang', $item['nama'])->first();
+            if ($barang) {
+                $barang->increment('jumlah', $item['jumlah']);
+            }
+        }
 
+        // 2. Proses item baru
         $namaArr = $request->input('nama', []);
         $jumlahArr = $request->input('jumlah', []);
         $hargaArr = $request->input('harga', []);
 
         $items = [];
         foreach ($namaArr as $i => $nama) {
+            $kodeBarang = $nama;
+            $jumlah = (int) ($jumlahArr[$i] ?? 0);
+            $harga = (float) ($hargaArr[$i] ?? 0);
+
+            $barang = Barang::where('kode_barang', $kodeBarang)->first();
+            if (!$barang) {
+                DB::rollBack();
+                return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
+            }
+
+            if ($barang->jumlah < $jumlah) {
+                DB::rollBack();
+                return back()->withErrors(['Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah]);
+            }
+
+            $barang->decrement('jumlah', $jumlah);
+
             $items[] = [
-                'nama' => $nama,
-                'jumlah' => (int) ($jumlahArr[$i] ?? 0),
-                'harga' => (float) ($hargaArr[$i] ?? 0),
+                'nama' => $kodeBarang,
+                'jumlah' => $jumlah,
+                'harga' => $harga,
             ];
         }
 
@@ -269,8 +326,13 @@ class StrukController extends Controller
         $struk->total_harga = $total;
         $struk->save();
 
+        DB::commit();
         return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->withErrors('Gagal mengupdate item: ' . $e->getMessage());
     }
+}
 
     public function addItem(Request $request, $id)
     {
@@ -293,42 +355,85 @@ class StrukController extends Controller
     }
 
     public function deleteItem($id, $index)
-    {
-        $struk = Struk::findOrFail($id);
-        $items = json_decode($struk->items, true);
+{
+    $struk = Struk::findOrFail($id);
+    $items = json_decode($struk->items, true);
 
-        if (isset($items[$index])) {
-            unset($items[$index]);
-            $items = array_values($items);
-            $struk->items = json_encode($items);
-            $struk->total_harga = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
-            $struk->save();
+    if (!isset($items[$index])) {
+        return redirect()->route('struks.index')->with('error', 'Item tidak ditemukan.');
+    }
+
+    DB::beginTransaction();
+    try {
+        // Kembalikan stok barang
+        $deletedItem = $items[$index];
+        $barang = Barang::where('kode_barang', $deletedItem['nama'])->first();
+        if ($barang) {
+            $barang->increment('jumlah', $deletedItem['jumlah']);
         }
 
+        unset($items[$index]);
+        $items = array_values($items);
+        
+        $struk->items = json_encode($items);
+        $struk->total_harga = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
+        $struk->save();
+
+        DB::commit();
         return redirect()->route('struks.index')->with('success', 'Item berhasil dihapus.');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->route('struks.index')->with('error', 'Gagal menghapus item: ' . $e->getMessage());
     }
+}
 
 
 
     public function bulkDelete(Request $request)
-    {
-        $selectedIds = $request->input('selected_ids');
+{
+    $selectedIds = $request->input('selected_ids');
 
-        if (is_string($selectedIds)) {
-            $selectedIds = explode(',', $selectedIds);
-            $request->merge(['selected_ids' => $selectedIds]);
+    if (is_string($selectedIds)) {
+        $selectedIds = explode(',', $selectedIds);
+        $request->merge(['selected_ids' => $selectedIds]);
+    }
+
+    $request->validate([
+        'selected_ids' => 'required|array',
+        'selected_ids.*' => 'exists:struks,id'
+    ]);
+
+    DB::beginTransaction();
+    try {
+        $struks = Struk::whereIn('id', $selectedIds)->get();
+        
+        // Kembalikan stok untuk semua struk yang akan dihapus
+        foreach ($struks as $struk) {
+            $items = json_decode($struk->items, true);
+            foreach ($items as $item) {
+                $barang = Barang::where('kode_barang', $item['nama'])->first();
+                if ($barang) {
+                    $barang->increment('jumlah', $item['jumlah']);
+                }
+            }
+            
+            // Hapus foto struk jika ada
+            if ($struk->foto_struk) {
+                Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
+            }
         }
 
-        $request->validate([
-            'selected_ids' => 'required|array',
-            'selected_ids.*' => 'exists:struks,id'
-        ]);
+        // Hapus struk
+        Struk::whereIn('id', $selectedIds)->delete();
 
-        \App\Models\Struk::whereIn('id', $selectedIds)->delete();
-
+        DB::commit();
         return redirect()->route('struks.index')
             ->with('success', count($selectedIds) . ' struk berhasil dihapus');
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->withErrors('Gagal menghapus struk: ' . $e->getMessage());
     }
+}
 
 
     public function getItems(Struk $struk)
