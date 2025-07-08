@@ -503,8 +503,13 @@
                                     <div class="divide-y divide-gray-100" id="barangListContainer">
                                         @foreach($barangList as $barang)
                                         <div class="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex justify-between items-center barang-item"
+                                            data-kode="{{ $barang->kode_barang }}"
                                             data-nama="{{ $barang->nama_barang }}" data-harga="{{ $barang->harga }}">
-                                            <span>{{ $barang->nama_barang }}</span>
+                                            <span>
+                                                <span
+                                                    class="font-mono text-xs text-gray-500">{{ $barang->kode_barang }}</span>
+                                                <span class="ml-2">{{ $barang->nama_barang }}</span>
+                                            </span>
                                             @if($barang->harga > 0)
                                             <span
                                                 class="text-xs text-gray-500">Rp{{ number_format($barang->harga, 0, ',', '.') }}</span>
@@ -877,12 +882,14 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.barang-item').forEach(item => {
         item.addEventListener('click', function() {
             document.getElementById('modalNewItemNama').value = this.dataset.nama;
+            document.getElementById('modalNewItemNama').dataset.kode = this.dataset
+                .kode; // simpan kode_barang
             document.getElementById('modalNewItemHarga').value = this.dataset.harga;
             document.getElementById('barangDropdown').classList.add('hidden');
-            // Tambahkan baris berikut agar fokus langsung ke jumlah
             document.getElementById('modalNewItemJumlah').focus();
         });
     });
+    // ...existing code...
     // ...existing code...
     // Sembunyikan dropdown jika klik di luar
     document.addEventListener('mousedown', function(e) {
@@ -898,19 +905,21 @@ document.addEventListener('DOMContentLoaded', function() {
         const namaInput = document.getElementById('modalNewItemNama');
         const jumlahInput = document.getElementById('modalNewItemJumlah');
         const hargaInput = document.getElementById('modalNewItemHarga');
+        const kodeBarang = namaInput.dataset.kode || '';
+
         const nama = namaInput.value.trim();
         const jumlah = jumlahInput.value.trim();
         const harga = hargaInput.value.trim();
 
-        if (!nama || !jumlah || !harga) {
-            alert('Mohon lengkapi semua field untuk item baru');
+        if (!kodeBarang || !nama || !jumlah || !harga) {
+            alert('Mohon pilih barang dari daftar dan lengkapi semua field');
             return;
         }
 
-        // Validasi nama barang harus dari daftar
+        // Validasi kode_barang harus dari daftar
         let valid = false;
         document.querySelectorAll('.barang-item').forEach(item => {
-            if (item.dataset.nama === nama) valid = true;
+            if (item.dataset.kode === kodeBarang) valid = true;
         });
         if (!valid) {
             alert('Silakan pilih barang dari daftar yang tersedia');
@@ -919,11 +928,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         addItemRowToModal({
+            kode: kodeBarang,
             nama,
             jumlah,
             harga
         });
         namaInput.value = '';
+        namaInput.dataset.kode = '';
         jumlahInput.value = '';
         hargaInput.value = '';
         updateModalTotalPrice();
@@ -941,36 +952,37 @@ function addItemRowToModal(item = {}, index = null) {
     itemRow.className =
         'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
     itemRow.innerHTML = `
-            <input type="hidden" name="item_index[]" value="${itemIndex}">
-            <div class="col-span-5">
-                <input type="text" name="nama[]" value="${item.nama || ''}"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100"
-                    readonly>
+        <input type="hidden" name="kode_barang[]" value="${item.kode || ''}">
+        <div class="col-span-5 flex flex-col">
+            <input type="text" name="nama[]" value="${item.nama || ''}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 mb-1"
+                readonly>
+            <input type="text" value="${item.kode || ''}" class="w-full border border-gray-200 rounded-lg px-3 py-1 bg-gray-50 text-xs font-mono text-gray-500" readonly>
+        </div>
+        <div class="col-span-2">
+            <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                placeholder="Jumlah" min="1">
+        </div>
+        <div class="col-span-3">
+            <div class="relative">
+                <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
+                <input name="harga[]" type="number" value="${item.harga || ''}"
+                    class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+                    placeholder="0" min="0">
             </div>
-            <div class="col-span-2">
-                <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
-                    class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                    placeholder="Jumlah" min="1">
-            </div>
-            <div class="col-span-3">
-                <div class="relative">
-                    <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
-                    <input name="harga[]" type="number" value="${item.harga || ''}"
-                        class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                        placeholder="0" min="0">
-                </div>
-            </div>
-            <div class="col-span-2 flex justify-center">
-                <button type="button" onclick="removeItemFromModal(this)"
-                    class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ${disableDelete ? 'opacity-50 cursor-not-allowed' : ''}"
-                    title="Hapus Item" ${disableDelete ? 'disabled' : ''}>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                </button>
-            </div>
-        `;
+        </div>
+        <div class="col-span-2 flex justify-center">
+            <button type="button" onclick="removeItemFromModal(this)"
+                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ${disableDelete ? 'opacity-50 cursor-not-allowed' : ''}"
+                title="Hapus Item" ${disableDelete ? 'disabled' : ''}>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </button>
+        </div>
+    `;
     container.appendChild(itemRow);
 
     // Add event listeners for real-time total price update
