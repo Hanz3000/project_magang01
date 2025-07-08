@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use Illuminate\Support\Facades\DB;
 
 class StrukController extends Controller
 {
@@ -37,13 +38,14 @@ class StrukController extends Controller
         return view('struks.create', compact('barangList'));
     }
 
+
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'nama_toko' => 'required|string|max:255',
             'nomor_struk' => 'required|string|max:255',
             'tanggal_struk' => 'required|date',
-            'tanggal_keluar' => 'nullable|date', // tambahkan ini
+            'tanggal_keluar' => 'nullable|date',
             'items' => 'required|array|min:1',
             'items.*.nama' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
@@ -52,24 +54,47 @@ class StrukController extends Controller
             'foto_struk' => 'nullable|image|max:2048'
         ]);
 
+        // Upload foto struk
         $fotoFilename = null;
         if ($request->hasFile('foto_struk')) {
             $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
             $fotoFilename = basename($fotoPath);
         }
 
+        // Validasi dan kurangi stok master barang
+        foreach ($validatedData['items'] as $item) {
+            $kodeBarang = $item['nama']; // nama = kode_barang
+            $jumlah = $item['jumlah'];
+
+            $barang = Barang::where('kode_barang', $kodeBarang)->first();
+            if (!$barang) {
+                return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
+            }
+
+            if ($barang->jumlah < $jumlah) {
+                return back()->withErrors(['Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah]);
+            }
+
+            // Kurangi stok
+            $barang->jumlah -= $jumlah;
+            $barang->save();
+        }
+
+        // Simpan struk
         Struk::create([
             'nama_toko'      => $validatedData['nama_toko'],
             'nomor_struk'    => $validatedData['nomor_struk'],
             'tanggal_struk'  => $validatedData['tanggal_struk'],
-            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null, // pastikan ini ada
+            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
             'items'          => json_encode($validatedData['items']),
             'total_harga'    => $validatedData['total_harga'],
             'foto_struk'     => $fotoFilename
         ]);
 
-        return redirect()->route('struks.index')->with('created', 'Struk berhasil disimpan!');
+        return redirect()->route('struks.index')->with('created', 'Struk berhasil disimpan dan stok telah dikurangi.');
     }
+
+
 
     public function edit(Struk $struk)
     {
@@ -84,7 +109,7 @@ class StrukController extends Controller
             'nama_toko' => 'required|string|max:255',
             'nomor_struk' => 'required|string|max:255',
             'tanggal_struk' => 'required|date',
-            'tanggal_keluar' => 'nullable|date', // ✅ Tambahkan ini
+            'tanggal_keluar' => 'nullable|date',
             'items' => 'required|array|min:1',
             'items.*.nama' => 'required|string|max:255',
             'items.*.jumlah' => 'required|integer|min:1',
@@ -103,18 +128,46 @@ class StrukController extends Controller
             $validatedData['foto_struk'] = $struk->foto_struk;
         }
 
-        $struk->update([
-            'nama_toko'      => $validatedData['nama_toko'],
-            'nomor_struk'    => $validatedData['nomor_struk'],
-            'tanggal_struk'  => $validatedData['tanggal_struk'],
-            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null, // ✅ Jangan lupa ini
-            'items'          => json_encode($validatedData['items']),
-            'total_harga'    => $validatedData['total_harga'],
-            'foto_struk'     => $validatedData['foto_struk'] // ✅ gunakan yang disimpan
-        ]);
+        DB::beginTransaction();
+        try {
+            // 1. Rollback stok dari item lama
+            $oldItems = json_decode($struk->items, true);
+            foreach ($oldItems as $item) {
+                $barang = Barang::where('kode_barang', $item['nama'])->first();
+                if ($barang) {
+                    $barang->jumlah -= $item['jumlah'];
+                    $barang->save();
+                }
+            }
 
-        return redirect()->route('struks.index')->with('updated', 'Struk berhasil diperbarui!');
+            // 2. Tambahkan stok baru
+            foreach ($validatedData['items'] as $item) {
+                $barang = Barang::where('kode_barang', $item['nama'])->first();
+                if ($barang) {
+                    $barang->jumlah += $item['jumlah'];
+                    $barang->save();
+                }
+            }
+
+            // 3. Update struk
+            $struk->update([
+                'nama_toko'      => $validatedData['nama_toko'],
+                'nomor_struk'    => $validatedData['nomor_struk'],
+                'tanggal_struk'  => $validatedData['tanggal_struk'],
+                'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
+                'items'          => json_encode($validatedData['items']),
+                'total_harga'    => $validatedData['total_harga'],
+                'foto_struk'     => $validatedData['foto_struk']
+            ]);
+
+            DB::commit();
+            return redirect()->route('struks.index')->with('updated', 'Struk berhasil diperbarui!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors('Gagal mengupdate struk: ' . $e->getMessage());
+        }
     }
+
 
 
     public function destroy(Struk $struk)

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\DB;
 use App\Models\Pengeluaran;
 use App\Models\Struk;
 use App\Models\Pegawai;
@@ -48,91 +49,70 @@ class PengeluaranController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi dasar yang berlaku untuk semua jenis pengeluaran
-        $baseRules = [
+        $validated = $request->validate([
+            'nama_toko' => 'required|string',
+            'nomor_struk' => 'required|string',
             'pegawai_id' => 'required|exists:pegawais,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string',
-            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-        ];
-
-        // Jika pengeluaran dari pemasukan
-        if ($request->has('from_income')) {
-            $validated = $request->validate(array_merge($baseRules, [
-                'struk_id' => 'required|exists:struks,id',
-                'tanggal_struk' => 'required|date', // Pastikan divalidasi juga
-            ]));
-
-            $struk = Struk::findOrFail($validated['struk_id']);
-            $items = json_decode($struk->items, true) ?? [];
-            $total = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
-
-            $pengeluaranData = [
-                'nama_toko' => $struk->nama_toko,
-                'nomor_struk' => $struk->nomor_struk,
-                'tanggal' => $validated['tanggal'],
-                'tanggal_struk' => $validated['tanggal_struk'], // <-- Tambahkan ini!
-                'pegawai_id' => $validated['pegawai_id'],
-                'daftar_barang' => json_encode($items),
-                'total' => $total,
-                'jumlah_item' => count($items),
-                'keterangan' => $validated['keterangan'] ?? null,
-                'struk_id' => $validated['struk_id'],
-                'bukti_pembayaran' => $struk->foto_struk ? 'struk_foto/' . $struk->foto_struk : null,
-            ];
-
-            // Handle file upload
-            if ($request->hasFile('bukti_pembayaran')) {
-                $pengeluaranData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
-            }
-
-            Pengeluaran::create($pengeluaranData);
-
-            if ($request->has('from_income') && $request->from_income == 1) {
-                // Hapus pemasukan (struk) yang dipilih
-                $struk = Struk::find($request->struk_id);
-                if ($struk) {
-                    $struk->delete();
-                }
-            }
-
-            // Redirect ke index pengeluaran
-            return redirect()->route('pengeluarans.index')->with('created', 'Pengeluaran berhasil disimpan!');
-        }
-
-        // Jika pengeluaran manual
-        $validated = $request->validate(array_merge($baseRules, [
-            'nama_toko' => 'required|string',
-            'nomor_struk' => 'required|string',
             'items' => 'required|array|min:1',
-            'items.*.nama' => 'required|string',
+            'items.*.nama' => 'required|string', // ini adalah kode_barang
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.harga' => 'required|integer|min:0',
-        ]));
+            'total' => 'required|numeric',
+            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
 
-        $total = collect($validated['items'])->sum(fn($item) => $item['jumlah'] * $item['harga']);
+        // Validasi stok
+        foreach ($validated['items'] as $item) {
+            $kodeBarang = $item['nama']; // kode_barang
+            $jumlah = $item['jumlah'];
 
+            $barang = \App\Models\Barang::where('kode_barang', $kodeBarang)->first();
+            if (!$barang) {
+                return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
+            }
+
+            if ($barang->jumlah < $jumlah) {
+                return back()->withErrors([
+                    'Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah
+                ]);
+            }
+        }
+
+        // Jika semua valid, kurangi stok
+        foreach ($validated['items'] as $item) {
+            $kodeBarang = $item['nama'];
+            $jumlah = $item['jumlah'];
+
+            $barang = \App\Models\Barang::where('kode_barang', $kodeBarang)->first();
+            $barang->jumlah -= $jumlah;
+            $barang->save();
+        }
+
+        // Simpan pengeluaran
         $pengeluaranData = [
             'nama_toko' => $validated['nama_toko'],
             'nomor_struk' => $validated['nomor_struk'],
-            'tanggal' => $validated['tanggal'],
             'pegawai_id' => $validated['pegawai_id'],
-            'daftar_barang' => json_encode($validated['items']),
-            'total' => $total,
-            'jumlah_item' => collect($validated['items'])->sum('jumlah'),
+            'tanggal' => $validated['tanggal'],
             'keterangan' => $validated['keterangan'] ?? null,
-            'struk_id' => null, // Manual expenses don't need struk_id
+            'daftar_barang' => json_encode($validated['items']),
+            'total' => $validated['total'],
+            'jumlah_item' => collect($validated['items'])->sum('jumlah'),
         ];
 
-        // Handle file upload
+        // Upload bukti pembayaran jika ada
         if ($request->hasFile('bukti_pembayaran')) {
             $pengeluaranData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
         }
 
-        Pengeluaran::create($pengeluaranData);
+        \App\Models\Pengeluaran::create($pengeluaranData);
 
-        return redirect()->route('pengeluarans.index')->with('success', 'Pengeluaran manual berhasil dibuat.');
+        return redirect()->route('pengeluarans.index')->with('created', 'Pengeluaran berhasil disimpan dan stok dikurangi.');
     }
+
+
 
     public function show($id)
     {
