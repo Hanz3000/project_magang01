@@ -11,5 +11,10 @@ class Barang extends Model
 
     protected $table = 'master_barangs';
 
-    protected $fillable = ['nama_barang', 'kode_barang'];
+    // app/Models/Barang.php
+    protected $fillable = [
+        'nama_barang',
+        'kode_barang',
+        'jumlah', // <- harus ada ini
+    ];
 }
