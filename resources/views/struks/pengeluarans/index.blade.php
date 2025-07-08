@@ -174,7 +174,7 @@
                                 </path>
                             </svg>
                         </div>
-                        <div>f
+                        <div>
                             <h3 class="text-lg font-semibold text-gray-800">Data Struk Pengeluaran</h3>
                             <p class="text-sm text-gray-500">{{ $pengeluarans->total() }} struk ditemukan</p>
                         </div>
