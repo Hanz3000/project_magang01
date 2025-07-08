@@ -951,7 +951,7 @@
                             <tr class="item-row" data-item="0">
                                 <td>
                                     <div class="input-group">
-                                        <select name="items[0][nama]" class="select-barang" required>
+                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStok(this)">
                                             <option value="">Pilih Barang</option>
                                             @foreach ($barangList as $barang)
                                             <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
