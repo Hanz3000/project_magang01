@@ -174,7 +174,7 @@
                                 </path>
                             </svg>
                         </div>
-                        <div>
+                        <div>f
                             <h3 class="text-lg font-semibold text-gray-800">Data Struk Pengeluaran</h3>
                             <p class="text-sm text-gray-500">{{ $pengeluarans->total() }} struk ditemukan</p>
                         </div>
@@ -256,12 +256,15 @@
                             <td class="px-6 py-4 whitespace-nowrap align-top">
                                 @foreach ($pengeluaran->daftar_barang as $item)
                                 <div class="flex items-center mb-1">
-                                    <span
-                                        class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle"></span>
-                                    <span class="text-gray-700">{{ $item['nama'] }}</span>
+                                    <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mr-2 align-middle"></span>
+                                    <span class="text-gray-700">
+                                        {{ $barangs[$item['nama']] ?? $item['nama'] }} {{-- tampilkan nama_barang dari kode_barang --}}
+                                    </span>
                                 </div>
                                 @endforeach
                             </td>
+
+
                             <td class="px-6 py-4 whitespace-nowrap align-top text-gray-400 text-center">
                                 @foreach ($pengeluaran->daftar_barang as $item)
                                 <div class="mb-1">x{{ $item['jumlah'] }}</div>

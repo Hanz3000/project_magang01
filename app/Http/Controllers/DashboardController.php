@@ -6,6 +6,7 @@ use App\Models\Struk;
 use App\Models\Pengeluaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use App\Models\Barang;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class DashboardController extends Controller
@@ -44,19 +45,23 @@ class DashboardController extends Controller
                 break;
         }
 
+        $barangMaster = Barang::pluck('nama_barang', 'kode_barang');
+
         $barangList = $this->processAndPaginateBarangList(
             $strukQuery,
             $request->only(['search', 'sort']),
-            'page_barang'
+            'page_barang',
+            $barangMaster
         );
 
         $pengeluaranBarangList = $this->processAndPaginatePengeluaranList(
             $pengeluaranQuery,
             $request->only(['search_pengeluaran', 'sort_pengeluaran']),
-            'page_pengeluaran'
+            'page_pengeluaran',
+            $barangMaster
         );
 
-        $historyBarang = $this->generateAndPaginateHistoryBarang('page_history');
+        $historyBarang = $this->generateAndPaginateHistoryBarang('page_history', $barangMaster);
 
         $labels = [];
         $dataMasuk = [];

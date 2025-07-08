@@ -15,7 +15,7 @@
             <div class="bg-white shadow-md rounded-xl px-6 py-5 flex flex-col md:flex-row items-center gap-4 border border-gray-100 w-full md:w-auto">
                 <div class="flex items-center gap-2 mb-2 md:mb-0">
                     <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span class="font-semibold text-gray-700 text-base">Filter Data Dashboard</span>
                 </div>
@@ -34,16 +34,16 @@
                         class="{{ (request('time_period') == 'monthly' || $timePeriod == 'monthly') ? '' : 'hidden' }} flex gap-2">
                         <select name="bulan" class="border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-50 font-semibold">
                             @foreach(range(1, 12) as $month)
-                                <option value="{{ $month }}" {{ request('bulan', $bulan) == $month ? 'selected' : '' }}>
-                                    {{ DateTime::createFromFormat('!m', $month)->format('F') }}
-                                </option>
+                            <option value="{{ $month }}" {{ request('bulan', $bulan) == $month ? 'selected' : '' }}>
+                                {{ DateTime::createFromFormat('!m', $month)->format('F') }}
+                            </option>
                             @endforeach
                         </select>
                         <select name="tahun" class="border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-50 font-semibold">
                             @foreach(range(now()->year, now()->year - 5) as $year)
-                                <option value="{{ $year }}" {{ request('tahun', $tahun) == $year ? 'selected' : '' }}>
-                                    {{ $year }}
-                                </option>
+                            <option value="{{ $year }}" {{ request('tahun', $tahun) == $year ? 'selected' : '' }}>
+                                {{ $year }}
+                            </option>
                             @endforeach
                         </select>
                     </div>
@@ -134,7 +134,8 @@
                     <div>
                         <p class="text-sm text-gray-500 whitespace-nowrap">Total Barang Keluar</p>
                         <p class="text-2xl font-semibold text-gray-800 whitespace-nowrap">
-                            {{ $totalBarangKeluar ?? '0' }}</p>
+                            {{ $totalBarangKeluar ?? '0' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -341,11 +342,14 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $item['nama'] ?? '-' }}</td>
+                                {{ $barangMaster[$item['nama']] ?? $item['nama'] }}
+                            </td>
+
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] ?? '0' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['nomor_struk'] ?? '-' }}</td>
+                                {{ $item['nomor_struk'] ?? '-' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
                             </td>
@@ -446,11 +450,13 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $item['nama_barang'] ?? '-' }}</td>
+                                {{ $item['nama_barang'] ?? '-' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] ?? '0' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['nomor_struk'] ?? '-' }}</td>
+                                {{ $item['nomor_struk'] ?? '-' }}
+                            </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
                             </td>
@@ -562,4 +568,4 @@
             }
         });
     </script>
-@endsection
+    @endsection

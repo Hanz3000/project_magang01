@@ -14,7 +14,7 @@ class PengeluaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengeluaran::with(['pegawai', 'income']); // Tambahkan 'income'
+        $query = Pengeluaran::with(['pegawai', 'income']);
 
         if ($request->has('search') && $request->search != '') {
             $query->where('nama_toko', 'like', '%' . $request->search . '%')
@@ -25,9 +25,12 @@ class PengeluaranController extends Controller
         }
 
         $pengeluarans = $query->latest()->paginate(10);
+        $barangs = \App\Models\Barang::pluck('nama_barang', 'kode_barang'); // kode => nama
+
         return view('struks.pengeluarans.index', [
             'pengeluarans' => $pengeluarans,
-            'struks' => Struk::paginate(10), // Ubah dari all() ke paginate()
+            'struks' => Struk::paginate(10),
+            'barangs' => $barangs,
         ]);
     }
 
