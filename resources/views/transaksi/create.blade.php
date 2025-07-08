@@ -289,51 +289,6 @@
         display: block;
     }
 
-    /* === ITEM TABLE STYLES === */
-    .item-table {
-        width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-bottom: 1.5rem;
-        background: #fff;
-        border-radius: var(--border-radius);
-        overflow: hidden;
-        box-shadow: var(--shadow-sm);
-        border: 1px solid var(--gray);
-    }
-
-    .item-table th,
-    .item-table td {
-        padding: 1rem 1.25rem;
-        text-align: left;
-        vertical-align: middle;
-    }
-
-    .item-table th {
-        background: var(--light);
-        color: var(--secondary-dark);
-        font-weight: 600;
-        border-bottom: 1px solid var(--gray);
-    }
-
-    .item-table td {
-        border-bottom: 1px solid var(--gray);
-        color: var(--dark);
-    }
-
-    .item-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .item-table tr:hover td {
-        background: rgba(79, 70, 229, 0.03);
-    }
-
-    /* Perbaikan untuk subtotal agar tidak turun ke bawah */
-    .subtotal-display {
-        white-space: nowrap;
-        padding: 0.5rem 0;
-    }
 
     /* === ENHANCED FILE UPLOAD STYLES === */
     .file-upload-wrapper {
@@ -688,6 +643,144 @@
             padding: 0.75rem;
         }
     }
+
+    /* === IMPROVED ITEM TABLE STYLES === */
+    .item-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 1.5rem;
+        background: #fff;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+        border: 1px solid var(--gray);
+        table-layout: fixed;
+    }
+
+    /* Perbaikan alignment untuk kolom Barang */
+    .item-table td:nth-child(1) .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .item-table td:nth-child(1) .select2-container {
+        margin-top: 0;
+    }
+
+    /* Pastikan teks barang tidak keluar dari container */
+    .item-table .select2-selection__rendered {
+        white-space: normal;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .item-table th:nth-child(2),
+    .item-table td:nth-child(2) {
+        width: 15%;
+        /* Lebar kolom Jumlah */
+    }
+
+    .item-table th:nth-child(3),
+    .item-table td:nth-child(3) {
+        width: 20%;
+        /* Lebar kolom Harga Satuan */
+    }
+
+    .item-table th:nth-child(4),
+    .item-table td:nth-child(4) {
+        width: 20%;
+        /* Lebar kolom Subtotal */
+    }
+
+    .item-table th:nth-child(5),
+    .item-table td:nth-child(5) {
+        width: 10%;
+        /* Lebar kolom Aksi */
+    }
+
+    .item-table th {
+        background: var(--light);
+        color: var(--secondary-dark);
+        font-weight: 600;
+        border-bottom: 1px solid var(--gray);
+        padding: 0.75rem 1rem;
+        /* Padding lebih kecil untuk header */
+        text-align: center;
+        /* Tengahkan teks header */
+    }
+
+    .item-table td {
+        border-bottom: 1px solid var(--gray);
+        color: var(--dark);
+        padding: 0.75rem 1rem;
+        /* Padding lebih kecil untuk sel */
+        vertical-align: middle;
+    }
+
+    /* Perbaikan untuk input group dalam tabel */
+    .item-table .input-group {
+        margin-bottom: 0;
+    }
+
+    .item-table .input-group input {
+        padding: 0.5rem 0.75rem;
+        /* Padding lebih kecil untuk input */
+        font-size: 0.875rem;
+    }
+
+    /* Perbaikan untuk select2 dalam tabel */
+    .item-table .select2-container--default .select2-selection--single {
+        height: 40px;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.875rem;
+    }
+
+    /* Perbaikan untuk tombol hapus */
+    .item-table .btn-danger {
+        padding: 0.5rem;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .item-table .btn-danger i {
+        margin: 0;
+    }
+
+    /* Perbaikan untuk stok info */
+    .stok-info {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--secondary);
+        margin-top: 0.25rem;
+        text-align: left;
+    }
+
+    /* Perbaikan untuk subtotal */
+    .subtotal-display {
+        white-space: nowrap;
+        text-align: right;
+        padding: 0;
+        font-weight: 500;
+    }
+
+    /* Perataan tengah untuk kolom jumlah dan aksi */
+    .item-table td:nth-child(2),
+    .item-table td:nth-child(5) {
+        text-align: center;
+    }
+
+    /* Perataan kanan untuk kolom harga dan subtotal */
+    .item-table td:nth-child(3),
+    .item-table td:nth-child(4) {
+        text-align: right;
+    }
 </style>
 
 <!-- Income/Expense Form -->
@@ -790,29 +883,24 @@
                                 <td>
                                     <div class="input-group">
                                         <select name="items[0][nama]" class="select-barang" required onchange="updateStokIncome(this)">
-
                                             <option value="">Pilih Barang</option>
                                             @foreach ($barangList as $barang)
                                             <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
                                                 {{ $barang->nama_barang }} ({{ $barang->kode_barang }}) - Stok: {{ $barang->jumlah }}
                                             </option>
-
                                             @endforeach
                                         </select>
-                                        <span class="text-sm text-gray-500 stok-info">Stok: -</span>
-
+                                        <span class="stok-info">Stok: -</span>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="items[0][jumlah]" class="jumlah" min="1"
-                                            value="1" required>
+                                        <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="input-group">
-                                        <input type="number" name="items[0][harga]" class="harga" min="0"
-                                            required placeholder="0">
+                                        <input type="number" name="items[0][harga]" class="harga" min="0" required placeholder="0">
                                     </div>
                                 </td>
                                 <td>
@@ -1326,6 +1414,8 @@
         const container = document.getElementById('income-items-container');
         const oldRow = container.querySelector('.item-row');
         const newRow = oldRow.cloneNode(true);
+        newRow.innerHTML = newRow.innerHTML.replace(/id="subtotal-0"/g, `id="subtotal-${incomeIndex}"`);
+
 
         // Ganti semua index [0] → [incomeIndex]
         const regex = /\[0\]/g;
@@ -1343,12 +1433,12 @@
         const select = newRow.querySelector('.select-barang');
         select.selectedIndex = 0;
 
-        // Hapus Select2 lama (biar tidak crash)
+        // Hapus Select2 lama
         $(select).next('.select2-container').remove();
 
         // Tambahkan ulang event onchange
         select.addEventListener('change', function() {
-            updateStok(this);
+            updateStokIncome(this);
         });
 
         // Inisialisasi ulang Select2
@@ -1361,9 +1451,19 @@
         const stokInfo = newRow.querySelector('.stok-info');
         if (stokInfo) stokInfo.textContent = 'Stok: -';
 
+        // Tambahkan event listener untuk input jumlah & harga
+        newRow.querySelector('.jumlah').addEventListener('input', function() {
+            updateIncomeSubtotal($(newRow));
+        });
+
+        newRow.querySelector('.harga').addEventListener('input', function() {
+            updateIncomeSubtotal($(newRow));
+        });
+
         container.appendChild(newRow);
         incomeIndex++;
     }
+
 
 
 
@@ -1396,6 +1496,7 @@
 
         updateIncomeTotal();
     }
+
 
     function updateIncomeTotal() {
         let total = 0;
