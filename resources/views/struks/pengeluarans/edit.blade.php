@@ -4,7 +4,6 @@
 <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
     <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/20">
 
-        <!-- Header -->
         <div class="bg-gradient-to-r from-indigo-600 to-blue-500 p-6 text-white">
             <h2 class="text-xl font-bold">Edit Pengeluaran</h2>
             <p class="text-sm opacity-80">Ubah, tambah, atau hapus item dalam pengeluaran</p>
@@ -17,7 +16,7 @@
             {{-- Nama Toko --}}
             <div>
                 <label class="block mb-1 font-medium">Nama Toko</label>
-                <input type="text" name="nama_toko" class="w-full border rounded px-3 py-2 bg-gray-100" 
+                <input type="text" name="nama_toko" class="w-full border rounded px-3 py-2 bg-gray-100"
                     value="{{ old('nama_toko', $pengeluaran->nama_toko) }}" readonly>
             </div>
 
@@ -55,32 +54,47 @@
                     @foreach ($pengeluaran->daftar_barang as $index => $item)
                     <div class="flex items-center gap-4 bg-gray-50 border border-gray-200 rounded-lg p-4">
                         <div class="flex-1 grid grid-cols-3 gap-3">
+                            {{-- Dropdown Nama Barang --}}
                             <div>
                                 <label class="block text-sm text-gray-500">Nama Barang</label>
-                                <input type="text" name="nama_barang[]" value="{{ $item['nama'] }}"
-                                    class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
+                                <select name="items[{{ $index }}][nama]" class="w-full border rounded px-3 py-2 searchable-select barang-select" data-index="{{ $index }}">
+                                    <option value="">-- Pilih Barang --</option>
+                                    @foreach($barangs as $barang)
+                                    <option value="{{ $barang->nama_barang }}"
+                                        data-harga="{{ $barang->harga_satuan }}"
+                                        {{ $item['nama'] === $barang->nama_barang ? 'selected' : '' }}>
+                                        {{ $barang->nama_barang }}
+                                    </option>
+                                    @endforeach
+                                </select>
                             </div>
+
+                            {{-- Jumlah --}}
                             <div>
                                 <label class="block text-sm text-gray-500">Jumlah</label>
-                                <input type="text" name="jumlah[]" value="{{ $item['jumlah'] }}"
-                                    class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
+                                <input type="number" name="items[{{ $index }}][jumlah]" value="{{ $item['jumlah'] }}"
+                                    class="w-full border rounded px-3 py-2 jumlah-input" data-index="{{ $index }}">
                             </div>
+
+                            {{-- Harga --}}
                             <div>
                                 <label class="block text-sm text-gray-500">Harga Satuan</label>
-                                <input type="text" value="Rp {{ number_format($item['harga'], 0, ',', '.') }}"
-                                    class="w-full border rounded px-3 py-2 bg-gray-100" readonly>
+                                <input type="number" name="items[{{ $index }}][harga]" value="{{ $item['harga'] }}"
+                                    class="w-full border rounded px-3 py-2 harga-input" data-index="{{ $index }}">
                             </div>
                         </div>
                     </div>
                     @endforeach
                 </div>
-            </div> <!-- 🔴 Penutup daftar barang -->
+            </div>
 
             {{-- Total --}}
             <div>
                 <label class="block mb-1 font-medium">Total Pembayaran</label>
-                <input type="text" class="w-full border rounded px-3 py-2 text-xl font-bold text-right"
+                <input type="text" id="total-pembayaran"
+                    class="w-full border rounded px-3 py-2 text-xl font-bold text-right bg-gray-100"
                     value="Rp {{ number_format($pengeluaran->total, 0, ',', '.') }}" readonly>
+
             </div>
 
             {{-- Bukti Pembayaran --}}
@@ -93,7 +107,6 @@
                     alt="Bukti Pembayaran"
                     class="h-40 object-contain border rounded cursor-pointer hover:opacity-80 transition">
 
-                <!-- Modal -->
                 <div x-show="open" x-transition
                     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50">
                     <div @click.away="open = false" class="max-w-3xl mx-auto">
@@ -122,7 +135,61 @@
                 </button>
             </div>
 
-        </form> 
+        </form>
     </div>
 </div>
+
 @endsection
+@push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        $('.searchable-select').select2({
+            placeholder: 'Cari barang...',
+            allowClear: true
+        });
+
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        function updateTotal() {
+            let total = 0;
+            document.querySelectorAll('.jumlah-input').forEach(function(jumlahInput) {
+                const index = jumlahInput.dataset.index;
+                const jumlah = parseInt(jumlahInput.value) || 0;
+                const harga = parseInt(document.querySelector('.harga-input[data-index="' + index + '"]').value) || 0;
+                total += jumlah * harga;
+            });
+
+            document.getElementById('total-pembayaran').value = formatRupiah(total);
+        }
+
+        // Saat pilih barang, set harga otomatis
+        document.querySelectorAll('.barang-select').forEach(function(select) {
+            select.addEventListener('change', function() {
+                const harga = this.options[this.selectedIndex].getAttribute('data-harga');
+                const index = this.dataset.index;
+                const hargaInput = document.querySelector('.harga-input[data-index="' + index + '"]');
+                if (harga && hargaInput) {
+                    hargaInput.value = harga;
+                }
+                updateTotal();
+            });
+        });
+
+        // Saat ubah jumlah atau harga, update total
+        document.querySelectorAll('.jumlah-input, .harga-input').forEach(function(input) {
+            input.addEventListener('input', updateTotal);
+        });
+
+        // Initial total calculation on page load
+        updateTotal();
+    });
+</script>
+
+@endpush
+
+@push('styles')
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css" rel="stylesheet" />
+@endpush
