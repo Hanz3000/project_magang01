@@ -100,6 +100,7 @@ class DashboardController extends Controller
             'labels' => $labels,
             'dataMasuk' => $dataMasuk,
             'dataKeluar' => $dataKeluar,
+            'barangMaster' => $barangMaster,
         ]);
     }
 

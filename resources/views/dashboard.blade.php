@@ -450,8 +450,9 @@
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $item['nama_barang'] ?? '-' }}
+                                {{ $barangMaster[$item['nama_barang']] ?? $item['nama_barang'] }}
                             </td>
+
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] ?? '0' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
