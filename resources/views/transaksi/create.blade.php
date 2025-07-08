@@ -53,6 +53,7 @@
             border: 1px solid var(--gray);
             overflow: hidden;
             transition: var(--transition);
+            margin-bottom: 1.5rem;
         }
 
         .form-card:hover {
@@ -682,7 +683,7 @@
         }
     </style>
 
-    <div class="form-container">
+        <!-- Income/Expense Form -->
         <div class="form-card">
             <div class="form-inner">
                 {{-- Notifications --}}
@@ -770,7 +771,7 @@
                             <table class="item-table">
                                 <thead>
                                     <tr>
-                                        <th>Nama Barang</th>
+                                        <th>Barang</th>
                                         <th>Jumlah</th>
                                         <th>Harga Satuan</th>
                                         <th>Subtotal</th>
@@ -784,9 +785,9 @@
                                                 <select name="items[0][nama]" class="select-barang" required>
                                                     <option value="">Pilih Barang</option>
                                                     @foreach ($barangList as $barang)
-                                                        <option value="{{ $barang->nama_barang }}">
-                                                            {{ $barang->nama_barang }}
-                                                        </option>
+                                                    <option value="{{ $barang->kode_barang }}"> 
+                                                        {{ $barang->nama_barang }} ({{ $barang->kode_barang }})
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -920,8 +921,7 @@
                                     </select>
                                 </div>
                             </div>
-
-                            {{-- Items --}}
+ {{-- Items --}}
                             <div class="section-title">
                                 <i class="fas fa-shopping-cart"></i>
                                 <span>Daftar Barang</span>
@@ -930,45 +930,45 @@
                             <table class="item-table">
                                 <thead>
                                     <tr>
-                                        <th>Nama Barang</th>
+                                        <th>Barang</th>
                                         <th>Jumlah</th>
                                         <th>Harga Satuan</th>
                                         <th>Subtotal</th>
                                         <th>Aksi</th>
                                     </tr>
-                                </thead> <tbody id="income-items-container">
+                                </thead>
+                                <tbody id="income-items-container">
                                     <tr class="item-row" data-item="0">
                                         <td>
                                             <div class="input-group">
                                                 <select name="items[0][nama]" class="select-barang" required>
                                                     <option value="">Pilih Barang</option>
                                                     @foreach ($barangList as $barang)
-                                                        <option value="{{ $barang->nama_barang }}">
-                                                            {{ $barang->nama_barang }}
-                                                        </option>
+                                                    <option value="{{ $barang->kode_barang }}"> 
+                                                        {{ $barang->nama_barang }} ({{ $barang->kode_barang }})
+                                                    </option>
                                                     @endforeach
                                                 </select>
                                             </div>
                                         </td>
+                                        <td>
                                             <div class="input-group">
-                                                <input type="number" name="items[0][jumlah]" class="expense-jumlah"
-                                                    min="1" value="1" required>
+                                                <input type="number" name="items[0][jumlah]" class="jumlah" min="1"
+                                                    value="1" required>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="input-group">
-                                                <input type="number" name="items[0][harga]" class="expense-harga"
-                                                    min="0" placeholder="0" required>
+                                                <input type="number" name="items[0][harga]" class="harga" min="0"
+                                                    required placeholder="0">
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="subtotal-display" id="expense-subtotal-0">Rp 0</div>
-                                            <input type="hidden" name="items[0][subtotal]" class="expense-subtotal"
-                                                value="0">
+                                            <div class="subtotal-display" id="subtotal-0">Rp 0</div>
+                                            <input type="hidden" name="items[0][subtotal]" class="subtotal" value="0">
                                         </td>
                                         <td>
-                                            <button type="button" onclick="removeExpenseItem(this)"
-                                                class="btn btn-danger">
+                                            <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
@@ -1181,10 +1181,10 @@
             <tr class="item-row" data-item="${incomeItemIndex}">
                 <td>
                     <div class="input-group">
-                        <select name="items[${incomeItemIndex}][nama]" class="select-barang" required>
+                        <select name="items[${incomeItemIndex}][kode]" class="select-barang" required>
                             <option value="">Pilih Barang</option>
                             @foreach ($barangList as $barang)
-                                <option value="{{ $barang->nama_barang }}">{{ $barang->nama_barang }}</option>
+                                <option value="{{ $barang->nama_barang }}">{{ $barang->kode_barang }}</option>
                             @endforeach
                         </select>
                     </div>
