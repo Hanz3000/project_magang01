@@ -953,13 +953,17 @@ function addItemRowToModal(item = {}, index = null) {
     const itemRow = document.createElement('div');
     itemRow.className =
         'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
+
     itemRow.innerHTML = `
-        <input type="hidden" name="kode_barang[]" value="${item.kode || ''}">
         <div class="col-span-5 flex flex-col">
-            <input type="text" name="nama[]" value="${item.nama || ''}"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 mb-1"
+            <!-- Nama Barang -->
+            <input type="text" value="${item.nama_barang || '-'}"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-base"
                 readonly>
-            <input type="text" value="${item.kode || ''}" class="w-full border border-gray-200 rounded-lg px-3 py-1 bg-gray-50 text-xs font-mono text-gray-500" readonly>
+            <!-- Kode Barang (value yang akan dikirim sebagai "nama[]") -->
+            <input type="text" name="nama[]" value="${item.nama || ''}"
+                class="w-fit border border-indigo-200 rounded px-2 py-1 mt-1 bg-indigo-50 text-xs font-mono text-indigo-700"
+                readonly>
         </div>
         <div class="col-span-2">
             <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
@@ -987,7 +991,6 @@ function addItemRowToModal(item = {}, index = null) {
     `;
     container.appendChild(itemRow);
 
-    // Add event listeners for real-time total price update
     const inputs = itemRow.querySelectorAll('input[name="jumlah[]"], input[name="harga[]"]');
     inputs.forEach(input => {
         input.addEventListener('input', updateModalTotalPrice);
@@ -1002,6 +1005,7 @@ function addItemRowToModal(item = {}, index = null) {
         });
     }
 }
+
 
 function addNewItemToModal() {
     const namaSelect = document.getElementById('modalNewItemNama');
