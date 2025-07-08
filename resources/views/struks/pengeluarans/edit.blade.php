@@ -56,18 +56,28 @@
                         <div class="flex-1 grid grid-cols-3 gap-3">
                             {{-- Dropdown Nama Barang --}}
                             <div>
-                                <label class="block text-sm text-gray-500">Nama Barang</label>
-                                <select name="items[{{ $index }}][nama]" class="w-full border rounded px-3 py-2 searchable-select barang-select" data-index="{{ $index }}">
-                                    <option value="">-- Pilih Barang --</option>
-                                    @foreach($barangs as $barang)
-                                    <option value="{{ $barang->nama_barang }}"
+                            <label class="block text-sm text-gray-500">Nama Barang</label>
+                            <select name="items[{{ $index }}][nama]"
+                                    class="w-full border rounded px-3 py-2 searchable-select barang-select"
+                                    data-index="{{ $index }}">
+                                <option value="">-- Pilih Barang --</option>
+                                @foreach($barangs as $barang)
+                                <option value="{{ $barang->nama_barang }}"
+                                        data-kode="{{ $barang->kode_barang }}"
                                         data-harga="{{ $barang->harga_satuan }}"
                                         {{ $item['nama'] === $barang->nama_barang ? 'selected' : '' }}>
-                                        {{ $barang->nama_barang }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                    {{ $barang->kode_barang }} - {{ $barang->nama_barang }}
+                                </option>
+                                @endforeach
+                            </select>
+
+                            {{-- Hidden input untuk kode_barang --}}
+                            <input type="hidden"
+                                name="items[{{ $index }}][kode_barang]"
+                                id="kode-barang-{{ $index }}"
+                                value="{{ $item['kode_barang'] ?? '' }}">
+                        </div>
+
 
                             {{-- Jumlah --}}
                             <div>
@@ -143,51 +153,60 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        $('.searchable-select').select2({
-            placeholder: 'Cari barang...',
-            allowClear: true
-        });
-
-        function formatRupiah(angka) {
-            return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        }
-
-        function updateTotal() {
-            let total = 0;
-            document.querySelectorAll('.jumlah-input').forEach(function(jumlahInput) {
-                const index = jumlahInput.dataset.index;
-                const jumlah = parseInt(jumlahInput.value) || 0;
-                const harga = parseInt(document.querySelector('.harga-input[data-index="' + index + '"]').value) || 0;
-                total += jumlah * harga;
-            });
-
-            document.getElementById('total-pembayaran').value = formatRupiah(total);
-        }
-
-        // Saat pilih barang, set harga otomatis
-        document.querySelectorAll('.barang-select').forEach(function(select) {
-            select.addEventListener('change', function() {
-                const harga = this.options[this.selectedIndex].getAttribute('data-harga');
-                const index = this.dataset.index;
-                const hargaInput = document.querySelector('.harga-input[data-index="' + index + '"]');
-                if (harga && hargaInput) {
-                    hargaInput.value = harga;
-                }
-                updateTotal();
-            });
-        });
-
-        // Saat ubah jumlah atau harga, update total
-        document.querySelectorAll('.jumlah-input, .harga-input').forEach(function(input) {
-            input.addEventListener('input', updateTotal);
-        });
-
-        // Initial total calculation on page load
-        updateTotal();
+document.addEventListener('DOMContentLoaded', function() {
+    $('.searchable-select').select2({
+        placeholder: 'Cari barang...',
+        allowClear: true
     });
-</script>
 
+    function formatRupiah(angka) {
+        return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    function updateTotal() {
+        let total = 0;
+        document.querySelectorAll('.jumlah-input').forEach(function(jumlahInput) {
+            const index = jumlahInput.dataset.index;
+            const jumlah = parseInt(jumlahInput.value) || 0;
+            const harga = parseInt(document.querySelector('.harga-input[data-index="' + index + '"]').value) || 0;
+            total += jumlah * harga;
+        });
+
+        document.getElementById('total-pembayaran').value = formatRupiah(total);
+    }
+
+    // Saat pilih barang, set harga dan kode otomatis
+    document.querySelectorAll('.barang-select').forEach(function(select) {
+        select.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const harga = selectedOption.getAttribute('data-harga');
+            const kode = selectedOption.getAttribute('data-kode');
+            const index = this.dataset.index;
+
+            const hargaInput = document.querySelector('.harga-input[data-index="' + index + '"]');
+            if (harga && hargaInput) {
+                hargaInput.value = harga;
+            }
+
+            // Isi hidden input kode_barang
+            const kodeInput = document.getElementById('kode-barang-' + index);
+            if (kodeInput) {
+                kodeInput.value = kode;
+            }
+
+            updateTotal();
+        });
+    });
+
+    // Saat ubah jumlah atau harga, update total
+    document.querySelectorAll('.jumlah-input, .harga-input').forEach(function(input) {
+        input.addEventListener('input', updateTotal);
+    });
+
+    // Hitung total awal saat page load
+    updateTotal();
+});
+</script>
 @endpush
 
 @push('styles')
