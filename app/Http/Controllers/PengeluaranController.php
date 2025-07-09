@@ -140,48 +140,95 @@ class PengeluaranController extends Controller
             'pegawai_id' => 'required|exists:pegawais,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string',
-            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ];
 
-        // Jika pengeluaran manual dan ingin mengupdate items
-        if ($pengeluaran->struk_id === null && $request->has('items')) {
-            $rules['items'] = 'required|array|min:1';
-            $rules['items.*.nama'] = 'required|string';
-            $rules['items.*.jumlah'] = 'required|integer|min:1';
-            $rules['items.*.harga'] = 'required|integer|min:0';
+        if ($pengeluaran->struk_id === null) {
+            $rules['existing_items.*.nama'] = 'required|string';
+            $rules['existing_items.*.jumlah'] = 'required|integer|min:1';
+            $rules['existing_items.*.harga'] = 'required|integer|min:0';
+            $rules['new_items.*.nama'] = 'required|string';
+            $rules['new_items.*.jumlah'] = 'required|integer|min:1';
+            $rules['new_items.*.harga'] = 'required|integer|min:0';
         }
 
         $validated = $request->validate($rules);
 
-        $updateData = [
-            'nama_toko' => $validated['nama_toko'],
-            'nomor_struk' => $validated['nomor_struk'],
-            'pegawai_id' => $validated['pegawai_id'],
-            'tanggal' => $validated['tanggal'],
-            'keterangan' => $validated['keterangan'] ?? null,
-        ];
+        DB::transaction(function () use ($request, $validated, $pengeluaran) {
+            $updateData = [
+                'nama_toko' => $validated['nama_toko'],
+                'nomor_struk' => $validated['nomor_struk'],
+                'pegawai_id' => $validated['pegawai_id'],
+                'tanggal' => $validated['tanggal'],
+                'keterangan' => $validated['keterangan'] ?? null,
+            ];
 
-        // Jika pengeluaran manual dan ada items
-        if ($pengeluaran->struk_id === null && isset($validated['items'])) {
-            $total = collect($validated['items'])->sum(fn($item) => $item['jumlah'] * $item['harga']);
-            $updateData['daftar_barang'] = json_encode($validated['items']);
-            $updateData['total'] = $total;
-            $updateData['jumlah_item'] = collect($validated['items'])->sum('jumlah');
-        }
+            if ($pengeluaran->struk_id === null) {
+                $combinedItems = [];
 
-        // Handle file upload
-        if ($request->hasFile('bukti_pembayaran')) {
-            // Delete old file if exists
-            if ($pengeluaran->bukti_pembayaran) {
-                Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
+                // ✅ 1. Kembalikan stok barang lama sebelum update
+                if ($pengeluaran->daftar_barang) {
+                    $oldItems = $pengeluaran->daftar_barang;
+                    foreach ($oldItems as $old) {
+                        $barang = Barang::where('kode_barang', $old['nama'])->first();
+                        if ($barang) {
+                            $barang->increment('jumlah', $old['jumlah']);
+                        }
+                    }
+                }
+
+                // ✅ 2. Gabungkan item baru (existing + new)
+                if ($request->has('existing_items')) {
+                    foreach ($request->existing_items as $item) {
+                        $combinedItems[] = $item;
+                    }
+                }
+
+                if ($request->has('new_items')) {
+                    foreach ($request->new_items as $item) {
+                        $combinedItems[] = $item;
+                    }
+                }
+
+                // ✅ 3. Hitung ulang dan kurangi stok sesuai input baru
+                $total = 0;
+                $jumlahItem = 0;
+
+                foreach ($combinedItems as $item) {
+                    $total += $item['jumlah'] * $item['harga'];
+                    $jumlahItem += $item['jumlah'];
+
+                    $barang = Barang::where('kode_barang', $item['nama'])->first();
+                    if ($barang) {
+                        if ($barang->jumlah < $item['jumlah']) {
+                            throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup.");
+                        }
+
+                        $barang->decrement('jumlah', $item['jumlah']);
+                    }
+                }
+
+                $updateData['daftar_barang'] = json_encode($combinedItems);
+                $updateData['total'] = $total;
+                $updateData['jumlah_item'] = $jumlahItem;
             }
-            $updateData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
-        }
 
-        $pengeluaran->update($updateData);
+            // ✅ 4. File upload jika ada
+            if ($request->hasFile('bukti_pembayaran')) {
+                if ($pengeluaran->bukti_pembayaran) {
+                    Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
+                }
 
-        return redirect()->route('pengeluarans.index')->with('updated', 'Pengeluaran berhasil diperbarui.');
+                $updateData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
+            }
+
+            $pengeluaran->update($updateData);
+        });
+
+        return redirect()->route('pengeluarans.index')->with('updated', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
     }
+
+
 
     public function destroy(Pengeluaran $pengeluaran)
     {
