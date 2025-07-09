@@ -24,7 +24,15 @@
 
                 @foreach ($pengeluaran->daftar_barang as $index => $item)
                 <div class="grid grid-cols-4 gap-4 items-center py-3 border-b existing-item">
-                    <div class="font-medium">{{ $item['nama'] }} ({{ $item['kode_barang'] ?? '' }})</div>
+                    @php
+                    $kodeBarang = $item['nama']; // karena kamu simpan kode_barang di field 'nama'
+                    $namaBarang = \App\Models\Barang::where('kode_barang', $kodeBarang)->value('nama_barang') ?? $kodeBarang;
+                    @endphp
+
+                    <div class="text-sm">
+                        <div class="text-gray-900 font-semibold">{{ $namaBarang }}</div>
+                        <div class="text-gray-500 text-xs">Kode: {{ $kodeBarang }}</div>
+                    </div>
                     <div>
                         <input type="number" name="existing_items[{{ $index }}][jumlah]" value="{{ $item['jumlah'] }}" min="1"
                             class="w-full border rounded px-3 py-2 existing-jumlah-input">

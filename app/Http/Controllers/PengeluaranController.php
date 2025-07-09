@@ -117,18 +117,11 @@ class PengeluaranController extends Controller
 
 
 
-    public function show(Pengeluaran $pengeluaran)
+    public function show($id)
     {
-        if (is_string($pengeluaran->daftar_barang)) {
-            $pengeluaran->daftar_barang = json_decode($pengeluaran->daftar_barang, true);
-        }
-
-        $masterBarang = Barang::all()->keyBy('kode_barang');
-
-        return view('struks.pengeluarans.show', compact('pengeluaran', 'masterBarang'));
+        $pengeluaran = Pengeluaran::findOrFail($id);
+        return view('struks.pengeluarans.show', compact('pengeluaran'));
     }
-
-
 
     public function edit($id)
     {
