@@ -18,11 +18,11 @@
                 <div class="space-y-3">
                     <div><span class="font-semibold text-gray-700">Nama Toko:</span> {{ $pengeluaran->nama_toko }}</div>
                     <div><span class="font-semibold text-gray-700">Nomor Struk:</span> {{ $pengeluaran->nomor_struk }}</div>
-                <div>
-                    <span class="font-semibold text-gray-700">Tanggal Keluar:</span> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}
-                </div>
-                <div><span class="font-semibold text-gray-700">Pegawai:</span> {{ $pengeluaran->pegawai?->nama ?? '-' }}</div>
-                <div><span class="font-semibold text-gray-700">Jumlah Item:</span> {{ $pengeluaran->jumlah_item }} item</div>
+                    <div>
+                        <span class="font-semibold text-gray-700">Tanggal Keluar:</span> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}
+                    </div>
+                    <div><span class="font-semibold text-gray-700">Pegawai:</span> {{ $pengeluaran->pegawai?->nama ?? '-' }}</div>
+                    <div><span class="font-semibold text-gray-700">Jumlah Item:</span> {{ $pengeluaran->jumlah_item }} item</div>
                 </div>
                 <div class="space-y-4">
                     <div>
@@ -54,27 +54,39 @@
                         <thead class="bg-slate-100">
                             <tr>
                                 <th class="px-4 py-3 border">No</th>
+                                <th class="px-4 py-3 border text-left">Kode Barang</th>
                                 <th class="px-4 py-3 border text-left">Nama Barang</th>
                                 <th class="px-4 py-3 border text-center">Jumlah</th>
                                 <th class="px-4 py-3 border text-right">Harga Satuan</th>
                                 <th class="px-4 py-3 border text-right">Subtotal</th>
                             </tr>
                         </thead>
+
                         <tbody>
                             @foreach ($pengeluaran->daftar_barang as $index => $item)
+                            @php
+                            $kode = $item['nama'] ?? '-';
+                            $barang = $masterBarang[$kode] ?? null;
+                            $namaBarang = $barang?->nama_barang ?? $kode;
+                            $jumlah = $item['jumlah'] ?? 0;
+                            $harga = $item['harga'] ?? 0;
+                            $subtotal = $jumlah * $harga;
+                            @endphp
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-2 border text-center">{{ $index + 1 }}</td>
-                                <td class="px-4 py-2 border">{{ $item['nama'] }}</td>
-                                <td class="px-4 py-2 border text-center">{{ $item['jumlah'] }}</td>
+                                <td class="px-4 py-2 border text-gray-700">{{ $kode }}</td>
+                                <td class="px-4 py-2 border">{{ $namaBarang }}</td>
+                                <td class="px-4 py-2 border text-center">{{ $jumlah }}</td>
                                 <td class="px-4 py-2 border text-right">
-                                    Rp{{ number_format($item['harga'], 0, ',', '.') }}
+                                    Rp{{ number_format($harga, 0, ',', '.') }}
                                 </td>
                                 <td class="px-4 py-2 border text-right">
-                                    Rp{{ number_format(($item['jumlah'] ?? 0) * ($item['harga'] ?? 0), 0, ',', '.') }}
+                                    Rp{{ number_format($subtotal, 0, ',', '.') }}
                                 </td>
                             </tr>
                             @endforeach
                         </tbody>
+
                     </table>
                 </div>
             </div>
@@ -82,7 +94,7 @@
             <!-- Tombol Kembali -->
             <div>
                 <a href="{{ route('pengeluarans.index') }}"
-                   class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl shadow transition">
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl shadow transition">
                     Kembali
                 </a>
             </div>

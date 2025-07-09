@@ -76,44 +76,50 @@
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase border">No</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Kode Barang</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase border">Nama Barang</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase border">Jumlah</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase border">Harga Satuan</th>
                                 <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase border">Subtotal</th>
                             </tr>
                         </thead>
+
                         <tbody class="bg-white divide-y divide-gray-200">
                             @php
                             $items = [];
                             $rawItems = $struk->items;
 
                             if (is_string($rawItems)) {
-                                $decoded = json_decode($rawItems, true);
-                                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                                    $items = $decoded;
-                                }
+                            $decoded = json_decode($rawItems, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                            $items = $decoded;
+                            }
                             } elseif (is_object($rawItems) || is_array($rawItems)) {
-                                foreach ($rawItems as $key => $value) {
-                                    $items[$key] = is_object($value) ? (array) $value : $value;
-                                }
+                            foreach ($rawItems as $key => $value) {
+                            $items[$key] = is_object($value) ? (array) $value : $value;
+                            }
                             }
                             @endphp
 
                             @foreach ($items as $index => $item)
                             @php
-                            $nama = $item['nama'] ?? 'N/A';
+                            $kodeBarang = $item['nama'] ?? null;
+                            $nama = $masterBarang[$kodeBarang]->nama_barang ?? $kodeBarang;
                             $jumlah = (int) ($item['jumlah'] ?? 0);
                             $harga = (int) ($item['harga'] ?? 0);
                             $subtotal = $jumlah * $harga;
                             @endphp
                             <tr class="hover:bg-gray-50">
                                 <td class="px-4 py-4 text-sm text-center text-gray-500 border">{{ $index + 1 }}</td>
+                                <td class="px-6 py-4 text-sm text-gray-700 border">{{ $kodeBarang }}</td>
                                 <td class="px-6 py-4 text-sm font-medium text-gray-900 border">{{ $nama }}</td>
                                 <td class="px-6 py-4 text-sm text-center text-gray-500 border">{{ $jumlah }}</td>
                                 <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600 border">Rp{{ number_format($harga, 0, ',', '.') }}</td>
                                 <td class="px-6 py-4 text-sm text-center font-semibold text-indigo-600 border">Rp{{ number_format($subtotal, 0, ',', '.') }}</td>
                             </tr>
                             @endforeach
+
+
                         </tbody>
                     </table>
                 </div>

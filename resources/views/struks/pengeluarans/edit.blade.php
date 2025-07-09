@@ -83,8 +83,8 @@
                             <option value="">-- Pilih Barang --</option>
                             @foreach($barangs as $barang)
                             <option value="{{ $barang->nama_barang }}"
-                                    data-kode="{{ $barang->kode_barang }}"
-                                    data-harga="{{ $barang->harga_satuan }}">
+                                data-kode="{{ $barang->kode_barang }}"
+                                data-harga="{{ $barang->harga_satuan }}">
                                 {{ $barang->kode_barang }} - {{ $barang->nama_barang }}
                             </option>
                             @endforeach
@@ -102,7 +102,7 @@
                     </div>
                 </div>
 
-                <button type="button" id="tambah-barang" 
+                <button type="button" id="tambah-barang"
                     class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
                     + Tambah
                 </button>
@@ -159,82 +159,82 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const tambahBtn = document.getElementById('tambah-barang');
-    const template = document.getElementById('template-barang-baru');
-    const container = document.getElementById('items-container');
+    document.addEventListener('DOMContentLoaded', function() {
+        const tambahBtn = document.getElementById('tambah-barang');
+        const template = document.getElementById('template-barang-baru');
+        const container = document.getElementById('items-container');
 
-    function calculateTotal() {
-        let total = 0;
+        function calculateTotal() {
+            let total = 0;
 
-        document.querySelectorAll('.existing-item').forEach(item => {
-            const jumlah = parseInt(item.querySelector('.existing-jumlah-input').value) || 0;
-            const harga = parseInt(item.querySelector('.existing-harga-input').value) || 0;
-            total += jumlah * harga;
-        });
+            document.querySelectorAll('.existing-item').forEach(item => {
+                const jumlah = parseInt(item.querySelector('.existing-jumlah-input').value) || 0;
+                const harga = parseInt(item.querySelector('.existing-harga-input').value) || 0;
+                total += jumlah * harga;
+            });
 
-        document.querySelectorAll('.barang-baru').forEach(item => {
-            const jumlah = parseInt(item.querySelector('.new-jumlah-field').value) || 0;
-            const harga = parseInt(item.querySelector('.new-harga-field').value) || 0;
-            total += jumlah * harga;
-        });
+            document.querySelectorAll('.barang-baru').forEach(item => {
+                const jumlah = parseInt(item.querySelector('.new-jumlah-field').value) || 0;
+                const harga = parseInt(item.querySelector('.new-harga-field').value) || 0;
+                total += jumlah * harga;
+            });
 
-        document.getElementById('total-semua').textContent = 'Rp ' + total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-        document.getElementById('total-hidden').value = total;
-    }
-
-    // Existing items: hapus
-    container.addEventListener('click', function(e) {
-        if (e.target.closest('.hapus-item')) {
-            e.target.closest('.existing-item').remove();
-            calculateTotal();
-        }
-    });
-
-    // Tambah barang baru
-    tambahBtn.addEventListener('click', function() {
-        const select = document.querySelector('.barang-select');
-        const selectedOption = select.options[select.selectedIndex];
-
-        if (!selectedOption.value) {
-            alert('Silakan pilih barang terlebih dahulu');
-            return;
+            document.getElementById('total-semua').textContent = 'Rp ' + total.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            document.getElementById('total-hidden').value = total;
         }
 
-        const namaBarang = selectedOption.value;
-        const kodeBarang = selectedOption.getAttribute('data-kode');
-        const hargaBarang = document.querySelector('.new-harga-input').value || selectedOption.getAttribute('data-harga');
-        const jumlahBarang = document.querySelector('.new-jumlah-input').value || 1;
+        // Existing items: hapus
+        container.addEventListener('click', function(e) {
+            if (e.target.closest('.hapus-item')) {
+                e.target.closest('.existing-item').remove();
+                calculateTotal();
+            }
+        });
 
-        const clone = template.content.cloneNode(true);
-        const newItem = clone.querySelector('.barang-baru');
+        // Tambah barang baru
+        tambahBtn.addEventListener('click', function() {
+            const select = document.querySelector('.barang-select');
+            const selectedOption = select.options[select.selectedIndex];
 
-        newItem.querySelector('.new-nama-barang').textContent = namaBarang + ' (' + kodeBarang + ')';
-        newItem.querySelector('.new-nama-field').value = namaBarang;
-        newItem.querySelector('.new-kode-field').value = kodeBarang;
-        newItem.querySelector('.new-jumlah-field').value = jumlahBarang;
-        newItem.querySelector('.new-harga-field').value = hargaBarang;
+            if (!selectedOption.value) {
+                alert('Silakan pilih barang terlebih dahulu');
+                return;
+            }
 
-        // Delete new item
-        newItem.querySelector('.hapus-barang').addEventListener('click', function() {
-            newItem.remove();
+            const namaBarang = selectedOption.value;
+            const kodeBarang = selectedOption.getAttribute('data-kode');
+            const hargaBarang = document.querySelector('.new-harga-input').value || selectedOption.getAttribute('data-harga');
+            const jumlahBarang = document.querySelector('.new-jumlah-input').value || 1;
+
+            const clone = template.content.cloneNode(true);
+            const newItem = clone.querySelector('.barang-baru');
+
+            newItem.querySelector('.new-nama-barang').textContent = namaBarang + ' (' + kodeBarang + ')';
+            newItem.querySelector('.new-nama-field').value = namaBarang;
+            newItem.querySelector('.new-kode-field').value = kodeBarang;
+            newItem.querySelector('.new-jumlah-field').value = jumlahBarang;
+            newItem.querySelector('.new-harga-field').value = hargaBarang;
+
+            // Delete new item
+            newItem.querySelector('.hapus-barang').addEventListener('click', function() {
+                newItem.remove();
+                calculateTotal();
+            });
+
+            container.appendChild(clone);
+
+            select.value = '';
+            document.querySelector('.new-harga-input').value = '';
+            document.querySelector('.new-jumlah-input').value = '1';
+
             calculateTotal();
         });
 
-        container.appendChild(clone);
-
-        select.value = '';
-        document.querySelector('.new-harga-input').value = '';
-        document.querySelector('.new-jumlah-input').value = '1';
+        document.querySelectorAll('.existing-jumlah-input, .existing-harga-input').forEach(input => {
+            input.addEventListener('input', calculateTotal);
+        });
 
         calculateTotal();
     });
-
-    document.querySelectorAll('.existing-jumlah-input, .existing-harga-input').forEach(input => {
-        input.addEventListener('input', calculateTotal);
-    });
-
-    calculateTotal();
-});
 </script>
 @endpush
