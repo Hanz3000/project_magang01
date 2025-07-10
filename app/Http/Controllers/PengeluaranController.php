@@ -167,25 +167,16 @@ class PengeluaranController extends Controller
             if ($pengeluaran->struk_id === null) {
                 $combinedItems = [];
 
-                // 1. Kembalikan stok barang lama
-                if ($pengeluaran->daftar_barang) {
-                    $oldItems = is_string($pengeluaran->daftar_barang)
-                        ? json_decode($pengeluaran->daftar_barang, true)
-                        : $pengeluaran->daftar_barang;
+                // Ambil daftar barang lama
+                $oldItems = is_string($pengeluaran->daftar_barang)
+                    ? json_decode($pengeluaran->daftar_barang, true)
+                    : ($pengeluaran->daftar_barang ?? []);
 
-                    foreach ($oldItems as $old) {
-                        $barang = Barang::where('kode_barang', $old['nama'])->first();
-                        if ($barang) {
-                            $barang->increment('jumlah', $old['jumlah']);
-                        }
-                    }
-                }
-
-                // 2. Proses existing items
+                // Proses existing items
                 if ($request->has('existing_items')) {
                     foreach ($request->existing_items as $item) {
                         $combinedItems[] = [
-                            'nama' => $item['kode_barang'], // Simpan kode sebagai nama
+                            'nama' => $item['kode_barang'],
                             'kode_barang' => $item['kode_barang'],
                             'jumlah' => $item['jumlah'],
                             'harga' => $item['harga']
@@ -193,11 +184,11 @@ class PengeluaranController extends Controller
                     }
                 }
 
-                // 3. Proses new items
+                // Proses new items
                 if ($request->has('new_items')) {
                     foreach ($request->new_items as $item) {
                         $combinedItems[] = [
-                            'nama' => $item['kode_barang'], // Simpan kode sebagai nama
+                            'nama' => $item['kode_barang'],
                             'kode_barang' => $item['kode_barang'],
                             'jumlah' => $item['jumlah'],
                             'harga' => $item['harga']
@@ -205,7 +196,7 @@ class PengeluaranController extends Controller
                     }
                 }
 
-                // 4. Validasi stok dan hitung total
+                // Validasi dan update stok
                 $total = 0;
                 $jumlahItem = 0;
                 $finalItems = [];
@@ -217,27 +208,26 @@ class PengeluaranController extends Controller
 
                     $barang = Barang::where('kode_barang', $kodeBarang)->first();
                     if ($barang) {
-                        // Ambil jumlah sebelumnya
+                        // Cari jumlah sebelumnya (lama)
                         $jumlahLama = 0;
                         foreach ($oldItems as $old) {
-                            $kodeLama = $old['kode_barang'] ?? $old['nama']; // fallback ke 'nama' jika 'kode_barang' tidak ada
-
+                            $kodeLama = $old['kode_barang'] ?? $old['nama'];
                             if ($kodeLama == $kodeBarang) {
                                 $jumlahLama = $old['jumlah'];
                                 break;
                             }
                         }
 
+                        // Hitung selisih
+                        $selisih = $jumlahBaru - $jumlahLama;
 
-                        // Hitung stok tersedia (stok saat ini + yang dikembalikan dari edit)
-                        $stokTersedia = $barang->jumlah + $jumlahLama;
-
-                        if ($stokTersedia < $jumlahBaru) {
-                            throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup. Stok tersedia: {$stokTersedia}, diminta: {$jumlahBaru}");
+                        // Jika selisih positif, berarti minta tambahan stok
+                        if ($selisih > 0 && $barang->jumlah < $selisih) {
+                            throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup. Stok tersedia: {$barang->jumlah}, tambahan diminta: {$selisih}");
                         }
 
-                        // Update stok
-                        $barang->jumlah = $stokTersedia - $jumlahBaru;
+                        // Update stok sesuai selisih
+                        $barang->jumlah -= $selisih;
                         $barang->save();
 
                         $item['nama'] = $barang->nama_barang;
@@ -248,14 +238,12 @@ class PengeluaranController extends Controller
                     $finalItems[] = $item;
                 }
 
-
-
                 $updateData['daftar_barang'] = json_encode($finalItems);
                 $updateData['total'] = $total;
                 $updateData['jumlah_item'] = $jumlahItem;
             }
 
-            // 5. Upload bukti pembayaran
+            // Upload bukti pembayaran jika ada
             if ($request->hasFile('bukti_pembayaran')) {
                 if ($pengeluaran->bukti_pembayaran) {
                     Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
@@ -268,6 +256,7 @@ class PengeluaranController extends Controller
 
         return redirect()->route('pengeluarans.index')->with('updated', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
     }
+
 
 
 

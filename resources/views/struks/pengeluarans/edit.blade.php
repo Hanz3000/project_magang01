@@ -237,7 +237,11 @@
                     const jumlah = parseInt(input.value) || 0;
                     const stok = parseInt(item.getAttribute('data-stok')) || 0;
 
-                    if (jumlah > stok) {
+                    const jumlahAwal = parseInt(input.getAttribute('data-jumlah-awal')) || 0;
+                    const stokTersedia = stok + jumlahAwal;
+
+                    if (jumlah > stokTersedia) {
+                        console.warn(`Invalid: ${item.getAttribute('data-kode')} — Jumlah: ${jumlah}, Stok Tersedia: ${stokTersedia}`);
                         input.classList.add('border-red-500');
                         valid = false;
                     } else {
@@ -245,8 +249,10 @@
                     }
                 });
 
+                console.log('Form valid?', valid);
                 submitBtn.disabled = !valid;
             }
+
 
             tambahBtn.addEventListener('click', () => {
                 const option = barangSelect.options[barangSelect.selectedIndex];
@@ -328,19 +334,20 @@
                 const kode = item.getAttribute('data-kode');
 
                 const stokDisplay = item.querySelector('.stok-tersedia');
-                const stokAwal = parseInt(stokDisplay?.getAttribute('data-awal')) || 0;
-                const jumlahAwal = parseInt(input.defaultValue) || 0;
 
-                // Simpan jumlah awal di attribute
+                const jumlahAwal = parseInt(input.defaultValue) || 0; // Ambil dari value awal
+                const stokSaatIni = parseInt(item.getAttribute('data-stok')) || 0;
+                const stokTersedia = jumlahAwal + stokSaatIni;
+
+                // Simpan untuk referensi
                 input.setAttribute('data-jumlah-awal', jumlahAwal);
 
                 input.addEventListener('input', () => {
                     const jumlahBaru = parseInt(input.value) || 0;
-                    const stokMaster = jumlahAwal + stokAwal;
-                    const sisa = stokMaster - jumlahBaru;
+                    const sisa = stokTersedia - jumlahBaru;
 
                     if (sisa < 0) {
-                        alert(`❌ Stok tidak cukup!\nStok awal: ${stokMaster}\nDiminta: ${jumlahBaru}`);
+                        alert(`❌ Stok tidak cukup!\nStok tersedia (termasuk yang sudah dikeluarkan): ${stokTersedia}\nDiminta: ${jumlahBaru}`);
                         input.value = jumlahAwal;
                         input.classList.add('border-red-500');
                         submitBtn.disabled = true;
@@ -363,6 +370,7 @@
                 // Jalankan validasi awal
                 input.dispatchEvent(new Event('input'));
             });
+
 
             jumlahInputBaru.addEventListener('input', () => {
                 const option = barangSelect.options[barangSelect.selectedIndex];
