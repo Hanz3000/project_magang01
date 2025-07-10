@@ -24,10 +24,12 @@
 
                     @foreach ($pengeluaran->daftar_barang as $index => $item)
                     @php
-                    $kodeBarang = $item['nama']; // nama = kode_barang
+                    $kodeBarang = $item['kode_barang'] ?? $item['nama']; // Cek apakah ada kode_barang yang eksplisit
                     $barang = \App\Models\Barang::where('kode_barang', $kodeBarang)->first();
-                    $namaBarang = $barang->nama_barang ?? $kodeBarang;
-                    $stokTersedia = $barang->jumlah ?? 0;
+
+                    $namaBarang = $barang->nama_barang ?? ($item['nama'] ?? 'Tidak diketahui');
+                    $stokTersedia = $barang?->jumlah ?? 0;
+
                     @endphp
 
                     <div class="grid grid-cols-4 gap-4 items-center py-3 border-b existing-item"
@@ -163,14 +165,14 @@
                     </div>
 
                     <div>
-                        <input type="number" name="new_items[][jumlah]" class="w-full border rounded px-3 py-2 new-jumlah-field" min="1">
+                        <input type="number" name="new_items[{{ $index }}][jumlah]" class="w-full border rounded px-3 py-2 new-jumlah-field" min="0">
                     </div>
                     <div>
-                        <input type="number" name="new_items[][harga]" class="w-full border rounded px-3 py-2 new-harga-field" min="0">
+                        <input type="number" name="new_items[{{ $index }}][harga]" class="w-full border rounded px-3 py-2 new-harga-field" min="0">
                     </div>
                     <div>
                         <input type="hidden" name="new_items[][nama]" class="new-nama-field" value="">
-                        <input type="hidden" name="new_items[][kode_barang]" class="new-kode-field" value="">
+                        <input type="hidden" name="new_items[{{ $index }}][kode_barang]" class="new-kode-field" value="">
 
                         <button type="button" class="hapus-barang text-red-500 hover:text-red-700">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -256,18 +258,22 @@
                 const harga = hargaInputBaru.value || option.getAttribute('data-harga');
                 const jumlah = parseInt(jumlahInputBaru.value) || 1;
 
-                // ✅ Cek apakah barang sudah pernah ditambahkan
-                const sudahAda = [...document.querySelectorAll('input[name$="[kode]"]')]
-                    .some(input => input.value === kode);
+                // ✅ Pengecekan yang lebih akurat - hanya di item baru yang belum disimpan
+                const sudahAdaSebagaiBaru = [...document.querySelectorAll('.barang-baru')]
+                    .some(el => el.getAttribute('data-kode') === kode);
 
-
-                if (sudahAda) {
+                if (sudahAdaSebagaiBaru) {
                     alert('Barang ini sudah ditambahkan sebelumnya.');
                     return;
                 }
 
+                // Di dalam event listener tambah barang
                 if (jumlah > stok) {
-                    alert('Stok tidak mencukupi. Sisa: ' + stok);
+                    // Tampilkan peringatan lebih informatif
+                    alert(`Stok tidak mencukupi. 
+           Jumlah diminta: ${jumlah} 
+           Stok tersedia: ${stok}
+           Stok awal: ${item.querySelector('.stok-tersedia').getAttribute('data-awal')}`);
                     return;
                 }
 
@@ -275,30 +281,27 @@
 
                 const clone = template.content.cloneNode(true);
                 const el = clone.querySelector('.barang-baru');
+                const newIndex = document.querySelectorAll('.barang-baru').length;
 
                 // 💡 Set data-* attribute dan teks
                 el.setAttribute('data-kode', kode);
                 el.setAttribute('data-stok', stok - jumlah);
 
-                // Nama barang (ringkas)
+                // Update tampilan
                 el.querySelector('.new-nama-barang').textContent = nama;
+                el.querySelector('.new-kode-barang').textContent = kode;
+                el.querySelector('.stok-tersedia').textContent = stok - jumlah;
+                el.querySelector('.stok-tersedia').setAttribute('data-awal', stok - jumlah);
 
-                // Kode barang (jika ada span atau p)
-                const kodeEl = el.querySelector('.new-kode-barang');
-                if (kodeEl) kodeEl.textContent = kode;
-
-                // Stok (jika ada elemen untuk stok)
-                const stokEl = el.querySelector('.stok-tersedia');
-                if (stokEl) {
-                    stokEl.textContent = stok - jumlah;
-                    stokEl.setAttribute('data-awal', stok - jumlah);
-                }
-
-                // Input field
+                // Update input fields dengan nama yang benar
+                el.querySelector('.new-nama-field').name = `new_items[${newIndex}][nama]`;
                 el.querySelector('.new-nama-field').value = nama;
+                el.querySelector('.new-kode-field').name = `new_items[${newIndex}][kode_barang]`;
                 el.querySelector('.new-kode-field').value = kode;
+                el.querySelector('.new-jumlah-field').name = `new_items[${newIndex}][jumlah]`;
                 el.querySelector('.new-jumlah-field').value = jumlah;
                 el.querySelector('.new-jumlah-field').max = stok;
+                el.querySelector('.new-harga-field').name = `new_items[${newIndex}][harga]`;
                 el.querySelector('.new-harga-field').value = harga;
 
                 // Tombol hapus
@@ -311,7 +314,7 @@
 
                 container.appendChild(clone);
 
-                // Reset form input
+                // Reset form
                 barangSelect.value = '';
                 jumlahInputBaru.value = 1;
                 hargaInputBaru.value = '';
@@ -319,7 +322,7 @@
                 validateAll();
             });
 
-
+            let initialLoad = true;
 
             // 🔸 Existing item: perubahan jumlah
             // Existing item: perubahan jumlah

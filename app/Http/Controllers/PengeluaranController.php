@@ -145,18 +145,13 @@ class PengeluaranController extends Controller
 
         if ($pengeluaran->struk_id === null) {
             $rules['existing_items.*.kode_barang'] = 'required|string';
-            $rules['existing_items.*.nama'] = 'required|string';
             $rules['existing_items.*.jumlah'] = 'required|integer|min:1';
             $rules['existing_items.*.harga'] = 'required|integer|min:0';
 
-
-            $rules['new_items.*.kode_barang'] = 'required|string'; // Tambahkan ini
-            $rules['new_items.*.nama'] = 'nullable|string'; // Optional, karena tidak dipakai saat proses simpan
-
+            $rules['new_items.*.kode_barang'] = 'required|string';
             $rules['new_items.*.jumlah'] = 'required|integer|min:1';
             $rules['new_items.*.harga'] = 'required|integer|min:0';
         }
-
 
         $validated = $request->validate($rules);
 
@@ -172,9 +167,12 @@ class PengeluaranController extends Controller
             if ($pengeluaran->struk_id === null) {
                 $combinedItems = [];
 
-                // ✅ 1. Kembalikan stok barang lama sebelum update
+                // 1. Kembalikan stok barang lama
                 if ($pengeluaran->daftar_barang) {
-                    $oldItems = $pengeluaran->daftar_barang;
+                    $oldItems = is_string($pengeluaran->daftar_barang)
+                        ? json_decode($pengeluaran->daftar_barang, true)
+                        : $pengeluaran->daftar_barang;
+
                     foreach ($oldItems as $old) {
                         $barang = Barang::where('kode_barang', $old['nama'])->first();
                         if ($barang) {
@@ -183,22 +181,34 @@ class PengeluaranController extends Controller
                     }
                 }
 
-                // ✅ 2. Gabungkan item baru (existing + new)
+                // 2. Proses existing items
                 if ($request->has('existing_items')) {
                     foreach ($request->existing_items as $item) {
-                        $combinedItems[] = $item;
+                        $combinedItems[] = [
+                            'nama' => $item['kode_barang'], // Simpan kode sebagai nama
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                            'harga' => $item['harga']
+                        ];
                     }
                 }
 
+                // 3. Proses new items
                 if ($request->has('new_items')) {
                     foreach ($request->new_items as $item) {
-                        $combinedItems[] = $item;
+                        $combinedItems[] = [
+                            'nama' => $item['kode_barang'], // Simpan kode sebagai nama
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                            'harga' => $item['harga']
+                        ];
                     }
                 }
 
-                // ✅ 3. Hitung ulang dan kurangi stok sesuai input baru
+                // 4. Validasi stok dan hitung total
                 $total = 0;
                 $jumlahItem = 0;
+                $finalItems = [];
 
                 foreach ($combinedItems as $item) {
                     $kodeBarang = $item['kode_barang'];
@@ -210,34 +220,27 @@ class PengeluaranController extends Controller
                         if ($barang->jumlah < $jumlah) {
                             throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup.");
                         }
-
                         $barang->decrement('jumlah', $jumlah);
+
+                        // Tambahkan nama barang yang sebenarnya
+                        $item['nama'] = $barang->nama_barang;
                     }
 
                     $total += $jumlah * $harga;
                     $jumlahItem += $jumlah;
-
-                    $namaBarang = $barang ? $barang->nama_barang : $kodeBarang;
-                    $item['nama'] = $namaBarang;
-                    $item['harga'] = $harga;
-                    $item['jumlah'] = $jumlah;
-
-                    $combinedItemsFinal[] = $item;
+                    $finalItems[] = $item;
                 }
 
-
-                $updateData['daftar_barang'] = $combinedItems;
-
+                $updateData['daftar_barang'] = json_encode($finalItems);
                 $updateData['total'] = $total;
                 $updateData['jumlah_item'] = $jumlahItem;
             }
 
-            // ✅ 4. File upload jika ada
+            // 5. Upload bukti pembayaran
             if ($request->hasFile('bukti_pembayaran')) {
                 if ($pengeluaran->bukti_pembayaran) {
                     Storage::disk('public')->delete($pengeluaran->bukti_pembayaran);
                 }
-
                 $updateData['bukti_pembayaran'] = $request->file('bukti_pembayaran')->store('pengeluaran_bukti', 'public');
             }
 
