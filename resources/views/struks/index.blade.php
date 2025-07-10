@@ -600,7 +600,8 @@
                 }
 
                 @if(request('edit'))
-                url.searchParams.set('edit', '{{ request('edit') }}');
+                url.searchParams.set('edit', '{{ request('
+                    edit ') }}');
                 @endif
 
                 window.location.href = url.toString();
@@ -614,7 +615,8 @@
                 url.searchParams.delete('search');
 
                 @if(request('edit'))
-                url.searchParams.set('edit', '{{ request('edit') }}');
+                url.searchParams.set('edit', '{{ request('
+                    edit ') }}');
                 @endif
 
                 window.location.href = url.toString();
@@ -819,11 +821,12 @@
             }
 
             addItemRowToModal({
-                kode: kodeBarang,
-                nama,
+                nama_barang: nama,
+                nama: kodeBarang,
                 jumlah,
                 harga
             });
+
             namaInput.value = '';
             namaInput.dataset.kode = '';
             jumlahInput.value = '';
@@ -843,13 +846,17 @@
         itemRow.className = 'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
 
         itemRow.innerHTML = `
-        <div class="col-span-5 flex flex-col">
-            <input type="text" value="${item.nama_barang || '-'}"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-base"
-                readonly>
-            <input type="text" name="nama[]" value="${item.nama || ''}"
-                class="w-fit border border-indigo-200 rounded px-2 py-1 mt-1 bg-indigo-50 text-xs font-mono text-indigo-700"
-                readonly>
+            <div class="col-span-5 flex flex-col">
+        <!-- Nama Barang (untuk ditampilkan) -->
+        <input type="text" value="${item.nama_barang || '-'}"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-base"
+            readonly>
+        
+        <!-- Kode Barang (yang dikirim ke backend) -->
+        <input type="text" name="nama[]" value="${item.nama || item.kode || ''}"
+            class="w-fit border border-indigo-200 rounded px-2 py-1 mt-1 bg-indigo-50 text-xs font-mono text-indigo-700"
+            readonly>
+    </div>
         </div>
         <div class="col-span-2">
             <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
@@ -1088,7 +1095,9 @@
             items.forEach(item => item.classList.remove('bg-indigo-100'));
             if (index >= 0) {
                 items[index].classList.add('bg-indigo-100');
-                items[index].scrollIntoView({ block: 'nearest' });
+                items[index].scrollIntoView({
+                    block: 'nearest'
+                });
             }
         });
     }
