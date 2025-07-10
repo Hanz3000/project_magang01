@@ -882,17 +882,17 @@
                             <tr class="item-row" data-item="0">
                                 <td>
                                     <div class="input-group">
-                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStokIncome(this)">
+                                        <select name="items[0][nama]" class="select-barang" required>
                                             <option value="">Pilih Barang</option>
                                             @foreach ($barangList as $barang)
-                                            <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
-                                                {{ $barang->nama_barang }} ({{ $barang->kode_barang }}) - Stok: {{ $barang->jumlah }}
+                                            <option value="{{ $barang->kode_barang }}">
+                                                {{ $barang->nama_barang }} ({{ $barang->kode_barang }})
                                             </option>
                                             @endforeach
                                         </select>
-                                        <span class="stok-info">Stok: -</span>
                                     </div>
                                 </td>
+
                                 <td>
                                     <div class="input-group">
                                         <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>

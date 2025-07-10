@@ -21,8 +21,8 @@ class StrukController extends Controller
             $search = strtolower($request->input('search'));
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('LOWER(nama_toko) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(nomor_struk) LIKE ?', ["%{$search}%"])
-                  ->orWhereRaw('LOWER(CAST(items AS TEXT)) LIKE ?', ["%{$search}%"]);
+                    ->orWhereRaw('LOWER(nomor_struk) LIKE ?', ["%{$search}%"])
+                    ->orWhereRaw('LOWER(CAST(items AS TEXT)) LIKE ?', ["%{$search}%"]);
             });
         }
 
@@ -56,7 +56,7 @@ class StrukController extends Controller
             'tanggal_struk' => 'required|date',
             'tanggal_keluar' => 'nullable|date',
             'items' => 'required|array|min:1',
-            'items.*.nama' => 'required|exists:barangs,kode_barang',
+            'items.*.nama' => 'required|string', // sebelumnya 'exists', sekarang hanya 'string'
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.harga' => 'required|numeric|min:0',
             'total_harga' => 'required|numeric|min:0',
@@ -72,8 +72,23 @@ class StrukController extends Controller
         DB::beginTransaction();
         try {
             foreach ($validatedData['items'] as $item) {
-                $barang = Barang::where('kode_barang', $item['nama'])->firstOrFail();
-                $barang->jumlah += $item['jumlah'];
+                $kodeBarang = $item['nama'];
+                $jumlah = $item['jumlah'];
+
+                $barang = Barang::where('kode_barang', $kodeBarang)->first();
+
+                if ($barang) {
+                    // Barang sudah ada, update jumlah
+                    $barang->jumlah += $jumlah;
+                } else {
+                    // Barang belum ada, buat otomatis
+                    $barang = new Barang();
+                    $barang->kode_barang = $kodeBarang;
+                    $barang->nama_barang = $kodeBarang; // bisa ganti dengan input 'nama_barang' jika tersedia
+                    $barang->kategori = 'Lainnya'; // default kategori, bisa disesuaikan
+                    $barang->jumlah = $jumlah;
+                }
+
                 $barang->save();
             }
 
@@ -88,7 +103,7 @@ class StrukController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('struks.index')->with('success', 'Struk berhasil disimpan dan stok telah ditambahkan.');
+            return redirect()->route('struks.index')->with('success', 'Struk berhasil disimpan dan stok diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
             if ($fotoFilename) {
@@ -97,6 +112,7 @@ class StrukController extends Controller
             return back()->withErrors('Gagal menyimpan struk: ' . $e->getMessage())->withInput();
         }
     }
+
 
     public function edit(Struk $struk)
     {
@@ -113,7 +129,7 @@ class StrukController extends Controller
             'tanggal_struk' => 'required|date',
             'tanggal_keluar' => 'nullable|date',
             'items' => 'required|array|min:1',
-            'items.*.nama' => 'required|exists:barangs,kode_barang',
+            'items.*.nama' => 'required|exists:master_barangs,kode_barang',
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.harga' => 'required|numeric|min:0',
             'total_harga' => 'required|numeric|min:0',
@@ -270,7 +286,7 @@ class StrukController extends Controller
         $struk = Struk::findOrFail($id);
 
         $request->validate([
-            'nama.*' => 'required|exists:barangs,kode_barang',
+            'nama.*' => 'required|exists:master_barangs,kode_barang',
             'jumlah.*' => 'required|integer|min:1',
             'harga.*' => 'required|numeric|min:0',
         ]);
@@ -326,7 +342,7 @@ class StrukController extends Controller
         $struk = Struk::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required|exists:barangs,kode_barang',
+            'nama' => 'required|exists:master_barangs,kode_barang',
             'jumlah' => 'required|integer|min:1',
             'harga' => 'required|numeric|min:0',
         ]);
