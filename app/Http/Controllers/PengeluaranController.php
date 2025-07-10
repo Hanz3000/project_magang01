@@ -144,13 +144,19 @@ class PengeluaranController extends Controller
         ];
 
         if ($pengeluaran->struk_id === null) {
+            $rules['existing_items.*.kode_barang'] = 'required|string';
             $rules['existing_items.*.nama'] = 'required|string';
             $rules['existing_items.*.jumlah'] = 'required|integer|min:1';
             $rules['existing_items.*.harga'] = 'required|integer|min:0';
-            $rules['new_items.*.nama'] = 'required|string';
+
+
+            $rules['new_items.*.kode_barang'] = 'required|string'; // Tambahkan ini
+            $rules['new_items.*.nama'] = 'nullable|string'; // Optional, karena tidak dipakai saat proses simpan
+
             $rules['new_items.*.jumlah'] = 'required|integer|min:1';
             $rules['new_items.*.harga'] = 'required|integer|min:0';
         }
+
 
         $validated = $request->validate($rules);
 
@@ -195,20 +201,33 @@ class PengeluaranController extends Controller
                 $jumlahItem = 0;
 
                 foreach ($combinedItems as $item) {
-                    $total += $item['jumlah'] * $item['harga'];
-                    $jumlahItem += $item['jumlah'];
+                    $kodeBarang = $item['kode_barang'];
+                    $jumlah = $item['jumlah'];
+                    $harga = $item['harga'];
 
-                    $barang = Barang::where('kode_barang', $item['nama'])->first();
+                    $barang = Barang::where('kode_barang', $kodeBarang)->first();
                     if ($barang) {
-                        if ($barang->jumlah < $item['jumlah']) {
+                        if ($barang->jumlah < $jumlah) {
                             throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup.");
                         }
 
-                        $barang->decrement('jumlah', $item['jumlah']);
+                        $barang->decrement('jumlah', $jumlah);
                     }
+
+                    $total += $jumlah * $harga;
+                    $jumlahItem += $jumlah;
+
+                    $namaBarang = $barang ? $barang->nama_barang : $kodeBarang;
+                    $item['nama'] = $namaBarang;
+                    $item['harga'] = $harga;
+                    $item['jumlah'] = $jumlah;
+
+                    $combinedItemsFinal[] = $item;
                 }
 
-                $updateData['daftar_barang'] = json_encode($combinedItems);
+
+                $updateData['daftar_barang'] = $combinedItems;
+
                 $updateData['total'] = $total;
                 $updateData['jumlah_item'] = $jumlahItem;
             }

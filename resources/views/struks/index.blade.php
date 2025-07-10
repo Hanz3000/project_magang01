@@ -1109,23 +1109,46 @@
         const barangItems = document.querySelectorAll('.barang-item');
         const hargaInput = document.getElementById('modalNewItemHarga');
 
+        // Fungsi untuk update dropdown agar hanya tampil barang yang belum dipakai
+        function updateAvailableBarangDropdown() {
+            const selectedKodeList = Array.from(document.querySelectorAll('input[name="nama[]"]'))
+                .map(input => input.value); // value = kode_barang
+
+            barangItems.forEach(item => {
+                const kode = item.dataset.kode;
+                if (selectedKodeList.includes(kode)) {
+                    item.style.display = 'none';
+                } else {
+                    item.style.display = 'flex';
+                }
+            });
+        }
+
         inputElement.addEventListener('click', function(e) {
             e.preventDefault();
             dropdown.classList.remove('hidden');
+            updateAvailableBarangDropdown(); // Perbarui daftar sebelum muncul
             filterInput.focus();
         });
 
+        // Klik di luar dropdown
         document.addEventListener('click', function(e) {
             if (!inputElement.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.classList.add('hidden');
             }
         });
 
+        // Filter barang di dropdown
         filterInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             barangItems.forEach(item => {
                 const nama = item.dataset.nama.toLowerCase();
-                if (nama.includes(searchTerm)) {
+                const kode = item.dataset.kode;
+                const selectedKodeList = Array.from(document.querySelectorAll('input[name="nama[]"]'))
+                    .map(input => input.value);
+
+                // Tampilkan hanya jika cocok dengan search dan belum dipilih
+                if (nama.includes(searchTerm) && !selectedKodeList.includes(kode)) {
                     item.style.display = 'flex';
                 } else {
                     item.style.display = 'none';
@@ -1133,6 +1156,7 @@
             });
         });
 
+        // Saat item barang diklik
         barangItems.forEach(item => {
             item.addEventListener('click', function() {
                 inputElement.value = this.dataset.nama;
