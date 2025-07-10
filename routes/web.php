@@ -32,27 +32,6 @@ Route::middleware('auth')->group(function () {
     // ------------------- DASHBOARD -------------------
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // ------------------- MASTER BARANG -------------------
-    Route::prefix('master-barang')->group(function () {
-        Route::delete('/bulk-delete', [MasterBarangController::class, 'bulkDelete'])->name('master-barang.bulk-delete');
-        Route::get('/', [MasterBarangController::class, 'index'])->name('master-barang.index');
-        Route::get('/create', [MasterBarangController::class, 'create'])->name('master-barang.create');
-        Route::post('/', [MasterBarangController::class, 'store'])->name('master-barang.store');
-        Route::get('/{master_barang}/edit', [MasterBarangController::class, 'edit'])->name('master-barang.edit');
-        Route::put('/{master_barang}', [MasterBarangController::class, 'update'])->name('master-barang.update');
-        Route::delete('/{master_barang}', [MasterBarangController::class, 'destroy'])->name('master-barang.destroy');
-    });
-
-    // ------------------- MASTER PEGAWAI -------------------
-    Route::prefix('pegawai')->group(function () {
-        Route::delete('/bulk-delete', [PegawaiController::class, 'bulkDelete'])->name('pegawai.bulk-delete');
-        Route::get('/', [PegawaiController::class, 'index'])->name('pegawai.index');
-        Route::get('/create', [PegawaiController::class, 'create'])->name('pegawai.create');
-        Route::post('/', [PegawaiController::class, 'store'])->name('pegawai.store');
-        Route::get('/{pegawai}/edit', [PegawaiController::class, 'edit'])->name('pegawai.edit');
-        Route::put('/{pegawai}', [PegawaiController::class, 'update'])->name('pegawai.update');
-        Route::delete('/{pegawai}', [PegawaiController::class, 'destroy'])->name('pegawai.destroy');
-    });
 
     // ------------------- TRANSAKSI GABUNGAN -------------------
     Route::prefix('transaksi')->group(function () {

@@ -482,7 +482,7 @@
                     @method('PUT')
                     <div class="grid grid-cols-12 gap-4 pb-3 mb-4 border-b border-gray-200">
                         <div class="col-span-5">
-                            <label class="block text-sm font-medium text-gray-700">Nama Barang</label>
+                            <label class="block text-sm font-medium text-gray-700 text-center">Nama Barang</label>
                         </div>
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 text-center">Jumlah</label>
