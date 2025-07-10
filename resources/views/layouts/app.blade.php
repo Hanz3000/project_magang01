@@ -540,106 +540,88 @@
                     </div>
                 </div>
             </div>
+<!-- Sidebar Menu -->
+<nav class="py-4 px-1 flex-1 overflow-y-auto">
+    <ul class="space-y-2 text-sm">
+        <!-- Dashboard -->
+        <li>
+            <a href="{{ url('/dashboard') }}"
+                class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-600/30 hover:to-purple-600/30">
+                <div
+                    class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md group-hover:scale-105 transition-transform duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                </div>
+                <div x-show="sidebarOpen" x-transition
+                    class="whitespace-nowrap text-left">
+                    <span class="font-medium block">Dashboard</span>
+                    <p class="text-xs text-slate-300">Beranda sistem</p>
+                </div>
+            </a>
+        </li>
 
-            <!-- Sidebar Menu -->
-            <nav class="py-4 px-1 flex-1 overflow-y-auto">
-                <ul class="space-y-2 text-sm">
-                    <!-- Dashboard -->
-                    <li>
-                        <a href="{{ url('/dashboard') }}"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-600/30 hover:to-purple-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            </div>
-                            <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 delay-100"
-                                x-transition:leave="transition ease-in duration-200"
-                                class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Dashboard</span>
-                                <p class="text-xs text-slate-300">Beranda sistem</p>
-                            </div>
-                        </a>
-                    </li>
+        <!-- Pemasukan -->
+        <li>
+            <a href="{{ route('struks.index') }}"
+                class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-green-600/30 hover:to-emerald-600/30">
+                <div
+                    class="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-md group-hover:scale-105 transition-transform duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div x-show="sidebarOpen" x-transition
+                    class="whitespace-nowrap text-left">
+                    <span class="font-medium block">Pemasukan</span>
+                    <p class="text-xs text-slate-300">Data pemasukan</p>
+                </div>
+            </a>
+        </li>
 
-                    <!-- Manajemen Struk -->
-                    <li x-data="{ open: false }">
-                        <button @click="sidebarOpen = true; open = !open"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg w-full hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-green-600/30 hover:to-emerald-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
-                            </div>
-                            <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 delay-150"
-                                x-transition:leave="transition ease-in duration-200"
-                                class="flex-1 whitespace-nowrap text-left">
-                                <span class="font-medium block">Manajemen Struk</span>
-                                <p class="text-xs text-slate-300">Kelola transaksi</p>
-                            </div>
-                            <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 delay-175"
-                                x-transition:leave="transition ease-in duration-200">
-                                <svg :class="{ 'rotate-180': open }"
-                                    class="w-4 h-4 text-white transform transition-transform duration-300" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </button>
+        <!-- Pengeluaran -->
+        <li>
+            <a href="{{ route('pengeluarans.index') }}"
+                class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-red-600/30 hover:to-pink-600/30">
+                <div
+                    class="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-md group-hover:scale-105 transition-transform duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                </div>
+                <div x-show="sidebarOpen" x-transition
+                    class="whitespace-nowrap text-left">
+                    <span class="font-medium block">Pengeluaran</span>
+                    <p class="text-xs text-slate-300">Data pengeluaran</p>
+                </div>
+            </a>
+        </li>
 
-                        <!-- Submenu -->
-                        <div x-show="open && sidebarOpen" x-transition:enter="transition ease-out duration-300"
-                            x-transition:enter-start="opacity-0 translate-y-2"
-                            x-transition:enter-end="opacity-100 translate-y-0"
-                            x-transition:leave="transition ease-in duration-200"
-                            x-transition:leave-start="opacity-100 translate-y-0"
-                            x-transition:leave-end="opacity-0 translate-y-2" class="ml-11 mt-2 space-y-2 text-sm">
-                            <a href="{{ route('struks.index') }}"
-                                class="flex items-center gap-3 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all duration-200">
-                                <div
-                                    class="w-2 h-2 bg-blue-400 rounded-full group-hover:scale-110 transition-transform duration-200">
-                                </div>
-                                <span class="whitespace-nowrap">Pemasukan</span>
-                            </a>
-                            <a href="{{ route('pengeluarans.index') }}"
-                                class="flex items-center gap-3 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-md transition-all duration-200">
-                                <div
-                                    class="w-2 h-2 bg-red-400 rounded-full group-hover:scale-110 transition-transform duration-200">
-                                </div>
-                                <span class="whitespace-nowrap">Pengeluaran</span>
-                            </a>
-                        </div>
-                    </li>
+        <!-- Tambah Transaksi -->
+        <li>
+            <a href="{{ route('transaksi.create') }}"
+                class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-amber-600/30 hover:to-orange-600/30">
+                <div
+                    class="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-md group-hover:scale-105 transition-transform duration-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                </div>
+                <div x-show="sidebarOpen" x-transition
+                    class="whitespace-nowrap text-left">
+                    <span class="font-medium block">Tambah Transaksi</span>
+                    <p class="text-xs text-slate-300">Buat transaksi baru</p>
+                </div>
+            </a>
+        </li>
 
-                    <!-- Tambah Struk -->
-                    <li>
-                        <a href="{{ route('transaksi.create') }}"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-amber-600/30 hover:to-orange-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 delay-200"
-                                x-transition:leave="transition ease-in duration-200"
-                                class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Tambah Transaksi</span>
-                                <p class="text-xs text-slate-300">Buat transaksi baru</p>
-                            </div>
-                        </a>
-                    </li>
+    </ul>
+</nav>
 
-                    <!-- Master Section -->
-
-                </ul>
-            </nav>
         </aside>
 
         <!-- Main Content -->
