@@ -212,24 +212,43 @@ class PengeluaranController extends Controller
 
                 foreach ($combinedItems as $item) {
                     $kodeBarang = $item['kode_barang'];
-                    $jumlah = $item['jumlah'];
+                    $jumlahBaru = $item['jumlah'];
                     $harga = $item['harga'];
 
                     $barang = Barang::where('kode_barang', $kodeBarang)->first();
                     if ($barang) {
-                        if ($barang->jumlah < $jumlah) {
-                            throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup.");
-                        }
-                        $barang->decrement('jumlah', $jumlah);
+                        // Ambil jumlah sebelumnya
+                        $jumlahLama = 0;
+                        foreach ($oldItems as $old) {
+                            $kodeLama = $old['kode_barang'] ?? $old['nama']; // fallback ke 'nama' jika 'kode_barang' tidak ada
 
-                        // Tambahkan nama barang yang sebenarnya
+                            if ($kodeLama == $kodeBarang) {
+                                $jumlahLama = $old['jumlah'];
+                                break;
+                            }
+                        }
+
+
+                        // Hitung stok tersedia (stok saat ini + yang dikembalikan dari edit)
+                        $stokTersedia = $barang->jumlah + $jumlahLama;
+
+                        if ($stokTersedia < $jumlahBaru) {
+                            throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup. Stok tersedia: {$stokTersedia}, diminta: {$jumlahBaru}");
+                        }
+
+                        // Update stok
+                        $barang->jumlah = $stokTersedia - $jumlahBaru;
+                        $barang->save();
+
                         $item['nama'] = $barang->nama_barang;
                     }
 
-                    $total += $jumlah * $harga;
-                    $jumlahItem += $jumlah;
+                    $total += $jumlahBaru * $harga;
+                    $jumlahItem += $jumlahBaru;
                     $finalItems[] = $item;
                 }
+
+
 
                 $updateData['daftar_barang'] = json_encode($finalItems);
                 $updateData['total'] = $total;

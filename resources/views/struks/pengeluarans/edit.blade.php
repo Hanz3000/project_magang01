@@ -271,9 +271,9 @@
                 if (jumlah > stok) {
                     // Tampilkan peringatan lebih informatif
                     alert(`Stok tidak mencukupi. 
-           Jumlah diminta: ${jumlah} 
-           Stok tersedia: ${stok}
-           Stok awal: ${item.querySelector('.stok-tersedia').getAttribute('data-awal')}`);
+       Jumlah diminta: ${jumlah} 
+       Stok tersedia: ${stok}
+       Stok awal: ${item.querySelector('.stok-tersedia').getAttribute('data-awal')}`);
                     return;
                 }
 
@@ -322,58 +322,47 @@
                 validateAll();
             });
 
-            let initialLoad = true;
-
-            // 🔸 Existing item: perubahan jumlah
-            // Existing item: perubahan jumlah
+            // 🔸 Updated logic for existing items
             document.querySelectorAll('.existing-jumlah-input').forEach(input => {
                 const item = input.closest('.existing-item');
                 const kode = item.getAttribute('data-kode');
-                const maxStok = parseInt(item.getAttribute('data-stok')) || 0;
 
-                if (!window.stokSementara) window.stokSementara = new Map();
-                if (!stokSementara.has(kode)) {
-                    stokSementara.set(kode, maxStok);
-                }
+                const stokDisplay = item.querySelector('.stok-tersedia');
+                const stokAwal = parseInt(stokDisplay?.getAttribute('data-awal')) || 0;
+                const jumlahAwal = parseInt(input.defaultValue) || 0;
 
-                const jumlahAwal = parseInt(input.value) || 0;
-
-                // ❗ Jangan duplikat pengurangan stok
-                stokSementara.set(kode, stokSementara.get(kode) - jumlahAwal);
-
-                input.setAttribute('data-prev', jumlahAwal);
+                // Simpan jumlah awal di attribute
+                input.setAttribute('data-jumlah-awal', jumlahAwal);
 
                 input.addEventListener('input', () => {
-                    const prev = parseInt(input.getAttribute('data-prev')) || 0;
-                    const current = parseInt(input.value) || 0;
-                    const stokSaatIni = stokSementara.get(kode) ?? 0;
+                    const jumlahBaru = parseInt(input.value) || 0;
+                    const stokMaster = jumlahAwal + stokAwal;
+                    const sisa = stokMaster - jumlahBaru;
 
-                    const stokSetelah = stokSaatIni + prev - current;
-
-                    if (stokSetelah < 0) {
-                        input.value = prev;
+                    if (sisa < 0) {
+                        alert(`❌ Stok tidak cukup!\nStok awal: ${stokMaster}\nDiminta: ${jumlahBaru}`);
+                        input.value = jumlahAwal;
                         input.classList.add('border-red-500');
-                        alert('Jumlah melebihi stok tersedia.');
+                        submitBtn.disabled = true;
                         return;
                     }
 
-                    stokSementara.set(kode, stokSetelah);
-                    input.setAttribute('data-prev', current);
                     input.classList.remove('border-red-500');
+                    submitBtn.disabled = false;
 
-                    const stokTampilan = item.querySelector('.stok-tersedia');
-                    if (stokTampilan) {
-                        stokTampilan.textContent = stokSetelah;
-                        stokTampilan.setAttribute('data-awal', stokSetelah);
+                    // Update tampilan stok sisa
+                    if (stokDisplay) {
+                        stokDisplay.textContent = sisa;
+                        stokDisplay.setAttribute('data-awal', sisa);
                     }
 
                     calculateTotal();
                     validateAll();
                 });
 
+                // Jalankan validasi awal
                 input.dispatchEvent(new Event('input'));
             });
-
 
             jumlahInputBaru.addEventListener('input', () => {
                 const option = barangSelect.options[barangSelect.selectedIndex];
@@ -381,19 +370,34 @@
 
                 const kode = option.getAttribute('data-kode');
                 const stok = stokSementara.get(kode) || 0;
-                let jumlah = parseInt(jumlahInputBaru.value) || 0;
+                const val = jumlahInputBaru.value.trim();
 
-                // Hindari angka negatif/0
-                if (jumlah < 1) jumlah = 1;
+                // Jika masih kosong (user sedang menghapus angka), biarkan
+                if (val === '') {
+                    jumlahInputBaru.classList.remove('border-red-500');
+                    return;
+                }
 
-                // Validasi melebihi stok
-                if (jumlah > stok) {
-                    jumlahInputBaru.value = stok;
+                const jumlah = parseInt(val);
+
+                if (isNaN(jumlah) || jumlah < 1) {
+                    jumlahInputBaru.classList.add('border-red-500');
+                } else if (jumlah > stok) {
                     jumlahInputBaru.classList.add('border-red-500');
                 } else {
-                    jumlahInputBaru.value = jumlah;
                     jumlahInputBaru.classList.remove('border-red-500');
                 }
+            });
+
+
+            // ⬅️ Pindahkan di sini (bukan di dalam jumlahInputBaru listener)
+            document.querySelectorAll('.hapus-item').forEach(button => {
+                button.addEventListener('click', () => {
+                    const item = button.closest('.existing-item');
+                    item.remove();
+                    calculateTotal();
+                    validateAll();
+                });
             });
 
         });
