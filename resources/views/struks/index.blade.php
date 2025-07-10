@@ -171,8 +171,9 @@
                     <tbody class="divide-y divide-gray-200">
                         @forelse ($struks as $index => $struk)
                         @php
-                        $items = json_decode($struk->items, true);
-                        $totalHarga = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
+                            $items = is_string($struk->items) ? json_decode($struk->items, true) : [];
+                            if (!is_array($items)) $items = [];
+                            $totalHarga = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
                         @endphp
 
                         <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
@@ -197,7 +198,7 @@
                                         <span
                                             class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
                                         <span class="text-gray-700 break-words">
-                                            {{ $item['nama_barang'] }}
+                                            {{ $item['nama_barang'] ?? '-' }}
                                         </span>
                                     </div>
                                     @endforeach
@@ -294,7 +295,7 @@
                                             <div class="flex items-center space-x-4 item-row">
                                                 <input type="hidden" name="item_index[]" value="{{ $idx }}">
                                                 <div class="flex-1 relative">
-                                                    <input type="text" name="nama[]" value="{{ $item['nama'] ?? '' }}"
+                                                    <input type="text" name="nama[]" value="{{ $item['nama_barang'] ?? '' }}"
                                                         class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100"
                                                         readonly>
                                                 </div>
@@ -332,10 +333,17 @@
                                                     class="item-search w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white"
                                                     id="modalNewItemNama">
                                                     <option value="" disabled selected>Pilih Barang</option>
+                                                    @php
+                                                    $existingItems = collect($struks)->flatMap(function ($struk) {
+                                                        return is_string($struk->items) ? json_decode($struk->items, true) ?? [] : [];
+                                                    })->pluck('nama_barang')->unique()->toArray();
+                                                    @endphp
                                                     @foreach ($barangList as $barang)
+                                                    @if (!in_array($barang->nama_barang, $existingItems))
                                                     <option value="{{ $barang->nama_barang }}"
                                                         data-price="{{ $barang->harga }}">{{ $barang->nama_barang }}
                                                     </option>
+                                                    @endif
                                                     @endforeach
                                                 </select>
                                                 <div
@@ -349,6 +357,16 @@
                                                 class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
                                                 placeholder="Harga" id="newItemHarga" min="0">
 
+                                            <button type="button" id="addItemBtn"
+                                                class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm"
+                                                onclick="addNewItemToModal()">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                </svg>
+                                                Tambah
+                                            </button>
+                                        </div>
                                     </form>
                                 </div>
                             </td>
@@ -503,7 +521,13 @@
                                             placeholder="Filter barang...">
                                     </div>
                                     <div class="divide-y divide-gray-100" id="barangListContainer">
+                                        @php
+                                        $existingItems = collect($struks)->flatMap(function ($struk) {
+                                            return is_string($struk->items) ? json_decode($struk->items, true) ?? [] : [];
+                                        })->pluck('nama_barang')->unique()->toArray();
+                                        @endphp
                                         @foreach($barangList as $barang)
+                                        @if (!in_array($barang->nama_barang, $existingItems))
                                         <div class="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex justify-between items-center barang-item"
                                             data-kode="{{ $barang->kode_barang }}"
                                             data-nama="{{ $barang->nama_barang }}" data-harga="{{ $barang->harga }}">
@@ -517,6 +541,7 @@
                                                 class="text-xs text-gray-500">Rp{{ number_format($barang->harga, 0, ',', '.') }}</span>
                                             @endif
                                         </div>
+                                        @endif
                                         @endforeach
                                     </div>
                                 </div>
@@ -536,7 +561,8 @@
                             </div>
                             <div class="col-span-2 flex justify-center">
                                 <button type="button" id="addItemBtn"
-                                    class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm">
+                                    class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm"
+                                    onclick="addNewItemToModal()">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
@@ -838,7 +864,7 @@ function loadExistingItems(strukId) {
     fetch(`/struks/${strukId}/items`)
         .then(response => response.json())
         .then(data => {
-            const items = data.items;
+            const items = data.items || [];
             container.innerHTML = '';
             items.forEach((item, index) => {
                 addItemRowToModal(item, index);
@@ -880,7 +906,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Pilih barang dari daftar
-    // ...existing code...
     document.querySelectorAll('.barang-item').forEach(item => {
         item.addEventListener('click', function() {
             document.getElementById('modalNewItemNama').value = this.dataset.nama;
@@ -891,8 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('modalNewItemJumlah').focus();
         });
     });
-    // ...existing code...
-    // ...existing code...
+
     // Sembunyikan dropdown jika klik di luar
     document.addEventListener('mousedown', function(e) {
         const input = document.getElementById('modalNewItemNama');
@@ -1006,31 +1030,35 @@ function addItemRowToModal(item = {}, index = null) {
     }
 }
 
-
 function addNewItemToModal() {
-    const namaSelect = document.getElementById('modalNewItemNama');
-    const jumlah = document.getElementById('modalNewItemJumlah').value;
-    const harga = document.getElementById('modalNewItemHarga').value;
+    const namaInput = document.getElementById('modalNewItemNama');
+    const jumlahInput = document.getElementById('modalNewItemJumlah');
+    const hargaInput = document.getElementById('modalNewItemHarga');
+    const kodeBarang = namaInput.dataset.kode || '';
 
-    if (!namaSelect.value || !jumlah || !harga) {
-        alert('Mohon lengkapi semua field untuk item baru');
+    if (!kodeBarang || !namaInput.value.trim() || !jumlahInput.value.trim() || !hargaInput.value.trim()) {
+        alert('Mohon pilih barang dari daftar dan lengkapi semua field');
         return;
     }
 
-    const newItem = {
-        nama: namaSelect.value,
-        jumlah,
-        harga
-    };
-    addItemRowToModal(newItem);
+    addItemRowToModal({
+        kode: kodeBarang,
+        nama: namaInput.value.trim(),
+        jumlah: jumlahInput.value.trim(),
+        harga: hargaInput.value.trim()
+    });
     clearNewItemFields();
     updateModalTotalPrice();
 }
 
 function clearNewItemFields() {
-    document.getElementById('modalNewItemNama').value = '';
-    document.getElementById('modalNewItemJumlah').value = '';
-    document.getElementById('modalNewItemHarga').value = '';
+    const namaInput = document.getElementById('modalNewItemNama');
+    const jumlahInput = document.getElementById('modalNewItemJumlah');
+    const hargaInput = document.getElementById('modalNewItemHarga');
+    namaInput.value = '';
+    namaInput.dataset.kode = '';
+    jumlahInput.value = '';
+    hargaInput.value = '';
 }
 
 function removeItemFromModal(button) {
@@ -1128,58 +1156,9 @@ function confirmDeleteItem(strukId, index) {
     }
 }
 
-function addNewItemField() {
-    const newItemNama = document.getElementById('newItemNama');
-    const newItemJumlah = document.getElementById('newItemJumlah');
-    const newItemHarga = document.getElementById('newItemHarga');
-    const itemsContainer = document.getElementById('itemsContainer');
-
-    if (newItemNama.value && newItemJumlah.value.trim() && newItemHarga.value.trim()) {
-        const newItemRow = document.createElement('div');
-        newItemRow.classList.add('flex', 'items-center', 'space-x-4', 'item-row');
-
-        newItemRow.innerHTML = `
-                <div class="flex-1 relative">
-                    <input type="text" name="nama[]" value="${newItemNama.value}" 
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100" 
-                        readonly>
-                </div>
-                <input name="jumlah[]" type="number" value="${newItemJumlah.value}" 
-                    class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
-                    placeholder="Jumlah" min="1">
-                <input name="harga[]" type="number" value="${newItemHarga.value}" 
-                    class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" 
-                    placeholder="Harga" min="0">
-                <button type="button" onclick="this.closest('.item-row').remove()" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                </button>
-            `;
-        itemsContainer.appendChild(newItemRow);
-
-        newItemNama.selectedIndex = 0;
-        newItemJumlah.value = '';
-        newItemHarga.value = '';
-
-        // Update total price
-        let total = 0;
-        itemsContainer.querySelectorAll('.item-row').forEach(row => {
-            const jumlah = parseFloat(row.querySelector('input[name="jumlah[]"]').value) || 0;
-            const harga = parseFloat(row.querySelector('input[name="harga[]"]').value) || 0;
-            total += jumlah * harga;
-        });
-        itemsContainer.querySelector('.flex.justify-end').textContent =
-            `Total: Rp${total.toLocaleString('id-ID')}`;
-    } else {
-        alert('Harap isi semua kolom untuk item baru (Nama, Jumlah, Harga).');
-    }
-}
-
-
 function initAutocomplete(inputElement) {
     const resultsContainer = inputElement.nextElementSibling;
-    const datalistOptions = document.getElementById('barangList').options;
+    const datalistOptions = Array.from(document.querySelectorAll('#barangDropdown .barang-item'));
 
     inputElement.addEventListener('input', function(e) {
         const searchTerm = e.target.value.trim().toLowerCase();
@@ -1189,66 +1168,43 @@ function initAutocomplete(inputElement) {
             return;
         }
 
-        // Filter options from datalist
-        const filteredOptions = Array.from(datalistOptions)
-            .filter(option => option.value.toLowerCase().includes(searchTerm))
-            .slice(0, 10); // Limit to 10 results
-
         resultsContainer.innerHTML = '';
+
+        const filteredOptions = datalistOptions.filter(item => item.dataset.nama.toLowerCase().includes(searchTerm)).slice(0, 10);
 
         if (filteredOptions.length === 0) {
             const noResult = document.createElement('div');
             noResult.className = 'px-4 py-2 text-gray-500 text-center';
             noResult.textContent = 'Barang yang Anda cari tidak tersedia';
             resultsContainer.appendChild(noResult);
-
-            // Remove the "show all" button if not needed
         } else {
-            filteredOptions.forEach(option => {
-                const item = document.createElement('div');
-                item.className =
-                    'px-4 py-2 hover:bg-indigo-50 cursor-pointer flex items-center justify-between';
-
-                // Remove the price display if it's 0
-                const price = option.dataset.price || '0';
-                const showPrice = price !== '0' ?
-                    `Rp${parseInt(price).toLocaleString('id-ID')}` : '';
-
-                item.innerHTML = `
-                    <span>${option.value}</span>
-                    ${showPrice ? `<span class="text-xs text-gray-500">${showPrice}</span>` : ''}
+            filteredOptions.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'px-4 py-2 hover:bg-indigo-50 cursor-pointer flex items-center justify-between';
+                div.innerHTML = `
+                    <span>${item.dataset.nama}</span>
+                    <span class="text-xs text-gray-500">${item.dataset.harga ? 'Rp' + parseInt(item.dataset.harga).toLocaleString('id-ID') : ''}</span>
                 `;
-
-                item.addEventListener('click', function() {
-                    inputElement.value = option.value;
-
-                    // Auto-fill price only if not 0
-                    const priceInput = inputElement.closest('.grid.grid-cols-12')
-                        .querySelector(
-                            '#modalNewItemHarga');
-                    if (priceInput && option.dataset.price && option.dataset.price !==
-                        '0') {
-                        priceInput.value = option.dataset.price;
-                    }
-
+                div.addEventListener('click', function() {
+                    inputElement.value = item.dataset.nama;
+                    inputElement.dataset.kode = item.dataset.kode;
+                    document.getElementById('modalNewItemHarga').value = item.dataset.harga || '';
                     resultsContainer.classList.add('hidden');
+                    document.getElementById('modalNewItemJumlah').focus();
                 });
-
-                resultsContainer.appendChild(item);
+                resultsContainer.appendChild(div);
             });
         }
 
         resultsContainer.classList.remove('hidden');
     });
 
-    // Hide results when clicking outside
     document.addEventListener('click', function(e) {
         if (!inputElement.contains(e.target) && !resultsContainer.contains(e.target)) {
             resultsContainer.classList.add('hidden');
         }
     });
 
-    // Keyboard navigation
     inputElement.addEventListener('keydown', function(e) {
         const items = resultsContainer.querySelectorAll('div');
         if (!items.length) return;
@@ -1271,9 +1227,7 @@ function initAutocomplete(inputElement) {
         items.forEach(item => item.classList.remove('bg-indigo-100'));
         if (index >= 0) {
             items[index].classList.add('bg-indigo-100');
-            items[index].scrollIntoView({
-                block: 'nearest'
-            });
+            items[index].scrollIntoView({ block: 'nearest' });
         }
     });
 }
@@ -1285,7 +1239,6 @@ function initBarangDropdown() {
     const barangItems = document.querySelectorAll('.barang-item');
     const hargaInput = document.getElementById('modalNewItemHarga');
 
-    // Update the display of each item to hide price if 0
     barangItems.forEach(item => {
         const price = item.dataset.harga;
         const priceElement = item.querySelector('span.text-xs');
@@ -1293,18 +1246,17 @@ function initBarangDropdown() {
             priceElement.style.display = 'none';
         }
     });
+
     inputElement.addEventListener('focus', function() {
-        dropdown.classList.add('show');
+        dropdown.classList.remove('hidden');
     });
 
-    // Sembunyikan dropdown ketika klik di luar
     document.addEventListener('click', function(e) {
         if (!inputElement.contains(e.target) && !dropdown.contains(e.target)) {
-            dropdown.classList.remove('show');
+            dropdown.classList.add('hidden');
         }
     });
 
-    // Filter barang berdasarkan input
     filterInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         barangItems.forEach(item => {
@@ -1317,109 +1269,15 @@ function initBarangDropdown() {
         });
     });
 
-    // Ketika item barang dipilih
     barangItems.forEach(item => {
         item.addEventListener('click', function() {
             inputElement.value = this.dataset.nama;
+            inputElement.dataset.kode = this.dataset.kode;
             hargaInput.value = this.dataset.harga;
-            dropdown.classList.remove('show');
+            dropdown.classList.add('hidden');
+            document.getElementById('modalNewItemJumlah').focus();
         });
     });
-
-    addItemBtn
-}
-
-function showAllItems() {
-    const inputElement = document.querySelector('#editModal .item-search');
-    const resultsContainer = inputElement.nextElementSibling;
-    const datalistOptions = document.getElementById('barangList').options;
-
-    resultsContainer.innerHTML = '';
-
-    Array.from(datalistOptions).forEach(option => {
-        const item = document.createElement('div');
-        item.className =
-            'px-4 py-2 hover:bg-indigo-50 cursor-pointer flex items-center justify-between';
-
-        item.innerHTML = `
-            <span>${option.value}</span>
-            <span class="text-xs text-gray-500">${option.text.match(/\(Rp(.*)\)/)[0]}</span>
-        `;
-
-        item.addEventListener('click', function() {
-            inputElement.value = option.value;
-
-            // Auto-fill price
-            const priceInput = inputElement.closest('.grid.grid-cols-12').querySelector(
-                '#modalNewItemHarga');
-            if (priceInput && option.dataset.price) {
-                priceInput.value = option.dataset.price;
-            }
-
-            resultsContainer.classList.add('hidden');
-        });
-
-        resultsContainer.appendChild(item);
-    });
-
-    resultsContainer.classList.remove('hidden');
-}
-
-function addNewItemToModal() {
-    const namaInput = document.getElementById('modalNewItemNama');
-    const jumlahInput = document.getElementById('modalNewItemJumlah');
-    const hargaInput = document.getElementById('modalNewItemHarga');
-    const datalistOptions = document.getElementById('barangList').options;
-
-    // Validasi input
-    if (!namaInput.value) {
-        alert('Silakan pilih barang dari daftar');
-        namaInput.focus();
-        return;
-    }
-
-    // Cek apakah barang yang dimasukkan ada di daftar
-    const isValidBarang = Array.from(datalistOptions).some(option =>
-        option.value.toLowerCase() === namaInput.value.toLowerCase()
-    );
-
-    if (!isValidBarang) {
-        alert('Barang yang Anda cari tidak tersedia. Silakan pilih dari daftar.');
-        namaInput.focus();
-        return;
-    }
-
-    if (!jumlahInput.value || parseInt(jumlahInput.value) < 1) {
-        alert('Jumlah barang harus lebih dari 0');
-        jumlahInput.focus();
-        return;
-    }
-
-    if (!hargaInput.value || parseInt(hargaInput.value) < 0) {
-        alert('Harga barang tidak valid');
-        hargaInput.focus();
-        return;
-    }
-
-    // Ambil data harga dari datalist jika harga belum diisi
-    if (!hargaInput.value) {
-        const selectedOption = Array.from(datalistOptions).find(option =>
-            option.value.toLowerCase() === namaInput.value.toLowerCase()
-        );
-        if (selectedOption && selectedOption.dataset.price) {
-            hargaInput.value = selectedOption.dataset.price;
-        }
-    }
-
-    const newItem = {
-        nama: namaInput.value,
-        jumlah: jumlahInput.value,
-        harga: hargaInput.value
-    };
-
-    addItemRowToModal(newItem);
-    clearNewItemFields();
-    updateModalTotalPrice();
 }
 </script>
 
@@ -1615,19 +1473,6 @@ body.pengeluaran-page .toggle-label:hover {
     text-align: center;
 }
 
-/* Style untuk tombol "Tampilkan semua barang" */
-.autocomplete-results .bg-gray-100 {
-    padding: 10px 12px;
-    text-align: center;
-    font-weight: 500;
-    border-top: 1px solid #e5e7eb;
-    transition: background-color 0.2s;
-}
-
-.autocomplete-results .bg-gray-100:hover {
-    background-color: #e5e7eb !important;
-}
-
 * {
     transition: all 0.2s ease;
 }
@@ -1642,7 +1487,7 @@ body.pengeluaran-page .toggle-label:hover {
     }
 
     100% {
-        opacity
+        opacity: 0.6;
     }
 }
 

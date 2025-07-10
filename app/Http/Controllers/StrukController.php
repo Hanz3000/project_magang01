@@ -18,22 +18,21 @@ class StrukController extends Controller
         $query = Struk::query();
 
         if ($request->filled('search')) {
-            $search = strtolower($request->search);
+            $search = strtolower($request->input('search'));
             $query->where(function ($q) use ($search) {
-                $q->whereRaw('LOWER(nama_toko) like ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(nomor_struk) like ?', ["%{$search}%"])
-                    ->orWhereRaw('LOWER(items::text) like ?', ["%{$search}%"]);
+                $q->whereRaw('LOWER(nama_toko) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(nomor_struk) LIKE ?', ["%{$search}%"])
+                  ->orWhereRaw('LOWER(CAST(items AS TEXT)) LIKE ?', ["%{$search}%"]);
             });
         }
 
         $struks = $query->latest()->paginate(10);
         $barangList = Barang::all()->keyBy('kode_barang');
 
-        // Transform items untuk menyertakan nama barang
         $struks->getCollection()->transform(function ($struk) use ($barangList) {
-            $items = json_decode($struk->items, true);
+            $items = json_decode($struk->items, true) ?? [];
             $items = array_map(function ($item) use ($barangList) {
-                $item['nama_barang'] = $barangList[$item['nama']]->nama_barang ?? $item['nama'];
+                $item['nama_barang'] = $barangList[$item['nama']]?->nama_barang ?? $item['nama'];
                 return $item;
             }, $items);
             $struk->items = json_encode($items);
@@ -42,73 +41,66 @@ class StrukController extends Controller
 
         return view('struks.index', compact('struks', 'barangList'));
     }
+
     public function create()
     {
         $barangList = Barang::all();
         return view('struks.create', compact('barangList'));
     }
 
-
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'nama_toko' => 'required|string|max:255',
-            'nomor_struk' => 'required|string|max:255',
+            'nomor_struk' => 'required|string|max:255|unique:struks,nomor_struk',
             'tanggal_struk' => 'required|date',
             'tanggal_keluar' => 'nullable|date',
             'items' => 'required|array|min:1',
-            'items.*.nama' => 'required|string|max:255',
+            'items.*.nama' => 'required|exists:barangs,kode_barang',
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.harga' => 'required|numeric|min:0',
             'total_harga' => 'required|numeric|min:0',
-            'foto_struk' => 'nullable|image|max:2048'
+            'foto_struk' => 'nullable|image|max:2048',
         ]);
 
-        // Upload foto struk
         $fotoFilename = null;
         if ($request->hasFile('foto_struk')) {
             $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
             $fotoFilename = basename($fotoPath);
         }
 
-        // Validasi dan kurangi stok master barang
-        foreach ($validatedData['items'] as $item) {
-            $kodeBarang = $item['nama']; // nama = kode_barang
-            $jumlah = $item['jumlah'];
-
-            $barang = Barang::where('kode_barang', $kodeBarang)->first();
-            if (!$barang) {
-                return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
+        DB::beginTransaction();
+        try {
+            foreach ($validatedData['items'] as $item) {
+                $barang = Barang::where('kode_barang', $item['nama'])->firstOrFail();
+                $barang->jumlah += $item['jumlah'];
+                $barang->save();
             }
 
-            if ($barang->jumlah < $jumlah) {
-                return back()->withErrors(['Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah]);
-            }
+            Struk::create([
+                'nama_toko' => $validatedData['nama_toko'],
+                'nomor_struk' => $validatedData['nomor_struk'],
+                'tanggal_struk' => $validatedData['tanggal_struk'],
+                'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
+                'items' => json_encode($validatedData['items']),
+                'total_harga' => $validatedData['total_harga'],
+                'foto_struk' => $fotoFilename,
+            ]);
 
-            // Kurangi stok
-            $barang->jumlah -= $jumlah;
-            $barang->save();
+            DB::commit();
+            return redirect()->route('struks.index')->with('success', 'Struk berhasil disimpan dan stok telah ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if ($fotoFilename) {
+                Storage::disk('public')->delete('struk_foto/' . $fotoFilename);
+            }
+            return back()->withErrors('Gagal menyimpan struk: ' . $e->getMessage())->withInput();
         }
-
-        // Simpan struk
-        Struk::create([
-            'nama_toko'      => $validatedData['nama_toko'],
-            'nomor_struk'    => $validatedData['nomor_struk'],
-            'tanggal_struk'  => $validatedData['tanggal_struk'],
-            'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
-            'items'          => json_encode($validatedData['items']),
-            'total_harga'    => $validatedData['total_harga'],
-            'foto_struk'     => $fotoFilename
-        ]);
-
-        return redirect()->route('struks.index')->with('created', 'Struk berhasil disimpan dan stok telah dikurangi.');
     }
-
-
 
     public function edit(Struk $struk)
     {
-        $struk->items = json_decode($struk->items);
+        $struk->items = json_decode($struk->items, true) ?? [];
         $barangList = Barang::all();
         return view('struks.edit', compact('struk', 'barangList'));
     }
@@ -117,52 +109,44 @@ class StrukController extends Controller
     {
         $validatedData = $request->validate([
             'nama_toko' => 'required|string|max:255',
-            'nomor_struk' => 'required|string|max:255',
+            'nomor_struk' => 'required|string|max:255|unique:struks,nomor_struk,' . $struk->id,
             'tanggal_struk' => 'required|date',
             'tanggal_keluar' => 'nullable|date',
             'items' => 'required|array|min:1',
-            'items.*.nama' => 'required|string|max:255',
+            'items.*.nama' => 'required|exists:barangs,kode_barang',
             'items.*.jumlah' => 'required|integer|min:1',
             'items.*.harga' => 'required|numeric|min:0',
             'total_harga' => 'required|numeric|min:0',
-            'foto_struk' => 'nullable|image|max:2048'
+            'foto_struk' => 'nullable|image|max:2048',
         ]);
 
-        if ($request->hasFile('foto_struk')) {
-            if ($struk->foto_struk) {
-                Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
-            }
-            $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
-            $validatedData['foto_struk'] = basename($fotoPath);
-        } else {
-            $validatedData['foto_struk'] = $struk->foto_struk;
-        }
-
-        // Di method update()
         DB::beginTransaction();
         try {
-            // 1. Kembalikan stok dari item lama
-            $oldItems = json_decode($struk->items, true);
+            $oldItems = json_decode($struk->items, true) ?? [];
             foreach ($oldItems as $item) {
                 $barang = Barang::where('kode_barang', $item['nama'])->first();
                 if ($barang) {
-                    $barang->increment('jumlah', $item['jumlah']);
+                    $barang->jumlah -= $item['jumlah'];
+                    $barang->save();
                 }
             }
 
-            // 2. Kurangi stok baru
+            if ($request->hasFile('foto_struk')) {
+                if ($struk->foto_struk) {
+                    Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
+                }
+                $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
+                $validatedData['foto_struk'] = basename($fotoPath);
+            } else {
+                $validatedData['foto_struk'] = $struk->foto_struk;
+            }
+
             foreach ($validatedData['items'] as $item) {
-                $barang = Barang::where('kode_barang', $item['nama'])->first();
-                if ($barang) {
-                    if ($barang->jumlah < $item['jumlah']) {
-                        DB::rollBack();
-                        return back()->withErrors(['Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah]);
-                    }
-                    $barang->decrement('jumlah', $item['jumlah']);
-                }
+                $barang = Barang::where('kode_barang', $item['nama'])->firstOrFail();
+                $barang->jumlah += $item['jumlah'];
+                $barang->save();
             }
 
-            // 3. Update struk
             $struk->update([
                 'nama_toko' => $validatedData['nama_toko'],
                 'nomor_struk' => $validatedData['nomor_struk'],
@@ -170,32 +154,25 @@ class StrukController extends Controller
                 'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
                 'items' => json_encode($validatedData['items']),
                 'total_harga' => $validatedData['total_harga'],
-                'foto_struk' => $validatedData['foto_struk']
+                'foto_struk' => $validatedData['foto_struk'],
             ]);
 
             DB::commit();
-            return redirect()->route('struks.index')->with('updated', 'Struk berhasil diperbarui!');
+            return redirect()->route('struks.index')->with('success', 'Struk berhasil diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors('Gagal mengupdate struk: ' . $e->getMessage());
+            if ($request->hasFile('foto_struk')) {
+                Storage::disk('public')->delete('struk_foto/' . basename($request->file('foto_struk')->store('struk_foto', 'public')));
+            }
+            return back()->withErrors('Gagal mengupdate struk: ' . $e->getMessage())->withInput();
         }
     }
 
-
-
     public function destroy(Struk $struk)
     {
-        if ($struk->foto_struk) {
-            Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
-        }
-        $struk->delete();
-        return redirect()->route('struks.index')->with('deleted', 'Struk berhasil dihapus!');
-
-
         DB::beginTransaction();
         try {
-            // Kembalikan stok barang
-            $items = json_decode($struk->items, true);
+            $items = json_decode($struk->items, true) ?? [];
             foreach ($items as $item) {
                 $barang = Barang::where('kode_barang', $item['nama'])->first();
                 if ($barang) {
@@ -210,22 +187,17 @@ class StrukController extends Controller
             $struk->delete();
 
             DB::commit();
-            return redirect()->route('struks.index')->with('deleted', 'Struk berhasil dihapus!');
+            return redirect()->route('struks.index')->with('success', 'Struk berhasil dihapus!');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors('Gagal menghapus struk: ' . $e->getMessage());
         }
     }
 
-
-
     public function show(Struk $struk)
     {
-        $struk->items = json_decode($struk->items);
-
-        // Ambil semua master barang dan index berdasarkan kode_barang
+        $struk->items = json_decode($struk->items, true) ?? [];
         $masterBarang = Barang::all()->keyBy('kode_barang');
-
         return view('struks.show', compact('struk', 'masterBarang'));
     }
 
@@ -239,20 +211,29 @@ class StrukController extends Controller
 
         $row = 2;
         foreach ($struks as $struk) {
-            $items = collect(json_decode($struk->items))->map(fn($item) => "{$item->nama} ({$item->jumlah} x {$item->harga})")->implode(', ');
-            $sheet->fromArray([$struk->id, $struk->nama_toko, $struk->nomor_struk, $struk->tanggal_struk, $items, $struk->total_harga], NULL, "A$row");
+            $items = json_decode($struk->items, true) ?? [];
+            $itemsString = collect($items)->map(fn($item) => "{$item['nama']} ({$item['jumlah']} x {$item['harga']})")->implode(', ');
+            $sheet->fromArray([
+                $struk->id,
+                $struk->nama_toko,
+                $struk->nomor_struk,
+                $struk->tanggal_struk,
+                $itemsString,
+                $struk->total_harga
+            ], NULL, "A$row");
             $row++;
         }
 
         $writer = new Xlsx($spreadsheet);
         header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment; filename="data_struks.xlsx"');
+        header('Content-Disposition: attachment; filename="data_struks_' . date('Ymd_His') . '.xlsx"');
+        header('Cache-Control: max-age=0');
 
         $writer->save('php://output');
         exit;
     }
 
-    public function exportCSV()
+    public function exportCsv()
     {
         $struks = Struk::all();
         $spreadsheet = new Spreadsheet();
@@ -262,14 +243,24 @@ class StrukController extends Controller
 
         $row = 2;
         foreach ($struks as $struk) {
-            $items = collect(json_decode($struk->items))->map(fn($item) => "{$item->nama} ({$item->jumlah} x {$item->harga})")->implode(', ');
-            $sheet->fromArray([$struk->id, $struk->nama_toko, $struk->nomor_struk, $struk->tanggal_struk, $items, $struk->total_harga], NULL, "A$row");
+            $items = json_decode($struk->items, true) ?? [];
+            $itemsString = collect($items)->map(fn($item) => "{$item['nama']} ({$item['jumlah']} x {$item['harga']})")->implode(', ');
+            $sheet->fromArray([
+                $struk->id,
+                $struk->nama_toko,
+                $struk->nomor_struk,
+                $struk->tanggal_struk,
+                $itemsString,
+                $struk->total_harga
+            ], NULL, "A$row");
             $row++;
         }
 
         $writer = new Csv($spreadsheet);
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachment; filename="data_struks.csv"');
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="data_struks_' . date('Ymd_His') . '.csv"');
+        header('Cache-Control: max-age=0');
+
         $writer->save('php://output');
         exit;
     }
@@ -279,48 +270,37 @@ class StrukController extends Controller
         $struk = Struk::findOrFail($id);
 
         $request->validate([
-            'nama.*' => 'required|string|max:255',
+            'nama.*' => 'required|exists:barangs,kode_barang',
             'jumlah.*' => 'required|integer|min:1',
             'harga.*' => 'required|numeric|min:0',
         ]);
 
         DB::beginTransaction();
         try {
-            // 1. Kembalikan stok lama
-            $oldItems = json_decode($struk->items, true);
+            $oldItems = json_decode($struk->items, true) ?? [];
             foreach ($oldItems as $item) {
                 $barang = Barang::where('kode_barang', $item['nama'])->first();
                 if ($barang) {
-                    $barang->increment('jumlah', $item['jumlah']);
+                    $barang->jumlah -= $item['jumlah'];
+                    $barang->save();
                 }
             }
 
-            // 2. Proses item baru
             $namaArr = $request->input('nama', []);
             $jumlahArr = $request->input('jumlah', []);
             $hargaArr = $request->input('harga', []);
 
             $items = [];
             foreach ($namaArr as $i => $nama) {
-                $kodeBarang = $nama;
                 $jumlah = (int) ($jumlahArr[$i] ?? 0);
                 $harga = (float) ($hargaArr[$i] ?? 0);
 
-                $barang = Barang::where('kode_barang', $kodeBarang)->first();
-                if (!$barang) {
-                    DB::rollBack();
-                    return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
-                }
-
-                if ($barang->jumlah < $jumlah) {
-                    DB::rollBack();
-                    return back()->withErrors(['Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah]);
-                }
-
-                $barang->decrement('jumlah', $jumlah);
+                $barang = Barang::where('kode_barang', $nama)->firstOrFail();
+                $barang->jumlah += $jumlah;
+                $barang->save();
 
                 $items[] = [
-                    'nama' => $kodeBarang,
+                    'nama' => $nama,
                     'jumlah' => $jumlah,
                     'harga' => $harga,
                 ];
@@ -328,16 +308,16 @@ class StrukController extends Controller
 
             $total = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
 
-            $struk->items = json_encode($items);
-            $struk->total_harga = $total;
-            $struk->save();
-
+            $struk->update([
+                'items' => json_encode($items),
+                'total_harga' => $total,
+            ]);
 
             DB::commit();
             return redirect()->route('struks.index')->with('success', 'Item berhasil diperbarui!');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors('Gagal mengupdate item: ' . $e->getMessage());
+            return back()->withErrors('Gagal mengupdate item: ' . $e->getMessage())->withInput();
         }
     }
 
@@ -346,25 +326,38 @@ class StrukController extends Controller
         $struk = Struk::findOrFail($id);
 
         $request->validate([
-            'nama' => 'required|string|max:255',
+            'nama' => 'required|exists:barangs,kode_barang',
             'jumlah' => 'required|integer|min:1',
             'harga' => 'required|numeric|min:0',
         ]);
 
-        $items = json_decode($struk->items, true) ?? [];
+        DB::beginTransaction();
+        try {
+            $items = json_decode($struk->items, true) ?? [];
+            $barang = Barang::where('kode_barang', $request->nama)->firstOrFail();
+            $barang->jumlah += $request->jumlah;
+            $barang->save();
 
-        $items[] = $request->only(['nama', 'jumlah', 'harga']);
-        $struk->items = json_encode($items);
-        $struk->total_harga = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
+            $items[] = $request->only(['nama', 'jumlah', 'harga']);
+            $total = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
 
-        $struk->save();
-        return redirect()->route('struks.index')->with('success', 'Item baru berhasil ditambahkan.');
+            $struk->update([
+                'items' => json_encode($items),
+                'total_harga' => $total,
+            ]);
+
+            DB::commit();
+            return redirect()->route('struks.index')->with('success', 'Item baru berhasil ditambahkan dan stok telah ditambah.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->withErrors('Gagal menambahkan item: ' . $e->getMessage())->withInput();
+        }
     }
 
     public function deleteItem($id, $index)
     {
         $struk = Struk::findOrFail($id);
-        $items = json_decode($struk->items, true);
+        $items = json_decode($struk->items, true) ?? [];
 
         if (!isset($items[$index])) {
             return redirect()->route('struks.index')->with('error', 'Item tidak ditemukan.');
@@ -372,7 +365,6 @@ class StrukController extends Controller
 
         DB::beginTransaction();
         try {
-            // Kembalikan stok barang
             $deletedItem = $items[$index];
             $barang = Barang::where('kode_barang', $deletedItem['nama'])->first();
             if ($barang) {
@@ -381,10 +373,12 @@ class StrukController extends Controller
 
             unset($items[$index]);
             $items = array_values($items);
+            $total = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
 
-            $struk->items = json_encode($items);
-            $struk->total_harga = collect($items)->sum(fn($item) => $item['jumlah'] * $item['harga']);
-            $struk->save();
+            $struk->update([
+                'items' => json_encode($items),
+                'total_harga' => $total,
+            ]);
 
             DB::commit();
             return redirect()->route('struks.index')->with('success', 'Item berhasil dihapus.');
@@ -393,8 +387,6 @@ class StrukController extends Controller
             return redirect()->route('struks.index')->with('error', 'Gagal menghapus item: ' . $e->getMessage());
         }
     }
-
-
 
     public function bulkDelete(Request $request)
     {
@@ -407,16 +399,15 @@ class StrukController extends Controller
 
         $request->validate([
             'selected_ids' => 'required|array',
-            'selected_ids.*' => 'exists:struks,id'
+            'selected_ids.*' => 'exists:struks,id',
         ]);
 
         DB::beginTransaction();
         try {
             $struks = Struk::whereIn('id', $selectedIds)->get();
 
-            // Kembalikan stok untuk semua struk yang akan dihapus
             foreach ($struks as $struk) {
-                $items = json_decode($struk->items, true);
+                $items = json_decode($struk->items, true) ?? [];
                 foreach ($items as $item) {
                     $barang = Barang::where('kode_barang', $item['nama'])->first();
                     if ($barang) {
@@ -424,39 +415,34 @@ class StrukController extends Controller
                     }
                 }
 
-                // Hapus foto struk jika ada
                 if ($struk->foto_struk) {
                     Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
                 }
             }
 
-            // Hapus struk
             Struk::whereIn('id', $selectedIds)->delete();
 
             DB::commit();
-            return redirect()->route('struks.index')
-                ->with('success', count($selectedIds) . ' struk berhasil dihapus');
+            return redirect()->route('struks.index')->with('success', count($selectedIds) . ' struk berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withErrors('Gagal menghapus struk: ' . $e->getMessage());
         }
     }
 
-
     public function getItems(Struk $struk)
     {
-        $items = json_decode($struk->items, true);
+        $items = json_decode($struk->items, true) ?? [];
         $barangList = Barang::all()->keyBy('kode_barang');
 
-        // Tambahkan nama_barang ke setiap item
         $items = array_map(function ($item) use ($barangList) {
-            $item['nama_barang'] = $barangList[$item['nama']]->nama_barang ?? $item['nama'];
+            $item['nama_barang'] = $barangList[$item['nama']]?->nama_barang ?? $item['nama'];
             return $item;
         }, $items);
 
         return response()->json([
             'items' => $items,
-            'foto_struk' => $struk->foto_struk
+            'foto_struk' => $struk->foto_struk,
         ]);
     }
 }
