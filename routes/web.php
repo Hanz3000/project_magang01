@@ -14,9 +14,10 @@ use App\Http\Controllers\TransaksiController;
 // ------------------- AUTH ROUTES -------------------
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
 Route::post('/register', [AuthController::class, 'register']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
 // ------------------- FORGOT PASSWORD -------------------
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
