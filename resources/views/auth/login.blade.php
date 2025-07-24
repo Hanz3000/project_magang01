@@ -234,9 +234,8 @@
         </form>
 
         <div class="text-center text-sm mt-6 animate-fadeIn" style="animation-delay: 1s;">
-            <span class="text-slate-600">Belum punya akun?</span>
-            <a href="{{ route('register') }}" class="text-primary-600 font-medium hover:underline ml-1">Daftar</a>
-        </div>
+            <p class="text-sm text-gray-600">Akun hanya diberikan oleh admin Master Data. Hubungi bagian kepegawaian jika belum punya akun.</p>
+                   </div>
     </div>
 
     <script>
