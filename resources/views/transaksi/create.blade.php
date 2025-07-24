@@ -289,7 +289,6 @@
         display: block;
     }
 
-
     /* === ENHANCED FILE UPLOAD STYLES === */
     .file-upload-wrapper {
         position: relative;
@@ -419,18 +418,6 @@
 
     .hidden {
         display: none;
-    }
-
-    .total-display {
-        font-size: 1.125rem;
-        color: var(--dark);
-        margin-bottom: 1.5rem;
-        margin-top: 1rem;
-        text-align: right;
-        font-weight: 700;
-        padding: 1rem;
-        background: var(--light);
-        border-radius: var(--border-radius);
     }
 
     /* === SELECT2 DROPDOWN STYLES === */
@@ -679,26 +666,40 @@
         overflow: hidden;
     }
 
-    .item-table th:nth-child(2),
-    .item-table td:nth-child(2) {
+    /* Penyesuaian lebar kolom untuk tabel pemasukan */
+    .income-table th:nth-child(2),
+    .income-table td:nth-child(2) {
         width: 15%;
         /* Lebar kolom Jumlah */
     }
 
-    .item-table th:nth-child(3),
-    .item-table td:nth-child(3) {
+    .income-table th:nth-child(3),
+    .income-table td:nth-child(3) {
         width: 20%;
         /* Lebar kolom Harga Satuan */
     }
 
-    .item-table th:nth-child(4),
-    .item-table td:nth-child(4) {
+    .income-table th:nth-child(4),
+    .income-table td:nth-child(4) {
         width: 20%;
         /* Lebar kolom Subtotal */
     }
 
-    .item-table th:nth-child(5),
-    .item-table td:nth-child(5) {
+    .income-table th:nth-child(5),
+    .income-table td:nth-child(5) {
+        width: 10%;
+        /* Lebar kolom Aksi */
+    }
+
+    /* Penyesuaian lebar kolom untuk tabel pengeluaran */
+    .expense-table th:nth-child(2),
+    .expense-table td:nth-child(2) {
+        width: 20%;
+        /* Lebar kolom Jumlah */
+    }
+
+    .expense-table th:nth-child(3),
+    .expense-table td:nth-child(3) {
         width: 10%;
         /* Lebar kolom Aksi */
     }
@@ -709,16 +710,13 @@
         font-weight: 600;
         border-bottom: 1px solid var(--gray);
         padding: 0.75rem 1rem;
-        /* Padding lebih kecil untuk header */
         text-align: center;
-        /* Tengahkan teks header */
     }
 
     .item-table td {
         border-bottom: 1px solid var(--gray);
         color: var(--dark);
         padding: 0.75rem 1rem;
-        /* Padding lebih kecil untuk sel */
         vertical-align: middle;
     }
 
@@ -729,7 +727,6 @@
 
     .item-table .input-group input {
         padding: 0.5rem 0.75rem;
-        /* Padding lebih kecil untuk input */
         font-size: 0.875rem;
     }
 
@@ -762,24 +759,10 @@
         text-align: left;
     }
 
-    /* Perbaikan untuk subtotal */
-    .subtotal-display {
-        white-space: nowrap;
-        text-align: right;
-        padding: 0;
-        font-weight: 500;
-    }
-
     /* Perataan tengah untuk kolom jumlah dan aksi */
     .item-table td:nth-child(2),
-    .item-table td:nth-child(5) {
+    .item-table td:nth-child(3) {
         text-align: center;
-    }
-
-    /* Perataan kanan untuk kolom harga dan subtotal */
-    .item-table td:nth-child(3),
-    .item-table td:nth-child(4) {
-        text-align: right;
     }
 </style>
 
@@ -868,7 +851,7 @@
                         <span>Daftar Barang</span>
                     </div>
 
-                    <table class="item-table">
+                    <table class="item-table income-table">
                         <thead>
                             <tr>
                                 <th>Barang</th>
@@ -892,7 +875,6 @@
                                         </select>
                                     </div>
                                 </td>
-
                                 <td>
                                     <div class="input-group">
                                         <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>
@@ -935,7 +917,6 @@
 
                     <div class="file-upload-wrapper">
                         <input type="file" name="foto_struk" id="foto_struk" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this)">
-
                         <label for="foto_struk" class="file-upload-label" id="file-upload-label">
                             <div class="file-upload-content text-center">
                                 <div class="file-upload-icon">
@@ -945,7 +926,6 @@
                                 <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
                                 <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
                             </div>
-
                             <div class="file-preview-container hidden" id="file-preview-container">
                                 <img id="preview-image" src="#" alt="Preview" class="file-preview-image">
                                 <div class="file-preview-info">
@@ -1020,19 +1000,18 @@
                             </select>
                         </div>
                     </div>
+
                     {{-- Items --}}
                     <div class="section-title">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Daftar Barang</span>
                     </div>
 
-                    <table class="item-table">
+                    <table class="item-table expense-table">
                         <thead>
                             <tr>
                                 <th>Barang</th>
                                 <th>Jumlah</th>
-                                <th>Harga Satuan</th>
-                                <th>Subtotal</th>
                                 <th>Aksi</th>
                             </tr>
                         </thead>
@@ -1041,7 +1020,6 @@
                                 <td>
                                     <div class="input-group">
                                         <select name="items[0][nama]" class="select-barang" required onchange="updateStokExpense(this)">
-
                                             <option value="">Pilih Barang</option>
                                             @foreach ($barangList as $barang)
                                             <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
@@ -1049,31 +1027,17 @@
                                             </option>
                                             @endforeach
                                         </select>
-
-                                        <span class="text-sm text-gray-500 stok-info">Stok: -</span>
+                                        <span class="stok-info">Stok: -</span>
                                     </div>
                                 </td>
-
                                 <td>
                                     <div class="input-group">
                                         <input type="number" name="items[0][jumlah]" class="jumlah" min="1"
-                                            value="1" required oninput="onJumlahChange(this)">
-                                    </div>
-                                </td>
-
-                                <td>
-                                    <div class="input-group">
-                                        <input type="number" name="items[0][harga]" class="harga" min="0"
-                                            required placeholder="0">
+                                            value="1" required>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="subtotal-display" id="expense-subtotal-0">Rp 0</div>
-
-                                    <input type="hidden" name="items[0][subtotal]" class="subtotal" value="0">
-                                </td>
-                                <td>
-                                    <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
+                                    <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
                                         <i class="fas fa-trash"></i>
                                     </button>
                                 </td>
@@ -1085,42 +1049,6 @@
                         <button type="button" onclick="addExpenseItem()" class="btn btn-secondary">
                             <i class="fas fa-plus mr-2"></i>Tambah Barang
                         </button>
-                    </div>
-
-                    <div class="total-display">
-                        <strong>Total Pengeluaran:</strong> <span id="expense-total">Rp 0</span>
-                        <input type="hidden" name="total" id="expense_total" value="0">
-                    </div>
-
-                    {{-- Payment Proof --}}
-                    <div class="section-title">
-                        <i class="fas fa-camera"></i>
-                        <span>Bukti Pembayaran</span>
-                    </div>
-
-                    <div class="file-upload-wrapper">
-                        <input type="file" name="bukti_pembayaran" id="bukti_pembayaran" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this, 'expense')">
-
-                        <label for="bukti_pembayaran" class="file-upload-label" id="expense-file-upload-label">
-                            <div class="file-upload-content text-center">
-                                <div class="file-upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <h4 class="file-upload-title">Upload Bukti Pembayaran</h4>
-                                <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
-                                <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
-                            </div>
-
-                            <div class="file-preview-container hidden" id="expense-file-preview-container">
-                                <img id="expense-preview-image" src="#" alt="Preview" class="file-preview-image">
-                                <div class="file-preview-info">
-                                    <span id="expense-file-name" class="file-name"></span>
-                                    <button type="button" onclick="removeExpensePhoto()" class="remove-file-btn">
-                                        <i class="fas fa-trash"></i> Hapus
-                                    </button>
-                                </div>
-                            </div>
-                        </label>
                     </div>
 
                     <div class="button-group">
@@ -1135,7 +1063,6 @@
             </div>
         </div>
     </div>
-</div>
 </div>
 
 <!-- Image Modal -->
@@ -1156,118 +1083,6 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    function updateStokExpense(selectElement) { //pengeluaran 
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
-
-        const row = selectElement.closest('tr');
-        const jumlahInput = row.querySelector('.jumlah');
-        const stokInfo = row.querySelector('.stok-info');
-
-        const jumlah = parseInt(jumlahInput?.value || 0);
-        const sisa = stokAsli - jumlah;
-
-        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
-
-        // Tambahkan listener real-time jika belum
-        jumlahInput.addEventListener('input', () => {
-            const inputJumlah = parseInt(jumlahInput.value) || 0;
-            const sisaBaru = stokAsli - inputJumlah;
-
-            if (inputJumlah > stokAsli) {
-                alert("Jumlah melebihi stok tersedia!");
-                jumlahInput.value = stokAsli;
-                stokInfo.textContent = `Stok: 0`;
-            } else {
-                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
-            }
-        });
-    }
-
-
-    function updateStokIncome(selectElement) {
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
-
-        const row = selectElement.closest('tr');
-        const jumlahInput = row.querySelector('.jumlah');
-        const stokInfo = row.querySelector('.stok-info');
-
-        const jumlah = parseInt(jumlahInput?.value || 0);
-        const sisa = stokAsli - jumlah;
-
-        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
-
-        // Tambahkan listener real-time juga
-        jumlahInput.addEventListener('input', () => {
-            const newJumlah = parseInt(jumlahInput.value) || 0;
-            const sisaBaru = stokAsli - newJumlah;
-
-            if (newJumlah > stokAsli) {
-                alert("Jumlah melebihi stok tersedia!");
-                jumlahInput.value = stokAsli;
-                stokInfo.textContent = `Stok: 0`;
-            } else {
-                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
-            }
-        });
-    }
-
-
-    function onJumlahChange(input) {
-        const row = input.closest('tr');
-        const selectBarang = row.querySelector('.select-barang');
-        const selectedOption = selectBarang.options[selectBarang.selectedIndex];
-        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
-
-        const stokInfo = row.querySelector('.stok-info');
-        const jumlah = parseInt(input.value) || 0;
-        const stokSisa = stokAsli - jumlah;
-
-        if (jumlah > stokAsli) {
-            alert('Jumlah melebihi stok yang tersedia!');
-            input.value = stokAsli;
-            stokInfo.textContent = `Stok: 0`;
-        } else {
-            stokInfo.textContent = `Stok: ${stokSisa >= 0 ? stokSisa : 0}`;
-        }
-    }
-
-
-
-
-    function updateStok(selectElement) {
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const stok = parseInt(selectedOption.getAttribute('data-stok')) || 0;
-
-        const jumlahInput = selectElement.closest('tr').querySelector('.jumlah');
-        const stokInfo = selectElement.closest('td').querySelector('.stok-info');
-
-        // Saat dropdown diganti, tampilkan stok awal
-        let currentJumlah = parseInt(jumlahInput.value) || 0;
-        let sisaStok = stok - currentJumlah;
-        if (sisaStok < 0) sisaStok = 0;
-
-        stokInfo.textContent = `Stok: ${sisaStok}`;
-
-        // Tambahkan listener ketika jumlah berubah
-        jumlahInput.addEventListener('input', function() {
-            const newJumlah = parseInt(this.value) || 0;
-            let updatedSisa = stok - newJumlah;
-            if (updatedSisa < 0) updatedSisa = 0;
-
-            stokInfo.textContent = `Stok: ${updatedSisa}`;
-
-            // Optional: alert jika melebihi stok
-            if (newJumlah > stok) {
-                alert("Jumlah melebihi stok tersedia!");
-                this.value = stok;
-                stokInfo.textContent = `Stok: 0`;
-            }
-        });
-    }
-
-
     // Format currency
     function formatRupiah(angka) {
         if (!angka) return 'Rp 0';
@@ -1343,6 +1158,33 @@
         }
     });
 
+    // Update stok for expense
+    function updateStokExpense(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
+        const row = selectElement.closest('tr');
+        const jumlahInput = row.querySelector('.jumlah');
+        const stokInfo = row.querySelector('.stok-info');
+        const jumlah = parseInt(jumlahInput?.value || 0);
+        const sisa = stokAsli - jumlah;
+
+        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
+
+        // Real-time listener for jumlah input
+        jumlahInput.addEventListener('input', () => {
+            const inputJumlah = parseInt(jumlahInput.value) || 0;
+            const sisaBaru = stokAsli - inputJumlah;
+
+            if (inputJumlah > stokAsli) {
+                alert("Jumlah melebihi stok tersedia!");
+                jumlahInput.value = stokAsli;
+                stokInfo.textContent = `Stok: 0`;
+            } else {
+                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
+            }
+        });
+    }
+
     $(document).ready(function() {
         // Initialize Select2
         function initSelect2() {
@@ -1361,61 +1203,29 @@
         // Tab switching
         $('.tab-button').click(function() {
             const tabId = $(this).data('tab');
-
-            // Update active tab button
             $('.tab-button').removeClass('active');
             $(this).addClass('active');
-
-            // Update active tab content
             $('.tab-content').removeClass('active');
             $('#' + tabId).addClass('active');
         });
 
-        // Initialize event listeners for existing income rows
+        // Initialize event listeners for income rows
         $('#income-items-container .item-row').each(function() {
             const row = $(this);
             row.find('.jumlah, .harga').on('input', function() {
                 updateIncomeSubtotal(row);
             });
         });
-
-        // Initialize event listeners for existing expense rows
-        $('#expense-items-container .item-row').each(function() {
-            const row = $(this);
-            row.find('.expense-jumlah, .expense-harga').on('input', function() {
-                updateExpenseSubtotal(row);
-            });
-        });
-
-        $('#expense-items-container .item-row').each(function() {
-            const row = $(this);
-            row.find('.jumlah, .harga').on('input', function() {
-                updateExpenseSubtotal(row);
-            });
-        });
-
     });
 
     // Income items management
-
     let incomeIndex = 1;
-
-    function updateStok(select) {
-        const selectedOption = select.options[select.selectedIndex];
-        const stok = selectedOption.getAttribute('data-stok') || '-';
-        const infoSpan = select.closest('.input-group').querySelector('.stok-info');
-        if (infoSpan) {
-            infoSpan.textContent = 'Stok: ' + stok;
-        }
-    }
-
 
     function addIncomeItem() {
         const container = document.getElementById('income-items-container');
         const oldRow = container.querySelector('.item-row');
         const newRow = oldRow.cloneNode(true);
         newRow.innerHTML = newRow.innerHTML.replace(/id="subtotal-0"/g, `id="subtotal-${incomeIndex}"`);
-
 
         // Ganti semua index [0] → [incomeIndex]
         const regex = /\[0\]/g;
@@ -1432,24 +1242,13 @@
         // Reset select dropdown
         const select = newRow.querySelector('.select-barang');
         select.selectedIndex = 0;
-
-        // Hapus Select2 lama
         $(select).next('.select2-container').remove();
-
-        // Tambahkan ulang event onchange
-        select.addEventListener('change', function() {
-            updateStokIncome(this);
-        });
 
         // Inisialisasi ulang Select2
         $(select).select2({
             placeholder: "Pilih barang...",
             width: '100%'
         });
-
-        // Reset stok info
-        const stokInfo = newRow.querySelector('.stok-info');
-        if (stokInfo) stokInfo.textContent = 'Stok: -';
 
         // Tambahkan event listener untuk input jumlah & harga
         newRow.querySelector('.jumlah').addEventListener('input', function() {
@@ -1464,25 +1263,15 @@
         incomeIndex++;
     }
 
-
-
-
-    function removeIncomeItem(btn) {
-        const row = btn.closest('.item-row');
-        const container = document.getElementById('income-items-container');
-        if (container.querySelectorAll('.item-row').length > 1) {
-            row.remove();
-        }
-    }
-
-
-
     function removeIncomeItem(button) {
         const row = $(button).closest('.item-row');
-        row.fadeOut(300, function() {
-            row.remove();
-            updateIncomeTotal();
-        });
+        const container = document.getElementById('income-items-container');
+        if (container.querySelectorAll('.item-row').length > 1) {
+            row.fadeOut(300, function() {
+                row.remove();
+                updateIncomeTotal();
+            });
+        }
     }
 
     function updateIncomeSubtotal(row) {
@@ -1493,14 +1282,12 @@
 
         $(`#subtotal-${itemId}`).text(formatRupiah(subtotal));
         row.find('.subtotal').val(subtotal);
-
         updateIncomeTotal();
     }
 
-
     function updateIncomeTotal() {
         let total = 0;
-        $('.subtotal').each(function() {
+        $('#income-items-container .subtotal').each(function() {
             total += parseFloat($(this).val()) || 0;
         });
 
@@ -1508,6 +1295,7 @@
         $('#income-total').text(formatRupiah(total));
     }
 
+    // Expense items management
     let expenseItemIndex = 1;
 
     function addExpenseItem() {
@@ -1518,21 +1306,18 @@
         // Ganti index
         newRow.attr('data-item', expenseItemIndex);
         newRow.html(newRow.html().replace(/\[0\]/g, `[${expenseItemIndex}]`));
-        newRow.find('[id^="expense-subtotal-"]').attr('id', `expense-subtotal-${expenseItemIndex}`);
 
         // Reset input
         newRow.find('input').each(function() {
             if (this.type === 'number') {
                 this.value = this.classList.contains('jumlah') ? 1 : 0;
-            } else if (this.type === 'hidden') {
-                this.value = 0;
             }
         });
 
         // Reset select
         const select = newRow.find('.select-barang');
         select.val('');
-        select.next('.select2-container').remove(); // Hapus Select2 lama
+        select.next('.select2-container').remove();
 
         // Tambah kembali Select2
         select.select2({
@@ -1544,10 +1329,6 @@
         newRow.find('.stok-info').text('Stok: -');
 
         // Tambah event listener
-        newRow.find('.jumlah, .harga').on('input', function() {
-            updateExpenseSubtotal(newRow);
-        });
-
         select.on('change', function() {
             updateStokExpense(this);
         });
@@ -1556,38 +1337,14 @@
         expenseItemIndex++;
     }
 
-
-
     function removeExpenseItem(button) {
         const row = $(button).closest('.item-row');
-        row.fadeOut(300, function() {
-            row.remove();
-            updateExpenseTotal();
-        });
-    }
-
-    function updateExpenseSubtotal(row) {
-        const itemId = row.data('item');
-        const jumlah = parseFloat(row.find('.jumlah').val()) || 0;
-        const harga = parseFloat(row.find('.harga').val()) || 0;
-        const subtotal = jumlah * harga;
-
-        // Update tampilan subtotal
-        $(`#expense-subtotal-${itemId}`).text(formatRupiah(subtotal));
-        row.find('.subtotal').val(subtotal);
-
-        updateExpenseTotal();
-    }
-
-
-    function updateExpenseTotal() {
-        let total = 0;
-        $('#expense-items-container .subtotal').each(function() {
-            total += parseFloat($(this).val()) || 0;
-        });
-
-        $('#expense_total').val(total);
-        $('#expense-total').text(formatRupiah(total));
+        const container = document.getElementById('expense-items-container');
+        if (container.querySelectorAll('.item-row').length > 1) {
+            row.fadeOut(300, function() {
+                row.remove();
+            });
+        }
     }
 </script>
 @endsection

@@ -101,7 +101,7 @@
                         </svg>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">Total Struk</p>
+                        <p class="text-sm text-gray-500">Total SPK</p>
                         <p class="text-2xl font-semibold text-gray-800 whitespace-nowrap">{{ $totalStruk ?? '0' }}</p>
                     </div>
                 </div>
@@ -211,7 +211,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <p class="mt-2 text-gray-600">Belum ada struk terbaru tercatat.</p>
+                    <p class="mt-2 text-gray-600">Belum ada SPK terbaru tercatat.</p>
                 </div>
                 @endif
             </div>
@@ -267,7 +267,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <p class="mt-2 text-gray-600">Belum ada struk pengeluaran terbaru tercatat.</p>
+                    <p class="mt-2 text-gray-600">Belum ada SPK pengeluaran terbaru tercatat.</p>
                 </div>
                 @endif
             </div>
@@ -331,7 +331,7 @@
                                 Jumlah</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nomor Struk</th>
+                                Nomor SPK</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Tanggal Masuk</th>
@@ -438,7 +438,7 @@
                                 Jumlah</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nomor Struk</th>
+                                Nomor SPK</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Tanggal Keluar</th>
