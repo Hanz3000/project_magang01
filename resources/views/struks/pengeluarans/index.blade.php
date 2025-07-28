@@ -157,6 +157,7 @@
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider w-10">
                                 <input type="checkbox" id="selectAll" class="checkbox-style">
                             </th>
+<<<<<<< HEAD
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider sortable" data-sort="no">No.</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider sortable" data-sort="toko">Toko</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider sortable" data-sort="nomor_struk">No. Struk</th>
@@ -165,6 +166,25 @@
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider sortable" data-sort="jumlah_item">Jumlah Item</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider sortable" data-sort="daftar_barang">Daftar Barang</th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+=======
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
+                                Struk
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Keluar
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Pegawai
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang
+                            </th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Jumlah
+                            </th>
+                           
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi
+                            </th>
+>>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">

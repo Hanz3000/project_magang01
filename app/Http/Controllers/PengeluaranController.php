@@ -58,7 +58,7 @@ class PengeluaranController extends Controller
         ]);
 
         foreach ($validated['items'] as $item) {
-            $kodeBarang = $item['nama'];
+            $kodeBarang = trim($item['nama']);
             $jumlah = $item['jumlah'];
 
             $barang = Barang::where('kode_barang', $kodeBarang)->first();
@@ -74,7 +74,7 @@ class PengeluaranController extends Controller
         }
 
         foreach ($validated['items'] as $item) {
-            $barang = Barang::where('kode_barang', $item['nama'])->first();
+            $barang = Barang::where('kode_barang', trim($item['nama']))->first();
             $barang->jumlah -= $item['jumlah'];
             $barang->save();
         }
@@ -109,6 +109,7 @@ class PengeluaranController extends Controller
         return view('struks.pengeluarans.edit', compact('pengeluaran', 'pegawais', 'barangs'));
     }
 
+<<<<<<< HEAD
     public function update(Request $request, Pengeluaran $pengeluaran)
     {
         $rules = [
@@ -183,8 +184,80 @@ class PengeluaranController extends Controller
                         if ($kodeLama === $kode) {
                             $jumlahLama = $old['jumlah'];
                             break;
+=======
+   public function update(Request $request, Pengeluaran $pengeluaran)
+{
+    $rules = [
+        'nama_toko' => 'required|string',
+        'nomor_struk' => 'required|string',
+        'pegawai_id' => 'required|exists:pegawais,id',
+        'tanggal' => 'required|date',
+        'keterangan' => 'nullable|string',
+    ];
+
+    // Jika data barang dikirim (tanpa tergantung struk_id)
+    if ($request->has('existing_items') || $request->has('new_items')) {
+        $rules += [
+            'existing_items' => 'sometimes|array',
+            'existing_items.*.kode_barang' => 'required|string',
+            'existing_items.*.jumlah' => 'required|integer|min:1',
+
+            'new_items' => 'sometimes|array',
+            'new_items.*.kode_barang' => 'required|string|exists:master_barangs,kode_barang',
+            'new_items.*.jumlah' => 'required|integer|min:1',
+        ];
+    }
+
+    // Bersihkan dan rapikan new_items
+    $request->merge([
+        'new_items' => collect($request->input('new_items', []))
+            ->filter(fn($item) => isset($item['kode_barang']))
+            ->map(function ($item) {
+                $item['kode_barang'] = trim($item['kode_barang']);
+                return $item;
+            })->values()->toArray(),
+    ]);
+
+    // Validasi request
+    $validated = $request->validate($rules);
+
+    try {
+        DB::transaction(function () use ($request, $validated, $pengeluaran) {
+            $updateData = [
+                'nama_toko' => $validated['nama_toko'],
+                'nomor_struk' => $validated['nomor_struk'],
+                'pegawai_id' => $validated['pegawai_id'],
+                'tanggal' => $validated['tanggal'],
+                'keterangan' => $validated['keterangan'] ?? null,
+            ];
+
+            // Jika update daftar barang (hanya jika tidak terikat struk)
+            if ($pengeluaran->struk_id === null) {
+                $combinedItems = [];
+
+                // Handle existing_items
+                if (isset($validated['existing_items'])) {
+                    foreach ($validated['existing_items'] as $item) {
+                        $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
+                        if (!$barang) {
+                            throw new \Exception("Barang dengan kode {$item['kode_barang']} tidak ditemukan");
+>>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
                         }
+
+                        if ($barang->jumlah < $item['jumlah']) {
+                            throw new \Exception("Stok tidak mencukupi untuk {$barang->nama_barang}. Tersedia: {$barang->jumlah}, diminta: {$item['jumlah']}");
+                        }
+
+                        $barang->jumlah -= $item['jumlah'];
+                        $barang->save();
+
+                        $combinedItems[] = [
+                            'nama' => $barang->nama_barang,
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                        ];
                     }
+<<<<<<< HEAD
 
                     $selisih = $jumlahBaru - $jumlahLama;
                     if ($selisih > 0 && $barang->jumlah < $selisih) {
@@ -205,15 +278,56 @@ class PengeluaranController extends Controller
 
                 $updateData['daftar_barang'] = json_encode($finalItems);
                 $updateData['jumlah_item'] = $jumlahItem;
+=======
+                }
+
+                // Handle new_items
+                if (isset($validated['new_items'])) {
+                    foreach ($validated['new_items'] as $item) {
+                        $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
+                        if (!$barang) {
+                            throw new \Exception("Barang dengan kode {$item['kode_barang']} tidak ditemukan");
+                        }
+
+                        if ($barang->jumlah < $item['jumlah']) {
+                            throw new \Exception("Stok tidak mencukupi untuk {$barang->nama_barang}. Tersedia: {$barang->jumlah}, diminta: {$item['jumlah']}");
+                        }
+
+                        $barang->jumlah -= $item['jumlah'];
+                        $barang->save();
+
+                        $combinedItems[] = [
+                            'nama' => $barang->nama_barang,
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                        ];
+                    }
+                }
+
+                // Simpan barang ke pengeluaran
+                $updateData['daftar_barang'] = json_encode($combinedItems);
+                $updateData['jumlah_item'] = array_sum(array_column($combinedItems, 'jumlah'));
+>>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
             }
 
             $pengeluaran->update($updateData);
         });
 
+<<<<<<< HEAD
         // Redirect dengan parameter pencarian yang sama untuk mempertahankan state
         $search = $request->query('search', '');
         return redirect()->route('pengeluarans.index', ['search' => $search])->with('updated', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
     }
+=======
+        return redirect()->route('pengeluarans.index')
+            ->with('success', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
+    } catch (\Throwable $e) {
+        return back()->withErrors(['db_error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+    }
+}
+>>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
+
+
 
     public function destroy(Pengeluaran $pengeluaran)
     {
