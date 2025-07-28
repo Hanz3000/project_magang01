@@ -164,17 +164,16 @@
         const jumlahInputBaru = document.querySelector('.new-jumlah-input');
         const submitBtn = document.getElementById('submit-button');
 
-        // Stok sementara semua barang
+        let newItemIndex = 0; // 🆕 Counter untuk new_items
+
         const stokSementara = new Map();
 
-        // Inisialisasi stok dari dropdown
         barangSelect.querySelectorAll('option').forEach(option => {
             const kode = option.getAttribute('data-kode');
             const stok = parseInt(option.getAttribute('data-stok')) || 0;
             if (kode) stokSementara.set(kode, stok);
         });
 
-        // Tambah item baru
         tambahBtn.addEventListener('click', () => {
             const option = barangSelect.options[barangSelect.selectedIndex];
             if (!option.value) {
@@ -187,13 +186,11 @@
             const stok = stokSementara.get(kode);
             const jumlah = parseInt(jumlahInputBaru.value) || 1;
 
-            // Validasi stok
             if (jumlah > stok) {
                 alert(`Stok tidak mencukupi!\nStok tersedia: ${stok}\nJumlah diminta: ${jumlah}`);
                 return;
             }
 
-            // Cek apakah barang sudah ada (baik existing maupun baru)
             const sudahAda = [...document.querySelectorAll('.existing-item, .barang-baru')]
                 .some(el => el.getAttribute('data-kode') === kode);
             
@@ -202,44 +199,40 @@
                 return;
             }
 
-            // Update stok sementara
             stokSementara.set(kode, stok - jumlah);
 
-            // Clone template
             const clone = template.content.cloneNode(true);
             const el = clone.querySelector('.barang-baru');
             
-            // Set data attributes
             el.setAttribute('data-kode', kode);
             el.setAttribute('data-stok', stok - jumlah);
 
-            // Update tampilan
             el.querySelector('.new-nama-barang').textContent = nama;
             el.querySelector('.new-kode-barang').textContent = kode;
             el.querySelector('.stok-tersedia').textContent = stok - jumlah;
             el.querySelector('.stok-tersedia').setAttribute('data-awal', stok - jumlah);
 
-            // Update input fields
-            el.querySelector('.new-jumlah-field').value = jumlah;
-            el.querySelector('.new-jumlah-field').max = stok - jumlah;
-            el.querySelector('.new-kode-field').value = kode;
+            // 🆕 Ganti name pakai index
+            const jumlahInput = el.querySelector('.new-jumlah-field');
+            const kodeInput = el.querySelector('.new-kode-field');
+            jumlahInput.value = jumlah;
+            jumlahInput.max = stok - jumlah;
+            jumlahInput.setAttribute('name', `new_items[${newItemIndex}][jumlah]`);
+            kodeInput.value = kode;
+            kodeInput.setAttribute('name', `new_items[${newItemIndex}][kode_barang]`);
+            newItemIndex++;
 
-            // Tombol hapus
             el.querySelector('.hapus-barang').addEventListener('click', function() {
-                // Kembalikan stok saat dihapus
                 stokSementara.set(kode, stokSementara.get(kode) + jumlah);
                 el.remove();
             });
 
-            // Tambahkan ke container
             container.appendChild(clone);
 
-            // Reset form
             barangSelect.value = '';
             jumlahInputBaru.value = 1;
         });
 
-        // Validasi existing items
         document.querySelectorAll('.existing-jumlah-input').forEach(input => {
             const item = input.closest('.existing-item');
             const kode = item.getAttribute('data-kode');
@@ -263,7 +256,6 @@
             });
         });
 
-        // Tombol hapus existing item
         document.querySelectorAll('.hapus-item').forEach(button => {
             button.addEventListener('click', function() {
                 this.closest('.existing-item').remove();

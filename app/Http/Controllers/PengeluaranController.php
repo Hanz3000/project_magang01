@@ -57,7 +57,7 @@ class PengeluaranController extends Controller
         ]);
 
         foreach ($validated['items'] as $item) {
-            $kodeBarang = $item['nama'];
+            $kodeBarang = trim($item['nama']);
             $jumlah = $item['jumlah'];
 
             $barang = Barang::where('kode_barang', $kodeBarang)->first();
@@ -73,7 +73,7 @@ class PengeluaranController extends Controller
         }
 
         foreach ($validated['items'] as $item) {
-            $barang = Barang::where('kode_barang', $item['nama'])->first();
+            $barang = Barang::where('kode_barang', trim($item['nama']))->first();
             $barang->jumlah -= $item['jumlah'];
             $barang->save();
         }
@@ -108,7 +108,7 @@ class PengeluaranController extends Controller
         return view('struks.pengeluarans.edit', compact('pengeluaran', 'pegawais', 'barangs'));
     }
 
-    public function update(Request $request, Pengeluaran $pengeluaran)
+   public function update(Request $request, Pengeluaran $pengeluaran)
 {
     $rules = [
         'nama_toko' => 'required|string',
@@ -118,102 +118,108 @@ class PengeluaranController extends Controller
         'keterangan' => 'nullable|string',
     ];
 
-    // Validasi jika input manual (bukan dari struk)
-    if ($pengeluaran->struk_id === null) {
-        $rules['existing_items.*.kode_barang'] = 'required|string';
-        $rules['existing_items.*.jumlah'] = 'required|integer|min:1';
+    // Jika data barang dikirim (tanpa tergantung struk_id)
+    if ($request->has('existing_items') || $request->has('new_items')) {
+        $rules += [
+            'existing_items' => 'sometimes|array',
+            'existing_items.*.kode_barang' => 'required|string',
+            'existing_items.*.jumlah' => 'required|integer|min:1',
 
-        $rules['new_items.*.kode_barang'] = 'required|string';
-        $rules['new_items.*.jumlah'] = 'required|integer|min:1';
+            'new_items' => 'sometimes|array',
+            'new_items.*.kode_barang' => 'required|string|exists:master_barangs,kode_barang',
+            'new_items.*.jumlah' => 'required|integer|min:1',
+        ];
     }
 
+    // Bersihkan dan rapikan new_items
+    $request->merge([
+        'new_items' => collect($request->input('new_items', []))
+            ->filter(fn($item) => isset($item['kode_barang']))
+            ->map(function ($item) {
+                $item['kode_barang'] = trim($item['kode_barang']);
+                return $item;
+            })->values()->toArray(),
+    ]);
+
+    // Validasi request
     $validated = $request->validate($rules);
 
-    DB::transaction(function () use ($request, $validated, $pengeluaran) {
-        $updateData = [
-            'nama_toko' => $validated['nama_toko'],
-            'nomor_struk' => $validated['nomor_struk'],
-            'pegawai_id' => $validated['pegawai_id'],
-            'tanggal' => $validated['tanggal'],
-            'keterangan' => $validated['keterangan'] ?? null,
-        ];
+    try {
+        DB::transaction(function () use ($request, $validated, $pengeluaran) {
+            $updateData = [
+                'nama_toko' => $validated['nama_toko'],
+                'nomor_struk' => $validated['nomor_struk'],
+                'pegawai_id' => $validated['pegawai_id'],
+                'tanggal' => $validated['tanggal'],
+                'keterangan' => $validated['keterangan'] ?? null,
+            ];
 
-        // Jika bukan dari struk, update daftar_barang dan stok
-        if ($pengeluaran->struk_id === null) {
-            $combinedItems = [];
+            // Jika update daftar barang (hanya jika tidak terikat struk)
+            if ($pengeluaran->struk_id === null) {
+                $combinedItems = [];
 
-            // Ambil item lama dari data JSON
-            $oldItems = is_string($pengeluaran->daftar_barang)
-                ? json_decode($pengeluaran->daftar_barang, true)
-                : ($pengeluaran->daftar_barang ?? []);
-
-            // Proses existing_items
-            if ($request->has('existing_items')) {
-                foreach ($request->existing_items as $item) {
-                    $combinedItems[] = [
-                        'nama' => $item['kode_barang'],
-                        'kode_barang' => $item['kode_barang'],
-                        'jumlah' => $item['jumlah'],
-                    ];
-                }
-            }
-
-            // Proses new_items
-            if ($request->has('new_items')) {
-                foreach ($request->new_items as $item) {
-                    $combinedItems[] = [
-                        'nama' => $item['kode_barang'],
-                        'kode_barang' => $item['kode_barang'],
-                        'jumlah' => $item['jumlah'],
-                    ];
-                }
-            }
-
-            $jumlahItem = 0;
-            $finalItems = [];
-
-            foreach ($combinedItems as $item) {
-                $kodeBarang = $item['kode_barang'];
-                $jumlahBaru = $item['jumlah'];
-
-                $barang = Barang::where('kode_barang', $kodeBarang)->first();
-                if ($barang) {
-                    // Cek jumlah lama jika ada
-                    $jumlahLama = 0;
-                    foreach ($oldItems as $old) {
-                        $kodeLama = $old['kode_barang'] ?? $old['nama'];
-                        if ($kodeLama == $kodeBarang) {
-                            $jumlahLama = $old['jumlah'];
-                            break;
+                // Handle existing_items
+                if (isset($validated['existing_items'])) {
+                    foreach ($validated['existing_items'] as $item) {
+                        $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
+                        if (!$barang) {
+                            throw new \Exception("Barang dengan kode {$item['kode_barang']} tidak ditemukan");
                         }
+
+                        if ($barang->jumlah < $item['jumlah']) {
+                            throw new \Exception("Stok tidak mencukupi untuk {$barang->nama_barang}. Tersedia: {$barang->jumlah}, diminta: {$item['jumlah']}");
+                        }
+
+                        $barang->jumlah -= $item['jumlah'];
+                        $barang->save();
+
+                        $combinedItems[] = [
+                            'nama' => $barang->nama_barang,
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                        ];
                     }
-
-                    $selisih = $jumlahBaru - $jumlahLama;
-
-                    if ($selisih > 0 && $barang->jumlah < $selisih) {
-                        throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup. Tersedia: {$barang->jumlah}, tambahan diminta: {$selisih}");
-                    }
-
-                    $barang->jumlah -= $selisih;
-                    $barang->save();
-
-                    $item['nama'] = $barang->nama_barang;
                 }
 
-                $jumlahItem += $jumlahBaru;
-                $finalItems[] = $item;
+                // Handle new_items
+                if (isset($validated['new_items'])) {
+                    foreach ($validated['new_items'] as $item) {
+                        $barang = Barang::where('kode_barang', $item['kode_barang'])->first();
+                        if (!$barang) {
+                            throw new \Exception("Barang dengan kode {$item['kode_barang']} tidak ditemukan");
+                        }
+
+                        if ($barang->jumlah < $item['jumlah']) {
+                            throw new \Exception("Stok tidak mencukupi untuk {$barang->nama_barang}. Tersedia: {$barang->jumlah}, diminta: {$item['jumlah']}");
+                        }
+
+                        $barang->jumlah -= $item['jumlah'];
+                        $barang->save();
+
+                        $combinedItems[] = [
+                            'nama' => $barang->nama_barang,
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                        ];
+                    }
+                }
+
+                // Simpan barang ke pengeluaran
+                $updateData['daftar_barang'] = json_encode($combinedItems);
+                $updateData['jumlah_item'] = array_sum(array_column($combinedItems, 'jumlah'));
             }
 
-            $updateData['daftar_barang'] = json_encode($finalItems);
-            $updateData['jumlah_item'] = $jumlahItem;
-        }
+            $pengeluaran->update($updateData);
+        });
 
-        // Simpan data pengeluaran
-        $pengeluaran->update($updateData);
-    });
-
-    return redirect()->route('pengeluarans.index')->with('updated', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
+        return redirect()->route('pengeluarans.index')
+            ->with('success', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
+    } catch (\Throwable $e) {
+        return back()->withErrors(['db_error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+    }
 }
+
+
 
     public function destroy(Pengeluaran $pengeluaran)
     {
