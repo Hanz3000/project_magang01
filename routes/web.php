@@ -5,10 +5,9 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\StrukController;
-use App\Http\Controllers\MasterBarangController;
-use App\Http\Controllers\PegawaiController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\TransaksiController;
+use App\Http\Controllers\ProfileController;
 
 
 // ------------------- AUTH ROUTES -------------------
@@ -24,6 +23,14 @@ Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->n
 Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.email');
 Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
+
+// ------------------- PROFILE -------------------
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.edit'); // ini penting
+    Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
+});
+
 
 // ------------------- PROTECTED ROUTES (AUTH REQUIRED) -------------------
 Route::middleware('auth')->group(function () {
