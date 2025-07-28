@@ -644,32 +644,32 @@
                     </div>
                     <div class="flex items-center gap-4">
                         @auth
-    <!-- User Profile Dropdown -->
-    <div x-data="{ open: false }" class="relative">
-        <button @click="open = !open" class="flex items-center gap-3 focus:outline-none group">
-            <div class="relative">
-                <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                </div>
-                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
-            </div>
-            <div class="hidden md:inline-block text-left">
-                <div class="flex items-center gap-1.5">
-                    <span class="font-medium text-slate-800 text-sm leading-tight">{{ Auth::user()->name }}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                @if(Auth::user()->pegawai && Auth::user()->pegawai->nip)
-                    <div class="flex items-center gap-1 mt-0.5">
-                        <span class="text-xs font-mono bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">NIP: {{ Auth::user()->pegawai->nip }}</span>
-                    </div>
-                @endif
-            </div>
-            <svg :class="{ 'rotate-180': open }" class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-        </button>
+                        <!-- User Profile Dropdown -->
+                        <div x-data="{ open: false }" class="relative">
+                            <button @click="open = !open" class="flex items-center gap-3 focus:outline-none group">
+                                <div class="relative">
+                                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all">
+                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    </div>
+                                    <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
+                                </div>
+                                <div class="hidden md:inline-block text-left">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="font-medium text-slate-800 text-sm leading-tight">{{ Auth::user()->name }}</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    @if(Auth::user()->pegawai && Auth::user()->pegawai->nip)
+                                    <div class="flex items-center gap-1 mt-0.5">
+                                        <span class="text-xs font-mono bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">NIP: {{ Auth::user()->pegawai->nip }}</span>
+                                    </div>
+                                    @endif
+                                </div>
+                                <svg :class="{ 'rotate-180': open }" class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
 
                             <!-- Dropdown Menu -->
                             <div x-show="open" @click.away="open = false"
@@ -681,7 +681,7 @@
                                 x-transition:leave-end="opacity-0 scale-95"
                                 class="absolute right-0 mt-2 w-48 origin-top-right rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden">
                                 <div class="py-1">
-                                   
+
                                     <a href="{{ route('profile.edit') }}"
                                         class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
                                         Profil Saya

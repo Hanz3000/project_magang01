@@ -1,13 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-{{-- Select2 CSS --}}
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-{{-- Font Awesome --}}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-{{-- Google Fonts --}}
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <style>
     :root {
         --primary: #4f46e5;
@@ -1160,30 +1153,30 @@
 
     // Update stok for expense
     function updateStokExpense(selectElement) {
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
-        const row = selectElement.closest('tr');
-        const jumlahInput = row.querySelector('.jumlah');
-        const stokInfo = row.querySelector('.stok-info');
-        const jumlah = parseInt(jumlahInput?.value || 0);
-        const sisa = stokAsli - jumlah;
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
+    const row = selectElement.closest('tr');
+    const jumlahInput = row.querySelector('.jumlah');
+    const stokInfo = row.querySelector('.stok-info');
+    const jumlah = parseInt(jumlahInput?.value || 0);
+    const sisa = stokAsli - jumlah;
 
-        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
+    stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
 
-        // Real-time listener for jumlah input
-        jumlahInput.addEventListener('input', () => {
-            const inputJumlah = parseInt(jumlahInput.value) || 0;
-            const sisaBaru = stokAsli - inputJumlah;
+    // Real-time listener for jumlah input
+    jumlahInput.addEventListener('input', () => {
+        const inputJumlah = parseInt(jumlahInput.value) || 0;
+        const sisaBaru = stokAsli - inputJumlah;
 
-            if (inputJumlah > stokAsli) {
-                alert("Jumlah melebihi stok tersedia!");
-                jumlahInput.value = stokAsli;
-                stokInfo.textContent = `Stok: 0`;
-            } else {
-                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
-            }
-        });
-    }
+        if (inputJumlah > stokAsli) {
+            alert("Jumlah melebihi stok tersedia!");
+            jumlahInput.value = stokAsli;
+            stokInfo.textContent = `Stok: 0`;
+        } else {
+            stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
+        }
+    });
+}
 
     $(document).ready(function() {
         // Initialize Select2
