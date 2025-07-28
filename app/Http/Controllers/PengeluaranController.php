@@ -13,23 +13,24 @@ class PengeluaranController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Pengeluaran::with(['pegawai', 'income']);
+        $query = Pengeluaran::with(['pegawai']);
 
         if ($request->has('search') && $request->search != '') {
             $query->where('nama_toko', 'like', '%' . $request->search . '%')
-                ->orWhere('nomor_struk', 'like', '%' . $request->search . '%')
-                ->orWhereHas('pegawai', function ($q) use ($request) {
-                    $q->where('nama', 'like', '%' . $request->search . '%');
-                });
+                  ->orWhere('nomor_struk', 'like', '%' . $request->search . '%')
+                  ->orWhereHas('pegawai', function ($q) use ($request) {
+                      $q->where('nama', 'like', '%' . $request->search . '%');
+                  });
         }
 
         $pengeluarans = $query->latest()->paginate(10);
         $barangs = Barang::pluck('nama_barang', 'kode_barang');
+        $struks = Struk::all();
 
         return view('struks.pengeluarans.index', [
             'pengeluarans' => $pengeluarans,
-            'struks' => Struk::paginate(10),
             'barangs' => $barangs,
+            'struks' => $struks,
         ]);
     }
 
@@ -109,111 +110,110 @@ class PengeluaranController extends Controller
     }
 
     public function update(Request $request, Pengeluaran $pengeluaran)
-{
-    $rules = [
-        'nama_toko' => 'required|string',
-        'nomor_struk' => 'required|string',
-        'pegawai_id' => 'required|exists:pegawais,id',
-        'tanggal' => 'required|date',
-        'keterangan' => 'nullable|string',
-    ];
-
-    // Validasi jika input manual (bukan dari struk)
-    if ($pengeluaran->struk_id === null) {
-        $rules['existing_items.*.kode_barang'] = 'required|string';
-        $rules['existing_items.*.jumlah'] = 'required|integer|min:1';
-
-        $rules['new_items.*.kode_barang'] = 'required|string';
-        $rules['new_items.*.jumlah'] = 'required|integer|min:1';
-    }
-
-    $validated = $request->validate($rules);
-
-    DB::transaction(function () use ($request, $validated, $pengeluaran) {
-        $updateData = [
-            'nama_toko' => $validated['nama_toko'],
-            'nomor_struk' => $validated['nomor_struk'],
-            'pegawai_id' => $validated['pegawai_id'],
-            'tanggal' => $validated['tanggal'],
-            'keterangan' => $validated['keterangan'] ?? null,
+    {
+        $rules = [
+            'nama_toko' => 'required|string',
+            'nomor_struk' => 'required|string',
+            'pegawai_id' => 'required|exists:pegawais,id',
+            'tanggal' => 'required|date',
+            'keterangan' => 'nullable|string',
         ];
 
-        // Jika bukan dari struk, update daftar_barang dan stok
         if ($pengeluaran->struk_id === null) {
-            $combinedItems = [];
+            $rules['existing_items'] = 'nullable|array';
+            $rules['existing_items.*.kode_barang'] = 'required|string';
+            $rules['existing_items.*.jumlah'] = 'required|integer|min:1';
 
-            // Ambil item lama dari data JSON
-            $oldItems = is_string($pengeluaran->daftar_barang)
-                ? json_decode($pengeluaran->daftar_barang, true)
-                : ($pengeluaran->daftar_barang ?? []);
+            $rules['new_items'] = 'nullable|array';
+            $rules['new_items.*.kode_barang'] = 'required|string';
+            $rules['new_items.*.jumlah'] = 'required|integer|min:1';
+        }
 
-            // Proses existing_items
-            if ($request->has('existing_items')) {
-                foreach ($request->existing_items as $item) {
-                    $combinedItems[] = [
-                        'nama' => $item['kode_barang'],
-                        'kode_barang' => $item['kode_barang'],
-                        'jumlah' => $item['jumlah'],
-                    ];
+        $validated = $request->validate($rules);
+
+        DB::transaction(function () use ($request, $validated, $pengeluaran) {
+            $updateData = [
+                'nama_toko' => $validated['nama_toko'],
+                'nomor_struk' => $validated['nomor_struk'],
+                'pegawai_id' => $validated['pegawai_id'],
+                'tanggal' => $validated['tanggal'],
+                'keterangan' => $validated['keterangan'] ?? null,
+            ];
+
+            if ($pengeluaran->struk_id === null) {
+                $oldItems = is_string($pengeluaran->daftar_barang)
+                    ? json_decode($pengeluaran->daftar_barang, true)
+                    : ($pengeluaran->daftar_barang ?? []);
+
+                $combinedItems = [];
+
+                if ($request->has('existing_items')) {
+                    foreach ($request->existing_items as $item) {
+                        $combinedItems[] = [
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                        ];
+                    }
                 }
-            }
 
-            // Proses new_items
-            if ($request->has('new_items')) {
-                foreach ($request->new_items as $item) {
-                    $combinedItems[] = [
-                        'nama' => $item['kode_barang'],
-                        'kode_barang' => $item['kode_barang'],
-                        'jumlah' => $item['jumlah'],
-                    ];
+                if ($request->has('new_items')) {
+                    foreach ($request->new_items as $item) {
+                        $combinedItems[] = [
+                            'kode_barang' => $item['kode_barang'],
+                            'jumlah' => $item['jumlah'],
+                        ];
+                    }
                 }
-            }
 
-            $jumlahItem = 0;
-            $finalItems = [];
+                $jumlahItem = 0;
+                $finalItems = [];
 
-            foreach ($combinedItems as $item) {
-                $kodeBarang = $item['kode_barang'];
-                $jumlahBaru = $item['jumlah'];
+                foreach ($combinedItems as $item) {
+                    $kode = $item['kode_barang'];
+                    $jumlahBaru = $item['jumlah'];
+                    $barang = Barang::where('kode_barang', $kode)->first();
 
-                $barang = Barang::where('kode_barang', $kodeBarang)->first();
-                if ($barang) {
-                    // Cek jumlah lama jika ada
+                    if (!$barang) {
+                        throw new \Exception("Barang dengan kode {$kode} tidak ditemukan.");
+                    }
+
                     $jumlahLama = 0;
                     foreach ($oldItems as $old) {
                         $kodeLama = $old['kode_barang'] ?? $old['nama'];
-                        if ($kodeLama == $kodeBarang) {
+                        if ($kodeLama === $kode) {
                             $jumlahLama = $old['jumlah'];
                             break;
                         }
                     }
 
                     $selisih = $jumlahBaru - $jumlahLama;
-
                     if ($selisih > 0 && $barang->jumlah < $selisih) {
-                        throw new \Exception("Stok untuk barang {$barang->nama_barang} tidak cukup. Tersedia: {$barang->jumlah}, tambahan diminta: {$selisih}");
+                        throw new \Exception("Stok tidak cukup untuk barang {$barang->nama_barang}. Sisa stok: {$barang->jumlah}, diminta tambahan: {$selisih}");
                     }
 
                     $barang->jumlah -= $selisih;
                     $barang->save();
 
-                    $item['nama'] = $barang->nama_barang;
+                    $finalItems[] = [
+                        'kode_barang' => $kode,
+                        'jumlah' => $jumlahBaru,
+                        'nama' => $barang->nama_barang
+                    ];
+
+                    $jumlahItem += $jumlahBaru;
                 }
 
-                $jumlahItem += $jumlahBaru;
-                $finalItems[] = $item;
+                $updateData['daftar_barang'] = json_encode($finalItems);
+                $updateData['jumlah_item'] = $jumlahItem;
             }
 
-            $updateData['daftar_barang'] = json_encode($finalItems);
-            $updateData['jumlah_item'] = $jumlahItem;
-        }
+            $pengeluaran->update($updateData);
+        });
 
-        // Simpan data pengeluaran
-        $pengeluaran->update($updateData);
-    });
-
-    return redirect()->route('pengeluarans.index')->with('updated', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
-}
+        // Redirect dengan parameter pencarian yang sama untuk mempertahankan state
+        $search = $request->query('search', '');
+        return redirect()->route('pengeluarans.index', ['search' => $search])->with('updated', 'Pengeluaran berhasil diperbarui dan stok diperbarui.');
+    }
 
     public function destroy(Pengeluaran $pengeluaran)
     {

@@ -26,12 +26,6 @@
                 </div>
                 <div class="space-y-4">
                     <div>
-                        <span class="font-semibold text-gray-700">Total:</span>
-                        <span class="text-2xl font-bold text-indigo-600">
-                            Rp{{ number_format($pengeluaran->total, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div>
                         <span class="font-semibold text-gray-700 block mb-2">Bukti Pembayaran:</span>
                         @if ($pengeluaran->bukti_pembayaran)
                         <img
@@ -57,8 +51,6 @@
                                 <th class="px-4 py-3 border text-left">Kode Barang</th>
                                 <th class="px-4 py-3 border text-left">Nama Barang</th>
                                 <th class="px-4 py-3 border text-center">Jumlah</th>
-                                <th class="px-4 py-3 border text-right">Harga Satuan</th>
-                                <th class="px-4 py-3 border text-right">Subtotal</th>
                             </tr>
                         </thead>
 
@@ -69,20 +61,12 @@
                             $barang = $masterBarang[$kode] ?? null;
                             $namaBarang = $barang?->nama_barang ?? $kode;
                             $jumlah = $item['jumlah'] ?? 0;
-                            $harga = $item['harga'] ?? 0;
-                            $subtotal = $jumlah * $harga;
                             @endphp
                             <tr class="hover:bg-slate-50">
                                 <td class="px-4 py-2 border text-center">{{ $index + 1 }}</td>
                                 <td class="px-4 py-2 border text-gray-700">{{ $kode }}</td>
                                 <td class="px-4 py-2 border">{{ $namaBarang }}</td>
                                 <td class="px-4 py-2 border text-center">{{ $jumlah }}</td>
-                                <td class="px-4 py-2 border text-right">
-                                    Rp{{ number_format($harga, 0, ',', '.') }}
-                                </td>
-                                <td class="px-4 py-2 border text-right">
-                                    Rp{{ number_format($subtotal, 0, ',', '.') }}
-                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -91,12 +75,17 @@
                 </div>
             </div>
 
-            <!-- Tombol Kembali -->
-            <div>
+            <!-- Tombol Aksi -->
+            <div class="flex gap-4">
                 <a href="{{ route('pengeluarans.index') }}"
                     class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-xl shadow transition">
                     Kembali
                 </a>
+                <button
+                    onclick="printStruk()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl shadow transition">
+                    Cetak Struk
+                </button>
             </div>
         </div>
     </div>
@@ -122,5 +111,61 @@
         </div>
     </div>
     @endif
+
+    <!-- Area Struk Cetak -->
+    <div id="print-area" class="hidden">
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+            <h2 style="text-align: center;">Struk Pengeluaran</h2>
+            <hr style="margin: 10px 0;">
+            <p><strong>Nama Toko:</strong> {{ $pengeluaran->nama_toko }}</p>
+            <p><strong>Nomor Struk:</strong> {{ $pengeluaran->nomor_struk }}</p>
+            <p><strong>Tanggal:</strong> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}</p>
+            <p><strong>Pegawai:</strong> {{ $pengeluaran->pegawai?->nama ?? '-' }}</p>
+            <p><strong>Jumlah Item:</strong> {{ $pengeluaran->jumlah_item }} item</p>
+    
+
+            <h4 style="margin-top: 20px;">Daftar Barang</h4>
+            <table border="1" cellpadding="8" cellspacing="0" width="100%" style="margin-top: 10px;">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Kode</th>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($pengeluaran->daftar_barang as $index => $item)
+                    @php
+                        $kode = $item['nama'] ?? '-';
+                        $barang = $masterBarang[$kode] ?? null;
+                        $namaBarang = $barang?->nama_barang ?? $kode;
+                        $jumlah = $item['jumlah'] ?? 0;
+                    @endphp
+                    <tr>
+                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $kode }}</td>
+                        <td>{{ $namaBarang }}</td>
+                        <td>{{ $jumlah }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+
+            <p style="text-align:center; margin-top: 30px;">--- Terima Kasih ---</p>
+        </div>
+    </div>
 </div>
+
+<!-- Script Cetak -->
+<script>
+    function printStruk() {
+        const printContents = document.getElementById("print-area").innerHTML;
+        const originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents;
+        window.print();
+        document.body.innerHTML = originalContents;
+        location.reload();
+    }
+</script>
 @endsection
