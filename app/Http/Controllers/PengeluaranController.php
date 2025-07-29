@@ -261,21 +261,21 @@ class PengeluaranController extends Controller
     {
         $today = Carbon::today();
         $datePart = $today->format('d/m/y'); // Format: 28/08/25
-        
+
         // Cari nomor terakhir hari ini
         $lastPengeluaran = Pengeluaran::where('nomor_struk', 'like', 'spk/' . $today->format('d/m/y') . '%')
-                                    ->orderBy('nomor_struk', 'desc')
-                                    ->first();
-        
+            ->orderBy('nomor_struk', 'desc')
+            ->first();
+
         $sequence = 1;
         if ($lastPengeluaran) {
             // Extract sequence number dari nomor struk terakhir
             $lastNumber = substr($lastPengeluaran->nomor_struk, -5);
             $sequence = intval($lastNumber) + 1;
         }
-        
+
         $sequencePart = str_pad($sequence, 5, '0', STR_PAD_LEFT);
-        
+
         return 'spk/' . $datePart . $sequencePart;
     }
 

@@ -974,8 +974,6 @@
            placeholder="Terisi otomatis" readonly>
     <small class="text-gray-400">Format: spk/DD/MM/YYXXXXX</small>
 </div>
-
-
                         <div class="input-group">
                             <label for="expense_tanggal">
                                 <i class="fas fa-calendar-alt mr-1"></i>

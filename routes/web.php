@@ -78,8 +78,7 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
-  
-Route::get('/pengeluarans/generate-nomor-struk', [\App\Http\Controllers\PengeluaranController::class, 'ajaxGenerateNomorStruk']);
+    Route::get('/pengeluarans/generate-nomor-struk', [\App\Http\Controllers\PengeluaranController::class, 'ajaxGenerateNomorStruk']);
 
 
     // ------------------- PENGELUARAN -------------------
@@ -104,5 +103,6 @@ Route::get('/pengeluarans/generate-nomor-struk', [\App\Http\Controllers\Pengelua
     Route::get('pengeluarans/export/csv', [PengeluaranController::class, 'exportCsv'])->name('pengeluarans.export.csv');
 
     Route::delete('/pengeluarans/mass-delete', [PengeluaranController::class, 'massDelete'])->name('pengeluarans.massDelete');
+    Route::delete('/pengeluarans/{pengeluaran}', [PengeluaranController::class, 'destroy'])->name('pengeluarans.destroy');
     Route::get('/struks/{struk}/items', [StrukController::class, 'getItems'])->name('struks.items');
 });

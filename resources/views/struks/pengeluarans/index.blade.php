@@ -480,7 +480,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const selectAll = document.getElementById('selectAll');
         const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
         const bulkActions = document.getElementById('bulkActionsContainer');
@@ -490,26 +490,30 @@
         function updateBulkActions() {
             const selectedCheckboxes = document.querySelectorAll('.rowCheckbox:checked');
             const selectedIds = Array.from(selectedCheckboxes).map(checkbox => checkbox.value);
+
             if (selectedCheckboxes.length > 0) {
                 bulkActions.classList.remove('hidden');
-                selectedCount.textContent = ${selectedCheckboxes.length} dipilih;
+                // ✅ Perbaiki: Gunakan template literal dengan backtick
+                selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
                 selectedIdsInput.value = JSON.stringify(selectedIds);
             } else {
                 bulkActions.classList.add('hidden');
                 selectedIdsInput.value = '';
             }
 
-            // Update select all checkbox
+            // Update status checkbox "Select All"
             if (selectAll) {
-                selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length && rowCheckboxes.length >
-                    0;
-                selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length <
-                    rowCheckboxes.length;
+                const totalCheckboxes = rowCheckboxes.length;
+                const checkedCount = selectedCheckboxes.length;
+
+                selectAll.checked = checkedCount === totalCheckboxes && totalCheckboxes > 0;
+                selectAll.indeterminate = checkedCount > 0 && checkedCount < totalCheckboxes;
             }
         }
 
+        // Event: Select All
         if (selectAll) {
-            selectAll.addEventListener('change', function() {
+            selectAll.addEventListener('change', function () {
                 const isChecked = this.checked;
                 rowCheckboxes.forEach(checkbox => {
                     checkbox.checked = isChecked;
@@ -518,46 +522,61 @@
             });
         }
 
+        // Event: Setiap checkbox baris
         rowCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateBulkActions);
         });
 
-        // Event delegation untuk checkbox dinamis
-        document.addEventListener('change', function(e) {
+        // Event delegation untuk checkbox dinamis (jika ada)
+        document.addEventListener('change', function (e) {
             if (e.target.classList.contains('rowCheckbox')) {
                 updateBulkActions();
             }
         });
 
-        // Fungsi untuk clear selection
-        window.clearSelection = function() {
+        // ✅ Fungsi: Clear Selection
+        window.clearSelection = function () {
             rowCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
             });
-            if (selectAll) selectAll.checked = false;
-            bulkActions.classList.add('hidden');
-            selectedIdsInput.value = '';
+            if (selectAll) {
+                selectAll.checked = false;
+            }
+            updateBulkActions(); // Gunakan fungsi yang sama untuk sinkronisasi
         };
 
-        // Fungsi untuk konfirmasi bulk delete
-        window.confirmBulkDelete = function() {
-            const selectedIds = selectedIdsInput.value;
-            if (!selectedIds) {
-                alert('Pilih setidaknya satu data untuk dihapus');
+        // ✅ Fungsi: Konfirmasi Bulk Delete → Buka Modal
+        window.confirmBulkDelete = function () {
+            const selectedIds = JSON.parse(selectedIdsInput.value || '[]');
+            if (selectedIds.length === 0) {
+                alert('Pilih setidaknya satu data untuk dihapus.');
                 return;
             }
-            const count = selectedIds.split(',').length;
-            if (confirm(Apakah Anda yakin ingin menghapus ${count} data yang dipilih?)) {
-                document.getElementById('bulkDeleteForm').submit();
-            }
+
+            // Tampilkan modal konfirmasi
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
         };
 
-        // Search tanpa enter, langsung cari saat user mengetik (debounce)
+        // ✅ Fungsi: Submit Bulk Delete
+        window.submitBulkDelete = function () {
+            document.getElementById('bulkDeleteForm').submit();
+        };
+
+        // ✅ Fungsi: Tutup Modal Bulk Delete
+        window.closeDeleteModal = function () {
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+        };
+
+        // 🔍 Fitur Pencarian dengan Debounce
         const searchInput = document.getElementById('searchInput');
         let searchTimeout;
 
         if (searchInput) {
-            searchInput.addEventListener('input', function() {
+            searchInput.addEventListener('input', function () {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => {
                     const searchTerm = searchInput.value.trim();
@@ -569,28 +588,22 @@
                         url.searchParams.delete('search');
                     }
 
-                    // Ganti location tanpa reload penuh, lalu reload data
                     window.location.href = url.toString();
-
-                    // Setelah reload, cursor otomatis tetap di input karena autofocus
-                }, 500); // 500ms debounce
+                }, 500);
             });
-        }
 
-        // Agar cursor tetap di input setelah reload
-        if (searchInput) {
+            // Autofocus & pertahankan kursor
             searchInput.setAttribute('autofocus', 'autofocus');
             searchInput.focus();
-            // Pindahkan cursor ke akhir teks
             const val = searchInput.value;
             searchInput.value = '';
             searchInput.value = val;
         }
 
+        // Tombol Clear Search
         const clearSearchButton = document.getElementById('clearSearch');
-
         if (clearSearchButton) {
-            clearSearchButton.addEventListener('click', function() {
+            clearSearchButton.addEventListener('click', function () {
                 const url = new URL(window.location.href);
                 url.searchParams.delete('search');
                 window.location.href = url.toString();
@@ -598,7 +611,7 @@
         }
     });
 
-    // Fungsi untuk modal image preview
+    // 🖼️ Fungsi: Modal Pratinjau Gambar
     function openModal(imageSrc) {
         document.getElementById('modalImage').src = imageSrc;
         document.getElementById('imageModal').classList.remove('hidden');
@@ -609,23 +622,22 @@
         document.getElementById('imageModal').classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
     }
-    document.getElementById('imageModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeModal();
-        }
+
+    document.getElementById('imageModal').addEventListener('click', function (e) {
+        if (e.target === this) closeModal();
     });
-    document.addEventListener('keydown', function(e) {
+
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !document.getElementById('imageModal').classList.contains('hidden')) {
             closeModal();
         }
     });
 
-    // Fungsi untuk modal single delete
+    // 🗑️ Fungsi: Hapus Satu Data
     function confirmSingleDelete(deleteUrl) {
-        const modal = document.getElementById('singleDeleteModal');
         const form = document.getElementById('singleDeleteForm');
         form.action = deleteUrl;
-        modal.classList.remove('hidden');
+        document.getElementById('singleDeleteModal').classList.remove('hidden');
         document.body.classList.add('overflow-hidden');
     }
 
@@ -634,27 +646,15 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    document.getElementById('singleDeleteModal').addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeSingleDeleteModal();
-        }
+    document.getElementById('singleDeleteModal').addEventListener('click', function (e) {
+        if (e.target === this) closeSingleDeleteModal();
     });
 
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape' && !document.getElementById('singleDeleteModal').classList.contains('hidden')) {
             closeSingleDeleteModal();
         }
     });
-
-    // Fungsi untuk modal bulk delete
-    function closeDeleteModal() {
-        document.getElementById('deleteModal').classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
-    }
-
-    function submitBulkDelete() {
-        document.getElementById('bulkDeleteForm').submit();
-    }
 </script>
 
 <style>
