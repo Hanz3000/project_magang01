@@ -256,26 +256,32 @@ class PengeluaranController extends Controller
     }
 
     private function generateNomorStruk()
-    {
-        $today = Carbon::today();
-        $datePart = $today->format('d/m/y'); // Format: 28/08/25
+{
+    $today = Carbon::today();
+    $dayMonth = $today->format('d/m');     // 29/07
+    $year = $today->format('y');           // 25
+    $prefix = 'SPK/' . $dayMonth . '/' . $year;
 
-        // Cari nomor terakhir hari ini
-        $lastPengeluaran = Pengeluaran::where('nomor_struk', 'like', 'spk/' . $today->format('d/m/y') . '%')
-            ->orderBy('nomor_struk', 'desc')
-            ->first();
+    // Cari nomor struk terakhir hari ini
+    $last = Pengeluaran::where('nomor_struk', 'like', $prefix . '%')
+        ->orderBy('nomor_struk', 'desc')
+        ->first();
 
-        $sequence = 1;
-        if ($lastPengeluaran) {
-            // Extract sequence number dari nomor struk terakhir
-            $lastNumber = substr($lastPengeluaran->nomor_struk, -5);
-            $sequence = intval($lastNumber) + 1;
+    $sequence = 1;
+
+    if ($last) {
+        // Ambil 6 digit terakhir dari nomor struk
+        $lastNumber = substr($last->nomor_struk, -6); // Ex: 000003
+        if (is_numeric($lastNumber)) {
+            $sequence = (int)$lastNumber + 1;
         }
-
-        $sequencePart = str_pad($sequence, 5, '0', STR_PAD_LEFT);
-
-        return 'SPK/' . $datePart . $sequencePart;
     }
+
+    $sequenceFormatted = str_pad($sequence, 6, '0', STR_PAD_LEFT); // 000004
+
+    return $prefix . $sequenceFormatted;
+}
+
 
     // Tambahkan method ini:
     public function ajaxGenerateNomorStruk(Request $request)
@@ -311,8 +317,24 @@ private function generateNamaSpkFromPegawaiId($pegawaiId)
     $pegawai = \App\Models\Pegawai::with('divisi')->findOrFail($pegawaiId);
     $divisi = $pegawai->divisi ? substr(strtoupper($pegawai->divisi->name), 0, 3) : 'XXX';
     $nip = substr($pegawai->nip, -2);
-    $count = \App\Models\Pengeluaran::where('pegawai_id', $pegawaiId)->count() + 1;
-    $sequence = str_pad($count, 3, '0', STR_PAD_LEFT);
+
+    // Ambil SPK terakhir berdasarkan nomor SPK pegawai itu
+    $lastSpk = \App\Models\Pengeluaran::where('pegawai_id', $pegawaiId)
+        ->where('nama_toko', 'like', "SPK-$divisi-$nip-%")
+        ->orderBy('created_at', 'desc')
+        ->first();
+
+    $lastNumber = 0;
+
+    if ($lastSpk) {
+        // Ambil 3 digit terakhir dari nama SPK
+        $matches = [];
+        if (preg_match('/SPK-' . $divisi . '-' . $nip . '-(\d+)/', $lastSpk->nama_toko, $matches)) {
+            $lastNumber = (int)$matches[1];
+        }
+    }
+
+    $sequence = str_pad($lastNumber + 1, 3, '0', STR_PAD_LEFT);
 
     return "SPK-{$divisi}-{$nip}-{$sequence}";
 }

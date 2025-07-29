@@ -757,6 +757,16 @@
     .item-table td:nth-child(3) {
         text-align: center;
     }
+
+    .total-display {
+        text-align: right;
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background: var(--light);
+        border-radius: var(--border-radius);
+        border: 1px solid var(--gray);
+    }
 </style>
 
 <!-- Income/Expense Form -->
@@ -955,31 +965,32 @@
 
                     <div class="form-grid">
                         <div class="input-group">
-    <label for="expense_nama_spk">
-        <i class="fas fa-file-signature mr-1"></i>
-        Nama SPK
-    </label>
-    <input 
-        type="text" 
-        name="nama_spk" 
-        id="expense_nama_spk"
-        class="form-input w-full bg-gray-100 text-gray-500 opacity-80 cursor-not-allowed"
-        placeholder="Terisi otomatis" 
-        readonly>
-    <small class="text-gray-400">Format: SPK-[DIVISI]-[NIP 2 digit]-[001]</small>
-</div>
+                            <label for="expense_nama_spk">
+                                <i class="fas fa-file-signature mr-1"></i>
+                                Nama SPK
+                            </label>
+                            <input 
+                                type="text" 
+                                name="nama_spk" 
+                                id="expense_nama_spk"
+                                class="form-input w-full bg-gray-100 text-gray-500 opacity-80 cursor-not-allowed"
+                                placeholder="Terisi otomatis" 
+                                readonly>
+                            <small class="text-gray-400">Format: SPK-[DIVISI]-[NIP 2 digit]-[001]</small>
+                        </div>
 
                         <div class="input-group">
-    <label for="expense_nomor_struk">
-        <i class="fas fa-receipt mr-1"></i>
-        Nomor Struk
-    </label>
-    <input type="text" name="nomor_struk" id="expense_nomor_struk"
-           value="{{ $nextSpkNumber ?? '' }}"
-           class="form-input w-full bg-gray-100 text-gray-500 placeholder-gray-400 opacity-80 cursor-not-allowed"
-           placeholder="Terisi otomatis" readonly>
-    <small class="text-gray-400">Format: spk/DD/MM/YYXXXXX</small>
-</div>
+                            <label for="expense_nomor_struk">
+                                <i class="fas fa-receipt mr-1"></i>
+                                Nomor Struk
+                            </label>
+                            <input type="text" name="nomor_struk" id="expense_nomor_struk"
+                                   value="{{ $nextSpkNumber ?? '' }}"
+                                   class="form-input w-full bg-gray-100 text-gray-500 placeholder-gray-400 opacity-80 cursor-not-allowed"
+                                   placeholder="Terisi otomatis" readonly>
+                            <small class="text-gray-400">Format: spk/DD/MM/YYXXXXX</small>
+                        </div>
+                        
                         <div class="input-group">
                             <label for="expense_tanggal">
                                 <i class="fas fa-calendar-alt mr-1"></i>
@@ -1097,14 +1108,17 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    $(document).ready(function() {
+    // Global variables
+    let incomeIndex = 1;
+    let expenseItemIndex = 1;
+
     // Format currency
     function formatRupiah(angka) {
         if (!angka) return 'Rp 0';
         return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    // Preview uploaded image
+    // Preview uploaded image - GLOBAL FUNCTION
     function previewUploadedImage(input, type = 'income') {
         const file = input.files[0];
         if (!file) return;
@@ -1133,7 +1147,7 @@
         reader.readAsDataURL(file);
     }
 
-    // Remove photo functions
+    // Remove photo functions - GLOBAL FUNCTIONS
     function removePhoto() {
         $('#foto_struk').val('');
         $('#preview-image').attr('src', '#');
@@ -1150,7 +1164,7 @@
         $('#expense-file-upload-label').removeClass('has-file');
     }
 
-    // Image modal functions
+    // Image modal functions - GLOBAL FUNCTIONS
     function openImageModal(imageUrl, title) {
         if (!imageUrl) return;
         $('#modalImageContent').attr('src', imageUrl);
@@ -1166,14 +1180,7 @@
         $('body').css('overflow', 'auto');
     }
 
-    // Close modal when clicking outside
-    $('#imageModal').click(function(e) {
-        if (e.target === this) {
-            closeImageModal();
-        }
-    });
-
-    // Update stok for expense
+    // Update stok for expense - GLOBAL FUNCTION
     function updateStokExpense(selectElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
@@ -1185,8 +1192,11 @@
 
         stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
 
-        // Real-time listener for jumlah input
-        jumlahInput.addEventListener('input', () => {
+        // Remove existing event listener to prevent duplicates
+        jumlahInput.removeEventListener('input', jumlahInput.stockUpdateHandler);
+        
+        // Create new event handler
+        jumlahInput.stockUpdateHandler = function() {
             const inputJumlah = parseInt(jumlahInput.value) || 0;
             const sisaBaru = stokAsli - inputJumlah;
 
@@ -1197,137 +1207,63 @@
             } else {
                 stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
             }
-        });
+        };
+
+        // Add new event listener
+        jumlahInput.addEventListener('input', jumlahInput.stockUpdateHandler);
     }
 
-    // Initialize Select2
-    function initSelect2() {
-        if ($('.select-barang').length) {
-            $('.select-barang').select2({
-                placeholder: "Pilih barang...",
-                width: '100%'
-            });
-        }
-        if ($('#pegawai_id').length) {
-            $('#pegawai_id').select2({
-                placeholder: "Pilih pegawai...",
-                width: '100%'
-            });
-        }
-    }
-    initSelect2();
-
-    // Tab switching
-    $('.tab-button').on('click', function(e) {
-        e.preventDefault();
-        const tabId = $(this).data('tab');
-        console.log('Tab clicked:', tabId); // Debugging
-        $('.tab-button').removeClass('active');
-        $(this).addClass('active');
-        $('.tab-content').removeClass('active');
-        $('#' + tabId).addClass('active');
-    });
-
-    // Initialize event listeners for income rows
-    if ($('#income-items-container .item-row').length) {
-        $('#income-items-container .item-row').each(function() {
-            const row = $(this);
-            row.find('.jumlah, .harga').on('input', function() {
-                updateIncomeSubtotal(row);
-            });
-        });
-    }
-
-    // Autofill divisi, generate Nama SPK & Nomor Struk saat pegawai dipilih
-    if ($('#pegawai_id').length) {
-        $('#pegawai_id').on('change', function() {
-            const pegawaiId = $(this).val();
-            console.log('Pegawai ID changed:', pegawaiId); // Debugging
-            $('#divisi_display').val('');
-            $('#expense_nama_spk').val('');
-            $('#expense_nomor_struk').val('');
-
-            if (pegawaiId) {
-                // Generate nama SPK dan divisi
-                $.ajax({
-                    url: '/generate-spk',
-                    method: 'POST',
-                    data: { 
-                        pegawai_id: pegawaiId,
-                        _token: '{{ csrf_token() }}'
-                    },
-                    success: function(response) {
-                        console.log('SPK Response:', response); // Debugging
-                        $('#expense_nama_spk').val(response.nama_spk || 'Tidak ada nama SPK');
-                        $('#divisi_display').val(response.divisi || 'Tidak diketahui');
-                    },
-                    error: function(xhr) {
-                        console.error('Error generating SPK:', xhr.responseText);
-                        $('#expense_nama_spk').val('Gagal generate Nama SPK');
-                        $('#divisi_display').val('Gagal memuat divisi');
-                    }
-                });
-
-                // Generate nomor struk otomatis
-                $.ajax({
-                    url: '/pengeluarans/generate-nomor-struk',
-                    method: 'GET',
-                    data: { pegawai_id: pegawaiId },
-                    success: function(response) {
-                        console.log('Nomor Struk Response:', response); // Debugging
-                        $('#expense_nomor_struk').val(response.nomor_struk || 'Tidak ada nomor struk');
-                    },
-                    error: function(xhr) {
-                        console.error('Error generating nomor struk:', xhr.responseText);
-                        $('#expense_nomor_struk').val('Gagal generate nomor struk');
-                    }
-                });
-            }
-        });
-    } else {
-        console.warn('Element #pegawai_id not found in DOM');
-    }
-
-    // Income items management
-    let incomeIndex = 1;
-
+    // Income items management - GLOBAL FUNCTIONS
     function addIncomeItem() {
         const container = document.getElementById('income-items-container');
         if (!container) return;
 
         const oldRow = container.querySelector('.item-row');
         const newRow = oldRow.cloneNode(true);
+        
+        // Update subtotal ID
         newRow.innerHTML = newRow.innerHTML.replace(/id="subtotal-0"/g, `id="subtotal-${incomeIndex}"`);
 
-        // Ganti semua index [0] → [incomeIndex]
+        // Replace all [0] with [incomeIndex]
         const regex = /\[0\]/g;
         newRow.innerHTML = newRow.innerHTML.replace(regex, `[${incomeIndex}]`);
         newRow.setAttribute('data-item', incomeIndex);
 
-        // Reset input
+        // Reset inputs
         const inputs = newRow.querySelectorAll('input');
         inputs.forEach(input => {
-            if (input.type === 'number') input.value = input.classList.contains('jumlah') ? 1 : 0;
-            if (input.type === 'hidden') input.value = 0;
+            if (input.type === 'number') {
+                input.value = input.classList.contains('jumlah') ? 1 : 0;
+            }
+            if (input.type === 'hidden') {
+                input.value = 0;
+            }
         });
 
         // Reset select dropdown
         const select = newRow.querySelector('.select-barang');
         select.selectedIndex = 0;
+        
+        // Remove existing Select2 container
         $(select).next('.select2-container').remove();
 
-        // Inisialisasi ulang Select2
+        // Initialize Select2 again
         $(select).select2({
             placeholder: "Pilih barang...",
-            width: '100%'
+            width: '100%',
+            dropdownAutoWidth: true,
+            closeOnSelect: true
         });
 
-        // Tambahkan event listener untuk input jumlah & harga
-        newRow.querySelector('.jumlah').addEventListener('input', function() {
+        // Add event listeners for quantity and price inputs
+        const jumlahInput = newRow.querySelector('.jumlah');
+        const hargaInput = newRow.querySelector('.harga');
+        
+        jumlahInput.addEventListener('input', function() {
             updateIncomeSubtotal($(newRow));
         });
 
-        newRow.querySelector('.harga').addEventListener('input', function() {
+        hargaInput.addEventListener('input', function() {
             updateIncomeSubtotal($(newRow));
         });
 
@@ -1367,9 +1303,7 @@
         $('#income-total').text(formatRupiah(total));
     }
 
-    // Expense items management
-    let expenseItemIndex = 1;
-
+    // Expense items management - GLOBAL FUNCTIONS
     function addExpenseItem() {
         const container = $('#expense-items-container');
         if (!container.length) return;
@@ -1377,11 +1311,11 @@
         const oldRow = container.find('.item-row').first();
         const newRow = oldRow.clone();
 
-        // Ganti index
+        // Update index
         newRow.attr('data-item', expenseItemIndex);
         newRow.html(newRow.html().replace(/\[0\]/g, `[${expenseItemIndex}]`));
 
-        // Reset input
+        // Reset inputs
         newRow.find('input').each(function() {
             if (this.type === 'number') {
                 this.value = this.classList.contains('jumlah') ? 1 : 0;
@@ -1393,16 +1327,18 @@
         select.val('');
         select.next('.select2-container').remove();
 
-        // Tambah kembali Select2
+        // Re-initialize Select2
         select.select2({
             placeholder: "Pilih barang...",
-            width: '100%'
+            width: '100%',
+            dropdownAutoWidth: true,
+            closeOnSelect: true
         });
 
-        // Reset stok info
+        // Reset stock info
         newRow.find('.stok-info').text('Stok: -');
 
-        // Tambah event listener
+        // Add event listener for select change
         select.on('change', function() {
             updateStokExpense(this);
         });
@@ -1421,22 +1357,116 @@
         }
     }
 
-    // Global event listeners for dynamically added buttons
-    $(document).on('click', '.add-income-item', function() {
-        addIncomeItem();
-    });
+    // Initialize Select2 - GLOBAL FUNCTION
+    function initSelect2() {
+        if ($('.select-barang').length) {
+            $('.select-barang').select2({
+                placeholder: "Pilih barang...",
+                width: '100%',
+                dropdownAutoWidth: true,
+                closeOnSelect: true
+            });
+        }
+        if ($('#pegawai_id').length) {
+            $('#pegawai_id').select2({
+                placeholder: "Pilih pegawai...",
+                width: '100%',
+                dropdownAutoWidth: true,
+                closeOnSelect: true
+            });
+        }
+    }
 
-    $(document).on('click', '.remove-income-item', function() {
-        removeIncomeItem(this);
-    });
+    // Document ready
+    $(document).ready(function() {
+        // Initialize Select2
+        initSelect2();
 
-    $(document).on('click', '.add-expense-item', function() {
-        addExpenseItem();
-    });
+        // Tab switching
+        $('.tab-button').on('click', function(e) {
+            e.preventDefault();
+            const tabId = $(this).data('tab');
+            $('.tab-button').removeClass('active');
+            $(this).addClass('active');
+            $('.tab-content').removeClass('active');
+            $('#' + tabId).addClass('active');
+        });
 
-    $(document).on('click', '.remove-expense-item', function() {
-        removeExpenseItem(this);
+        // Initialize event listeners for income rows
+        if ($('#income-items-container .item-row').length) {
+            $('#income-items-container .item-row').each(function() {
+                const row = $(this);
+                row.find('.jumlah, .harga').on('input', function() {
+                    updateIncomeSubtotal(row);
+                });
+            });
+        }
+
+        // Close modal when clicking outside
+        $('#imageModal').click(function(e) {
+            if (e.target === this) {
+                closeImageModal();
+            }
+        });
+
+        // Autofill divisi, generate Nama SPK & Nomor Struk saat pegawai dipilih
+        if ($('#pegawai_id').length) {
+            $('#pegawai_id').on('change', function() {
+                const pegawaiId = $(this).val();
+                $('#divisi_display').val('');
+                $('#expense_nama_spk').val('');
+                $('#expense_nomor_struk').val('');
+
+                if (pegawaiId) {
+                    // Generate nama SPK dan divisi
+                    $.ajax({
+                        url: '/generate-spk',
+                        method: 'POST',
+                        data: { 
+                            pegawai_id: pegawaiId,
+                            _token: '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            $('#expense_nama_spk').val(response.nama_spk || 'Tidak ada nama SPK');
+                            $('#divisi_display').val(response.divisi || 'Tidak diketahui');
+                        },
+                        error: function(xhr) {
+                            console.error('Error generating SPK:', xhr.responseText);
+                            $('#expense_nama_spk').val('Gagal generate Nama SPK');
+                            $('#divisi_display').val('Gagal memuat divisi');
+                        }
+                    });
+
+                    // Generate nomor struk otomatis
+                    $.ajax({
+                        url: '/pengeluarans/generate-nomor-struk',
+                        method: 'GET',
+                        data: { pegawai_id: pegawaiId },
+                        success: function(response) {
+                            $('#expense_nomor_struk').val(response.nomor_struk || 'Tidak ada nomor struk');
+                        },
+                        error: function(xhr) {
+                            console.error('Error generating nomor struk:', xhr.responseText);
+                            $('#expense_nomor_struk').val('Gagal generate nomor struk');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Handle Select2 close event to ensure dropdown closes properly
+        $(document).on('select2:close', '.select-barang, #pegawai_id', function() {
+            $(this).blur();
+        });
+
+        // Ensure Select2 dropdown closes when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.select2-container, .select2-dropdown').length) {
+                $('.select2-container--open').find('.select2-selection').trigger('blur');
+            }
+        });
     });
-});
 </script>
+
 @endsection
+
