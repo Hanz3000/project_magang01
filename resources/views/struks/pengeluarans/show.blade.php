@@ -16,7 +16,7 @@
             <!-- Informasi Utama -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="space-y-3">
-                    <div><span class="font-semibold text-gray-700">Nama Toko:</span> {{ $pengeluaran->nama_toko }}</div>
+                    <div><span class="font-semibold text-gray-700">Nama Spk:</span> {{ $pengeluaran->nama_toko }}</div>
                     <div><span class="font-semibold text-gray-700">Nomor Struk:</span> {{ $pengeluaran->nomor_struk }}</div>
                     <div>
                         <span class="font-semibold text-gray-700">Tanggal Keluar:</span> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}
@@ -24,20 +24,7 @@
                     <div><span class="font-semibold text-gray-700">Pegawai:</span> {{ $pengeluaran->pegawai?->nama ?? '-' }}</div>
                     <div><span class="font-semibold text-gray-700">Jumlah Item:</span> {{ $pengeluaran->jumlah_item }} item</div>
                 </div>
-                <div class="space-y-4">
-                    <div>
-                        <span class="font-semibold text-gray-700 block mb-2">Bukti Pembayaran:</span>
-                        @if ($pengeluaran->bukti_pembayaran)
-                        <img
-                            src="{{ asset('storage/' . $pengeluaran->bukti_pembayaran) }}"
-                            alt="Bukti Pembayaran"
-                            class="w-64 h-40 object-cover rounded-xl border cursor-pointer hover:opacity-80 transition"
-                            @click="showModal = true">
-                        @else
-                        <span class="italic text-gray-500">Tidak ada bukti</span>
-                        @endif
-                    </div>
-                </div>
+                
             </div>
 
             <!-- Daftar Barang -->
@@ -117,7 +104,7 @@
         <div style="font-family: Arial, sans-serif; padding: 20px;">
             <h2 style="text-align: center;">Struk Pengeluaran</h2>
             <hr style="margin: 10px 0;">
-            <p><strong>Nama Toko:</strong> {{ $pengeluaran->nama_toko }}</p>
+            <p><strong>Nama Spk:</strong> {{ $pengeluaran->nama_toko }}</p>
             <p><strong>Nomor Struk:</strong> {{ $pengeluaran->nomor_struk }}</p>
             <p><strong>Tanggal:</strong> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}</p>
             <p><strong>Pegawai:</strong> {{ $pengeluaran->pegawai?->nama ?? '-' }}</p>

@@ -150,11 +150,8 @@
         const jumlahInputBaru = document.querySelector('.new-jumlah-input');
         const submitBtn = document.getElementById('submit-button');
 
-<<<<<<< HEAD
-=======
         let newItemIndex = 0; // 🆕 Counter untuk new_items
 
->>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
         const stokSementara = new Map();
 
         barangSelect.querySelectorAll('option').forEach(option => {
@@ -192,11 +189,7 @@
 
             const clone = template.content.cloneNode(true);
             const el = clone.querySelector('.barang-baru');
-<<<<<<< HEAD
-
-=======
             
->>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
             el.setAttribute('data-kode', kode);
             el.setAttribute('data-stok', stok - jumlah);
 
@@ -205,11 +198,6 @@
             el.querySelector('.stok-tersedia').textContent = stok - jumlah;
             el.querySelector('.stok-tersedia').setAttribute('data-awal', stok - jumlah);
 
-<<<<<<< HEAD
-            el.querySelector('.new-jumlah-field').value = jumlah;
-            el.querySelector('.new-jumlah-field').max = stok - jumlah;
-            el.querySelector('.new-kode-field').value = kode;
-=======
             // 🆕 Ganti name pakai index
             const jumlahInput = el.querySelector('.new-jumlah-field');
             const kodeInput = el.querySelector('.new-kode-field');
@@ -219,18 +207,13 @@
             kodeInput.value = kode;
             kodeInput.setAttribute('name', `new_items[${newItemIndex}][kode_barang]`);
             newItemIndex++;
->>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
 
             el.querySelector('.hapus-barang').addEventListener('click', function() {
                 stokSementara.set(kode, stokSementara.get(kode) + jumlah);
                 el.remove();
             });
 
-<<<<<<< HEAD
-            container.appendChild(el);
-=======
             container.appendChild(clone);
->>>>>>> 13e404229dad74e456a6a75e5e38e7ec08d9399e
 
             barangSelect.value = '';
             jumlahInputBaru.value = 1;
