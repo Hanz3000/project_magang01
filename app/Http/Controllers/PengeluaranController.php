@@ -10,6 +10,7 @@ use App\Models\Barang;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
+
 class PengeluaranController extends Controller
 {
     public function index(Request $request)
@@ -50,7 +51,6 @@ class PengeluaranController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nama_toko' => 'required|string',
             'pegawai_id' => 'required|exists:pegawais,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string',
@@ -62,11 +62,9 @@ class PengeluaranController extends Controller
         // Generate nomor struk otomatis
         $validated['nomor_struk'] = $this->generateNomorStruk();
 
-        // Cek duplikasi nomor struk
-        $existing = Pengeluaran::where('nomor_struk', $validated['nomor_struk'])->first();
-        if ($existing) {
-            return back()->withErrors(['Nomor struk sudah digunakan. Silahkan coba lagi.']);
-        }
+        // Generate Nama SPK dan simpan di kolom nama_toko
+        $validated['nama_toko'] = $this->generateNamaSpkFromPegawaiId($validated['pegawai_id']); // ✅ Benar
+
 
         // Validasi stok barang
         foreach ($validated['items'] as $item) {
@@ -93,7 +91,7 @@ class PengeluaranController extends Controller
         }
 
         $pengeluaranData = [
-            'nama_toko' => $validated['nama_toko'],
+            'nama_toko' => $validated['nama_toko'], // Simpan Nama SPK di kolom nama_toko
             'nomor_struk' => $validated['nomor_struk'],
             'pegawai_id' => $validated['pegawai_id'],
             'tanggal' => $validated['tanggal'],
@@ -276,7 +274,7 @@ class PengeluaranController extends Controller
 
         $sequencePart = str_pad($sequence, 5, '0', STR_PAD_LEFT);
 
-        return 'spk/' . $datePart . $sequencePart;
+        return 'SPK/' . $datePart . $sequencePart;
     }
 
     // Tambahkan method ini:
@@ -285,4 +283,40 @@ class PengeluaranController extends Controller
         $nomor = $this->generateNomorStruk();
         return response()->json(['nomor_struk' => $nomor]);
     }
+
+
+public function generateNamaSpkString(Request $request)
+{
+    $request->validate([
+        'pegawai_id' => 'required|exists:pegawais,id'
+    ]);
+
+    $pegawai = Pegawai::with('divisi')->findOrFail($request->pegawai_id);
+
+    $divisi = $pegawai->divisi ? substr(strtoupper($pegawai->divisi->name), 0, 3) : 'XXX';
+    $nip = substr($pegawai->nip, -2);
+    $count = Pengeluaran::where('pegawai_id', $pegawai->id)->count() + 1;
+    $sequence = str_pad($count, 3, '0', STR_PAD_LEFT);
+
+    $namaSpk = "SPK-{$divisi}-{$nip}-{$sequence}";
+
+    return response()->json([
+        'nama_spk' => $namaSpk,
+        'divisi' => $pegawai->divisi ? $pegawai->divisi->name : 'Tidak diketahui'
+    ]);
+}
+
+private function generateNamaSpkFromPegawaiId($pegawaiId)
+{
+    $pegawai = \App\Models\Pegawai::with('divisi')->findOrFail($pegawaiId);
+    $divisi = $pegawai->divisi ? substr(strtoupper($pegawai->divisi->name), 0, 3) : 'XXX';
+    $nip = substr($pegawai->nip, -2);
+    $count = \App\Models\Pengeluaran::where('pegawai_id', $pegawaiId)->count() + 1;
+    $sequence = str_pad($count, 3, '0', STR_PAD_LEFT);
+
+    return "SPK-{$divisi}-{$nip}-{$sequence}";
+}
+
+
+
 }

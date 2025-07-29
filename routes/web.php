@@ -77,8 +77,11 @@ Route::middleware('auth')->group(function () {
         Route::get('/export/csv', [StrukController::class, 'exportCSV'])->name('struks.export.csv');
     });
 
-    Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+
     Route::get('/pengeluarans/generate-nomor-struk', [\App\Http\Controllers\PengeluaranController::class, 'ajaxGenerateNomorStruk']);
+
+Route::post('/generate-spk', [PengeluaranController::class, 'generateNamaSpkString']);
+
 
 
     // ------------------- PENGELUARAN -------------------
