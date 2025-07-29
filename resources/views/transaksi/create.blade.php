@@ -942,6 +942,7 @@
                 </form>
             </div>
 
+            <!-- PENGELUARANNNNN -->
             {{-- Expense Tab Content --}}
             <div id="expense-tab" class="tab-content">
                 <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
@@ -956,7 +957,7 @@
                         <div class="input-group">
                             <label for="expense_nama_toko">
                                 <i class="fas fa-store mr-1"></i>
-                                Nama Toko
+                                Nama Spk
                             </label>
                             <input type="text" name="nama_toko" id="expense_nama_toko"
                                 placeholder="Masukkan nama toko" required>
@@ -988,9 +989,21 @@
                             <select name="pegawai_id" id="pegawai_id" required>
                                 <option value="">Pilih Pegawai</option>
                                 @foreach ($pegawais as $pegawai)
-                                <option value="{{ $pegawai->id }}">{{ $pegawai->nama }}</option>
+                                <option value="{{ $pegawai->id }}" data-divisi="{{ $pegawai->divisi }}">
+                                    {{ $pegawai->nama }}
+                                </option>
                                 @endforeach
                             </select>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="divisi_display">
+                                <i class="fas fa-sitemap mr-1"></i>
+                                Divisi
+                            </label>
+                            <input type="text" id="divisi_display"
+                                class="form-input w-full bg-gray-100 text-gray-700 placeholder-gray-400"
+                                placeholder="Divisi akan terisi otomatis" readonly>
                         </div>
                     </div>
 
@@ -1153,30 +1166,30 @@
 
     // Update stok for expense
     function updateStokExpense(selectElement) {
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
-    const row = selectElement.closest('tr');
-    const jumlahInput = row.querySelector('.jumlah');
-    const stokInfo = row.querySelector('.stok-info');
-    const jumlah = parseInt(jumlahInput?.value || 0);
-    const sisa = stokAsli - jumlah;
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
+        const row = selectElement.closest('tr');
+        const jumlahInput = row.querySelector('.jumlah');
+        const stokInfo = row.querySelector('.stok-info');
+        const jumlah = parseInt(jumlahInput?.value || 0);
+        const sisa = stokAsli - jumlah;
 
-    stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
+        stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
 
-    // Real-time listener for jumlah input
-    jumlahInput.addEventListener('input', () => {
-        const inputJumlah = parseInt(jumlahInput.value) || 0;
-        const sisaBaru = stokAsli - inputJumlah;
+        // Real-time listener for jumlah input
+        jumlahInput.addEventListener('input', () => {
+            const inputJumlah = parseInt(jumlahInput.value) || 0;
+            const sisaBaru = stokAsli - inputJumlah;
 
-        if (inputJumlah > stokAsli) {
-            alert("Jumlah melebihi stok tersedia!");
-            jumlahInput.value = stokAsli;
-            stokInfo.textContent = `Stok: 0`;
-        } else {
-            stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
-        }
-    });
-}
+            if (inputJumlah > stokAsli) {
+                alert("Jumlah melebihi stok tersedia!");
+                jumlahInput.value = stokAsli;
+                stokInfo.textContent = `Stok: 0`;
+            } else {
+                stokInfo.textContent = `Stok: ${sisaBaru >= 0 ? sisaBaru : 0}`;
+            }
+        });
+    }
 
     $(document).ready(function() {
         // Initialize Select2
@@ -1339,5 +1352,26 @@
             });
         }
     }
+
+    // Autofill divisi saat pegawai dipilih
+    $(document).ready(function() {
+        $('#pegawai_id').on('change', function() {
+            const pegawaiId = $(this).val();
+            $('#divisi_display').val(''); // kosongkan dulu
+
+            if (pegawaiId) {
+                $.ajax({
+                    url: `/pegawai/${pegawaiId}/divisi`,
+                    method: 'GET',
+                    success: function(response) {
+                        $('#divisi_display').val(response.divisi || 'Tidak diketahui');
+                    },
+                    error: function() {
+                        $('#divisi_display').val('Gagal memuat divisi');
+                    }
+                });
+            }
+        });
+    });
 </script>
 @endsection

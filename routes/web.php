@@ -8,7 +8,7 @@ use App\Http\Controllers\StrukController;
 use App\Http\Controllers\PengeluaranController;
 use App\Http\Controllers\TransaksiController;
 use App\Http\Controllers\ProfileController;
-
+use App\Http\Controllers\PegawaiController;
 
 // ------------------- AUTH ROUTES -------------------
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
+Route::get('/pegawai/{id}/divisi', [PegawaiController::class, 'getDivisi']);
 
 // ------------------- PROTECTED ROUTES (AUTH REQUIRED) -------------------
 Route::middleware('auth')->group(function () {

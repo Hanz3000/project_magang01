@@ -108,4 +108,13 @@ class PegawaiController extends Controller
             ->route('pegawai.index')
             ->with('created', 'Tidak ada pegawai yang dipilih.');
     }
+
+    public function getDivisi($id)
+{
+    $pegawai = Pegawai::with('divisi')->findOrFail($id);
+    return response()->json([
+        'divisi' => $pegawai->divisi ? $pegawai->divisi->name : null
+    ]);
+}
+
 }

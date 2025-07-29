@@ -11,6 +11,7 @@ class Division extends Model
 
     // Kolom yang bisa diisi (mass assignment)
     protected $fillable = ['name']; 
+    protected $table = 'divisions'; 
 
 
 // Division.php

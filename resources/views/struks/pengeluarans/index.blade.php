@@ -210,7 +210,7 @@
                                 <input type="checkbox" id="selectAll" class="checkbox-style">
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Nama Spk
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
                                 Struk
