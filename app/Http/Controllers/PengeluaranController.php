@@ -278,4 +278,11 @@ class PengeluaranController extends Controller
         
         return 'spk/' . $datePart . $sequencePart;
     }
+
+    // Tambahkan method ini:
+    public function ajaxGenerateNomorStruk(Request $request)
+    {
+        $nomor = $this->generateNomorStruk();
+        return response()->json(['nomor_struk' => $nomor]);
+    }
 }

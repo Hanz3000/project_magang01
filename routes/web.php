@@ -78,6 +78,9 @@ Route::middleware('auth')->group(function () {
     });
 
     Route::get('/pengeluarans', [PengeluaranController::class, 'index'])->name('pengeluarans.index');
+  
+Route::get('/pengeluarans/generate-nomor-struk', [\App\Http\Controllers\PengeluaranController::class, 'ajaxGenerateNomorStruk']);
+
 
     // ------------------- PENGELUARAN -------------------
     Route::prefix('pengeluarans')->group(function () {

@@ -964,15 +964,17 @@
                         </div>
 
                         <div class="input-group">
-                            <label for="expense_nomor_struk">
-                                <i class="fas fa-receipt mr-1"></i>
-                                Nomor Struk
-                            </label>
-                            <input type="text" name="nomor_struk" id="expense_nomor_struk" 
-                                   value="{{ $nextSpkNumber ?? 'Akan digenerate otomatis' }}" 
-                                   class="bg-gray-100" readonly>
-                            <small class="text-gray-500">Format: spk/DD/MM/YYXXXXX</small>
-                        </div>
+    <label for="expense_nomor_struk">
+        <i class="fas fa-receipt mr-1"></i>
+        Nomor Struk
+    </label>
+    <input type="text" name="nomor_struk" id="expense_nomor_struk"
+           value="{{ $nextSpkNumber ?? '' }}"
+           class="form-input w-full bg-gray-100 text-gray-500 placeholder-gray-400 opacity-80 cursor-not-allowed"
+           placeholder="Terisi otomatis" readonly>
+    <small class="text-gray-400">Format: spk/DD/MM/YYXXXXX</small>
+</div>
+
 
                         <div class="input-group">
                             <label for="expense_tanggal">
@@ -1005,7 +1007,7 @@
                             </label>
                             <input type="text" id="divisi_display"
                                 class="form-input w-full bg-gray-100 text-gray-700 placeholder-gray-400"
-                                placeholder="Divisi akan terisi otomatis" readonly>
+                                placeholder="Terisi otomatis" readonly>
                         </div>
                     </div>
 
@@ -1372,6 +1374,21 @@
                         $('#divisi_display').val('Gagal memuat divisi');
                     }
                 });
+
+                // Generate nomor struk otomatis
+                $.ajax({
+                    url: '/pengeluarans/generate-nomor-struk',
+                    method: 'GET',
+                    data: { pegawai_id: pegawaiId },
+                    success: function(response) {
+                        $('#expense_nomor_struk').val(response.nomor_struk);
+                    },
+                    error: function() {
+                        $('#expense_nomor_struk').val('Gagal generate nomor struk');
+                    }
+                });
+            } else {
+                $('#expense_nomor_struk').val('Akan digenerate otomatis');
             }
         });
     });
