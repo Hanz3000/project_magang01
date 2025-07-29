@@ -968,8 +968,10 @@
                                 <i class="fas fa-receipt mr-1"></i>
                                 Nomor Struk
                             </label>
-                            <input type="text" name="nomor_struk" id="expense_nomor_struk"
-                                placeholder="Masukkan nomor struk" required>
+                            <input type="text" name="nomor_struk" id="expense_nomor_struk" 
+                                   value="{{ $nextSpkNumber ?? 'Akan digenerate otomatis' }}" 
+                                   class="bg-gray-100" readonly>
+                            <small class="text-gray-500">Format: spk/DD/MM/YYXXXXX</small>
                         </div>
 
                         <div class="input-group">
