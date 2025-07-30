@@ -117,7 +117,11 @@ class PengeluaranController extends Controller
     public function show($id)
     {
         $pengeluaran = Pengeluaran::findOrFail($id);
-        return view('struks.pengeluarans.show', compact('pengeluaran'));
+
+        // Ambil semua data barang dan ubah menjadi array dengan key = kode_barang
+        $masterBarang = Barang::all()->keyBy('kode_barang');
+
+        return view('struks.pengeluarans.show', compact('pengeluaran', 'masterBarang'));
     }
 
     public function edit($id)
