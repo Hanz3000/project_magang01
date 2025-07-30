@@ -16,7 +16,7 @@
             <!-- Informasi Utama -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 print:grid-cols-2 print:gap-4">
                 <div class="space-y-3 print:space-y-2">
-                    <div class="print:text-sm"><span class="font-semibold text-gray-700 print:text-black">Nama Toko:</span> {{ $pengeluaran->nama_toko }}</div>
+                    <div class="print:text-sm"><span class="font-semibold text-gray-700 print:text-black">Nama Spk:</span> {{ $pengeluaran->nama_toko }}</div>
                     <div class="print:text-sm"><span class="font-semibold text-gray-700 print:text-black">Nomor Struk:</span> {{ $pengeluaran->nomor_struk }}</div>
                     <div class="print:text-sm"><span class="font-semibold text-gray-700 print:text-black">Tanggal Keluar:</span> {{ date('d M Y', strtotime($pengeluaran->tanggal)) }}</div>
                 </div>

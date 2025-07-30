@@ -182,7 +182,7 @@
                         <span class="font-medium">{{ $latestStruk->nama_toko }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Nomor Struk:</span>
+                        <span class="w-24 text-gray-500">No Struk:</span>
                         <span class="font-mono">{{ $latestStruk->nomor_struk }}</span>
                     </div>
                     <div class="flex items-center">
@@ -233,11 +233,11 @@
                 @if (isset($latestPengeluaranStruk) && $latestPengeluaranStruk)
                 <div class="space-y-3 text-gray-700">
                     <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Nama Toko:</span>
+                        <span class="w-24 text-gray-500">Nama Spk:</span>
                         <span class="font-medium">{{ $latestPengeluaranStruk->nama_toko ?? '-' }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Nomor Struk:</span>
+                        <span class="w-24 text-gray-500">No Spk :</span>
                         <span class="font-mono">{{ $latestPengeluaranStruk->nomor_struk }}</span>
                     </div>
                     <div class="flex items-center">
@@ -245,7 +245,7 @@
                         <span>{{ $latestPengeluaranStruk->tanggal ?? '-' }}</span>
                     </div>
                     <div class="flex items-center">
-                        <span class="w-24 text-gray-500">Barang Keluar:</span>
+                        <span class="w-24 text-gray-500">Nama Barang:</span>
                         <span class="font-medium">
                             @php
                             $itemsKeluar = is_string($latestPengeluaranStruk->daftar_barang ?? null) ?

@@ -22,17 +22,12 @@
                     value="{{ old('tanggal', \Carbon\Carbon::parse($pengeluaran->tanggal)->format('Y-m-d')) }}" required>
             </div>
 
-            <div>
-                <label class="block mb-1 font-medium">Pegawai</label>
-                <select name="pegawai_id" class="w-full border rounded px-3 py-2" required>
-                    <option value="">-- Pilih Pegawai --</option>
-                    @foreach ($pegawais as $pegawai)
-                    <option value="{{ $pegawai->id }}" {{ $pegawai->id == $pengeluaran->pegawai_id ? 'selected' : '' }}>
-                        {{ $pegawai->nama }}
-                    </option>
-                    @endforeach
-                </select>
-            </div>
+<div>
+    <label class="block mb-1 font-medium">Pegawai</label>
+    <input type="text" class="w-full border rounded px-3 py-2 bg-gray-100 text-gray-700" 
+           value="{{ $pengeluaran->pegawai->nama }}" readonly>
+    <input type="hidden" name="pegawai_id" value="{{ $pengeluaran->pegawai_id }}">
+</div>
 
             <div class="space-y-3" id="items-container">
                 <div class="grid grid-cols-3 gap-4 font-medium text-gray-700 pb-2 border-b">
@@ -207,6 +202,25 @@
             kodeInput.value = kode;
             kodeInput.setAttribute('name', `new_items[${newItemIndex}][kode_barang]`);
             newItemIndex++;
+
+            jumlahInput.addEventListener('input', () => {
+    const jumlahBaru = parseInt(jumlahInput.value) || 0;
+    const stokAwal = stok; // stok sebelum dikurangi
+    const sisa = stokAwal - jumlahBaru;
+
+    if (sisa < 0) {
+        alert(`Stok tidak cukup!\nStok tersedia: ${stokAwal}\nDiminta: ${jumlahBaru}`);
+        jumlahInput.value = jumlah;
+        jumlahInput.classList.add('border-red-500');
+        return;
+    }
+
+    jumlahInput.classList.remove('border-red-500');
+    stokSementara.set(kode, sisa);
+    el.querySelector('.stok-tersedia').textContent = sisa;
+    el.setAttribute('data-stok', sisa);
+});
+
 
             el.querySelector('.hapus-barang').addEventListener('click', function() {
                 stokSementara.set(kode, stokSementara.get(kode) + jumlah);
