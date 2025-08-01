@@ -14,26 +14,30 @@ use Carbon\Carbon;
 class PengeluaranController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Pengeluaran::with(['pegawai', 'income']);
+{
+    $query = Pengeluaran::with(['pegawai', 'income']);
 
-        if ($request->has('search') && $request->search != '') {
-            $query->where('nama_toko', 'like', '%' . $request->search . '%')
-                ->orWhere('nomor_struk', 'like', '%' . $request->search . '%')
-                ->orWhereHas('pegawai', function ($q) use ($request) {
-                    $q->where('nama', 'like', '%' . $request->search . '%');
-                });
-        }
-
-        $pengeluarans = $query->latest()->paginate(10);
-        $barangs = Barang::pluck('nama_barang', 'kode_barang');
-
-        return view('struks.pengeluarans.index', [
-            'pengeluarans' => $pengeluarans,
-            'struks' => Struk::paginate(10),
-            'barangs' => $barangs,
-        ]);
+    if ($request->has('search') && $request->search != '') {
+        $searchTerm = strtolower($request->search);
+        
+        $query->where(function($q) use ($searchTerm) {
+            $q->whereRaw('LOWER(nama_toko) LIKE ?', ['%' . $searchTerm . '%'])
+              ->orWhereRaw('LOWER(nomor_struk) LIKE ?', ['%' . $searchTerm . '%'])
+              ->orWhereHas('pegawai', function ($q) use ($searchTerm) {
+                  $q->whereRaw('LOWER(nama) LIKE ?', ['%' . $searchTerm . '%']);
+              });
+        });
     }
+
+    $pengeluarans = $query->latest()->paginate(10);
+    $barangs = Barang::pluck('nama_barang', 'kode_barang');
+
+    return view('struks.pengeluarans.index', [
+        'pengeluarans' => $pengeluarans,
+        'struks' => Struk::paginate(10),
+        'barangs' => $barangs,
+    ]);
+}
 
     public function create(Request $request)
     {
