@@ -413,7 +413,7 @@
         display: none;
     }
 
-    /* === SELECT2 DROPDOWN STYLES === */
+    /* === OPTIMIZED SELECT2 DROPDOWN STYLES === */
     .select2-container--default .select2-selection--single {
         background: var(--light);
         border: 1px solid var(--gray);
@@ -436,28 +436,68 @@
 
     .select2-container--default .select2-selection--single .select2-selection__rendered {
         color: var(--dark);
-        line-height: 1.5;
+        line-height: 1.4;
         padding-left: 0;
+        padding-right: 30px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 100%;
         right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
     }
 
+    /* Dropdown dengan lebar optimal */
     .select2-dropdown {
         border-radius: var(--border-radius);
         border: 1px solid var(--gray);
         box-shadow: var(--shadow-md);
         background: #fff;
-        font-size: 1rem;
+        font-size: 0.95rem;
         color: var(--dark);
         z-index: 9999;
+        /* Lebar akan di-set dinamis via JavaScript */
+        width: auto !important;
+        min-width: 280px;
+        max-width: min(600px, 90vw);
+    }
+
+    .select2-results__options {
+        max-height: 250px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: var(--gray) transparent;
+    }
+
+    .select2-results__options::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .select2-results__options::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .select2-results__options::-webkit-scrollbar-thumb {
+        background: var(--gray);
+        border-radius: 3px;
     }
 
     .select2-results__option {
-        padding: 0.75rem 1.25rem;
+        padding: 0.75rem 1rem;
         transition: var(--transition);
+        white-space: normal;
+        word-wrap: break-word;
+        line-height: 1.4;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+    }
+
+    .select2-results__option:last-child {
+        border-bottom: none;
     }
 
     .select2-results__option--highlighted {
@@ -468,6 +508,7 @@
     .select2-results__option--selected {
         background: var(--primary) !important;
         color: #fff !important;
+        font-weight: 600;
     }
 
     .select2-container--default .select2-selection--single .select2-selection__placeholder {
@@ -607,6 +648,16 @@
         .modal-content {
             width: 95%;
         }
+
+        .select2-dropdown {
+            max-width: 95vw;
+            min-width: 250px;
+        }
+        
+        .item-table td:nth-child(1) {
+            min-width: 180px;
+            width: 50%;
+        }
     }
 
     @media (max-width: 480px) {
@@ -621,6 +672,11 @@
         .item-table th,
         .item-table td {
             padding: 0.75rem;
+        }
+
+        .select2-dropdown {
+            max-width: 90vw;
+            min-width: 200px;
         }
     }
 
@@ -649,52 +705,48 @@
         margin-top: 0;
     }
 
-    /* Pastikan teks barang tidak keluar dari container */
-    .item-table .select2-selection__rendered {
-        white-space: normal;
-        text-overflow: ellipsis;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
+    /* Penyesuaian lebar kolom untuk tabel pemasukan */
+    .income-table th:nth-child(1),
+    .income-table td:nth-child(1) {
+        width: 45%;
+        min-width: 280px;
     }
 
-    /* Penyesuaian lebar kolom untuk tabel pemasukan */
     .income-table th:nth-child(2),
     .income-table td:nth-child(2) {
         width: 15%;
-        /* Lebar kolom Jumlah */
     }
 
     .income-table th:nth-child(3),
     .income-table td:nth-child(3) {
         width: 20%;
-        /* Lebar kolom Harga Satuan */
     }
 
     .income-table th:nth-child(4),
     .income-table td:nth-child(4) {
         width: 20%;
-        /* Lebar kolom Subtotal */
     }
 
     .income-table th:nth-child(5),
     .income-table td:nth-child(5) {
         width: 10%;
-        /* Lebar kolom Aksi */
     }
 
     /* Penyesuaian lebar kolom untuk tabel pengeluaran */
+    .expense-table th:nth-child(1),
+    .expense-table td:nth-child(1) {
+        width: 70%;
+        min-width: 280px;
+    }
+
     .expense-table th:nth-child(2),
     .expense-table td:nth-child(2) {
         width: 20%;
-        /* Lebar kolom Jumlah */
     }
 
     .expense-table th:nth-child(3),
     .expense-table td:nth-child(3) {
         width: 10%;
-        /* Lebar kolom Aksi */
     }
 
     .item-table th {
@@ -1118,6 +1170,44 @@
         return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
+    // Calculate optimal dropdown width based on content
+    function calculateOptimalDropdownWidth(selectElement) {
+        const $select = $(selectElement);
+        const options = $select.find('option');
+        let maxLength = 0;
+        let longestText = '';
+
+        // Find the longest option text
+        options.each(function() {
+            const text = $(this).text().trim();
+            if (text.length > maxLength && text !== '') {
+                maxLength = text.length;
+                longestText = text;
+            }
+        });
+
+        // Create a temporary element to measure text width
+        const $temp = $('<span>').css({
+            'font-family': $('.select2-dropdown').css('font-family') || 'Plus Jakarta Sans, sans-serif',
+            'font-size': $('.select2-dropdown').css('font-size') || '0.95rem',
+            'font-weight': 'normal',
+            'position': 'absolute',
+            'visibility': 'hidden',
+            'white-space': 'nowrap',
+            'padding': '0.75rem 1rem'
+        }).text(longestText).appendTo('body');
+
+        const textWidth = $temp.outerWidth();
+        $temp.remove();
+
+        // Calculate optimal width with padding and arrow space
+        const minWidth = 280;
+        const maxWidth = Math.min(600, $(window).width() * 0.9);
+        const optimalWidth = Math.max(minWidth, Math.min(textWidth + 60, maxWidth));
+
+        return optimalWidth;
+    }
+
     // Preview uploaded image - GLOBAL FUNCTION
     function previewUploadedImage(input, type = 'income') {
         const file = input.files[0];
@@ -1247,13 +1337,8 @@
         // Remove existing Select2 container
         $(select).next('.select2-container').remove();
 
-        // Initialize Select2 again
-        $(select).select2({
-            placeholder: "Pilih barang...",
-            width: '100%',
-            dropdownAutoWidth: true,
-            closeOnSelect: true
-        });
+        // Initialize Select2 with optimal width
+        initializeSelect2ForElement(select);
 
         // Add event listeners for quantity and price inputs
         const jumlahInput = newRow.querySelector('.jumlah');
@@ -1327,13 +1412,8 @@
         select.val('');
         select.next('.select2-container').remove();
 
-        // Re-initialize Select2
-        select.select2({
-            placeholder: "Pilih barang...",
-            width: '100%',
-            dropdownAutoWidth: true,
-            closeOnSelect: true
-        });
+        // Re-initialize Select2 with optimal width
+        initializeSelect2ForElement(select[0]);
 
         // Reset stock info
         newRow.find('.stok-info').text('Stok: -');
@@ -1357,23 +1437,52 @@
         }
     }
 
-    // Initialize Select2 - GLOBAL FUNCTION
-    function initSelect2() {
-        if ($('.select-barang').length) {
-            $('.select-barang').select2({
+    // Initialize Select2 for a single element with optimal width
+    function initializeSelect2ForElement(element) {
+        const $element = $(element);
+        const isBarangSelect = $element.hasClass('select-barang');
+        
+        if (isBarangSelect) {
+            const optimalWidth = calculateOptimalDropdownWidth(element);
+            
+            $element.select2({
                 placeholder: "Pilih barang...",
                 width: '100%',
-                dropdownAutoWidth: true,
-                closeOnSelect: true
+                dropdownAutoWidth: false,
+                closeOnSelect: true,
+                dropdownParent: $('.form-card'),
+                dropdownCssClass: 'select2-dropdown-optimal'
+            }).on('select2:open', function() {
+                // Set optimal width when dropdown opens
+                const dropdown = $element.data('select2').$dropdown;
+                dropdown.css({
+                    'width': optimalWidth + 'px',
+                    'min-width': '280px',
+                    'max-width': Math.min(600, $(window).width() * 0.9) + 'px'
+                });
             });
-        }
-        if ($('#pegawai_id').length) {
-            $('#pegawai_id').select2({
-                placeholder: "Pilih pegawai...",
+        } else {
+            // Standard initialization for other selects
+            $element.select2({
+                placeholder: "Pilih...",
                 width: '100%',
                 dropdownAutoWidth: true,
-                closeOnSelect: true
+                closeOnSelect: true,
+                dropdownParent: $('.form-card')
             });
+        }
+    }
+
+    // Initialize Select2 - GLOBAL FUNCTION
+    function initSelect2() {
+        // Initialize barang selections with optimal width
+        $('.select-barang').each(function() {
+            initializeSelect2ForElement(this);
+        });
+
+        // Initialize pegawai selection (standard)
+        if ($('#pegawai_id').length) {
+            initializeSelect2ForElement($('#pegawai_id')[0]);
         }
     }
 
@@ -1465,8 +1574,17 @@
                 $('.select2-container--open').find('.select2-selection').trigger('blur');
             }
         });
+
+        // Handle window resize to recalculate dropdown widths
+        $(window).on('resize', function() {
+            $('.select-barang').each(function() {
+                if ($(this).hasClass('select2-hidden-accessible')) {
+                    const optimalWidth = calculateOptimalDropdownWidth(this);
+                    $(this).data('optimal-width', optimalWidth);
+                }
+            });
+        });
     });
 </script>
 
 @endsection
-
