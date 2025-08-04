@@ -94,29 +94,84 @@
                             <p class="text-sm text-gray-500">{{ $struks->total() }} struk ditemukan</p>
                         </div>
                     </div>
-                    <div class="relative">
-    <input type="text" name="search" id="searchInput" placeholder="Cari struk..." 
-           class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all" 
-           value="{{ request('search') }}" autocomplete="off">
-    <button type="button" class="absolute left-3 top-2.5 text-gray-400">
+                    <div class="relative w-64">
+    <!-- Input -->
+    <input type="text" name="search" id="searchInput"
+        class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 w-full transition-all bg-transparent text-sm text-gray-800"
+        value="{{ request('search') }}" autocomplete="off">
+
+    <!-- Teks placeholder animasi -->
+    <div id="animatedPlaceholder"
+        class="absolute left-10 top-2.5 text-gray-400 text-sm whitespace-nowrap overflow-hidden pointer-events-none w-[calc(100%-3rem)]"
+        style="{{ request('search') ? 'display: none;' : '' }}">
+        <div class="animate-marquee inline-block">
+            Cari berdasarkan Toko atau No. Struk
+        </div>
+    </div>
+
+    <!-- Icon search -->
+    <button type="button" class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
     </button>
+
+    <!-- Tombol clear -->
     @if (request('search'))
-    <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600" title="Bersihkan pencarian">
+    <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+        title="Bersihkan pencarian">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M6 18L18 6M6 6l12 12" />
         </svg>
     </button>
     @endif
+
+    <!-- Loading -->
     <div id="searchLoading" class="hidden absolute right-10 top-2.5">
-        <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+            <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
         </svg>
     </div>
 </div>
+
+<!-- Style animasi -->
+<style>
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 6s linear infinite;
+}
+</style>
+
+<!-- Script kontrol tampil/hilang placeholder -->
+<script>
+    const input = document.getElementById('searchInput');
+    const placeholder = document.getElementById('animatedPlaceholder');
+
+    input.addEventListener('focus', () => {
+        placeholder.style.display = 'none';
+    });
+
+    input.addEventListener('blur', () => {
+        if (!input.value) {
+            placeholder.style.display = 'block';
+        }
+    });
+</script>
+
                 </div>
             </div>
 
@@ -162,17 +217,17 @@
                                 <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</div>
                             </td>
                             <td class="px-6 py-4">
-    <div class="space-y-2 overflow-x-auto">
-        @foreach ($items as $item)
-        <div class="flex items-start whitespace-nowrap">
-            <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
-            <span class="text-gray-700">
-                {{ $item['nama_barang'] ?? '-' }}
-            </span>
-        </div>
-        @endforeach
-    </div>
-</td>
+                                <div class="space-y-2 overflow-x-auto">
+                                    @foreach ($items as $item)
+                                    <div class="flex items-start whitespace-nowrap">
+                                        <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
+                                        <span class="text-gray-700">
+                                            {{ $item['nama_barang'] ?? '-' }}
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </td>
                             <td class="px-6 py-4">
                                 <div class="max-w-xs space-y-2">
                                     @foreach ($items as $item)
@@ -589,133 +644,133 @@
         @endif
 
         const searchInput = document.getElementById('searchInput');
-const clearSearch = document.getElementById('clearSearch');
-const searchLoading = document.getElementById('searchLoading');
-let searchTimeout;
+        const clearSearch = document.getElementById('clearSearch');
+        const searchLoading = document.getElementById('searchLoading');
+        let searchTimeout;
 
-// Fungsi untuk memuat data via AJAX
-    function loadData(searchTerm = '') {
-        const url = new URL(window.location.href);
-        if (searchTerm) {
-            url.searchParams.set('search', searchTerm);
-        } else {
-            url.searchParams.delete('search');
-        }
-
-        searchLoading.classList.remove('hidden');
-
-        fetch(url.toString(), {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.text())
-        .then(html => {
-            // Parse HTML response
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, 'text/html');
-            
-            // Update tabel
-            const newTableBody = doc.querySelector('tbody');
-            if (newTableBody) {
-                document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
-            }
-
-            // Update pagination
-            const newPagination = doc.querySelector('[class*="pagination"]');
-            if (newPagination) {
-                const paginationContainer = document.querySelector('[class*="pagination"]').parentNode;
-                paginationContainer.innerHTML = newPagination.innerHTML;
-            }
-
-            // Update info hasil
-            const newResultsInfo = doc.querySelector('.text-sm.text-gray-600');
-            if (newResultsInfo) {
-                document.querySelector('.text-sm.text-gray-600').textContent = newResultsInfo.textContent;
-            }
-
-            searchLoading.classList.add('hidden');
-            
-            // Animasi untuk baris baru
-            animateRows();
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            searchLoading.classList.add('hidden');
-        });
-    }
-
-    // Fungsi untuk animasi baris
-    function animateRows() {
-        document.querySelectorAll('tbody tr').forEach((row, index) => {
-            row.style.opacity = '0';
-            row.style.transform = 'translateY(10px)';
-            row.style.transition = 'all 0.3s ease-out';
-            row.style.transitionDelay = `${index * 0.05}s`;
-
-            setTimeout(() => {
-                row.style.opacity = '1';
-                row.style.transform = 'translateY(0)';
-            }, 50);
-        });
-    }
-
-    // Event listener untuk input search
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        const searchTerm = this.value.trim();
-        
-        // Simpan cursor position
-        const cursorPosition = this.selectionStart;
-        localStorage.setItem('searchCursorPosition', cursorPosition);
-
-        searchTimeout = setTimeout(() => {
-            loadData(searchTerm);
-            
-            // Update URL tanpa reload
+        // Fungsi untuk memuat data via AJAX
+        function loadData(searchTerm = '') {
             const url = new URL(window.location.href);
             if (searchTerm) {
                 url.searchParams.set('search', searchTerm);
             } else {
                 url.searchParams.delete('search');
             }
-            window.history.pushState({}, '', url.toString());
-        }, 500); // Debounce 500ms
-    });
 
-    // Handle tombol clear search
-    if (clearSearch) {
-        clearSearch.addEventListener('click', function() {
-            searchInput.value = '';
-            localStorage.removeItem('searchCursorPosition');
-            loadData('');
-            
-            // Update URL
-            const url = new URL(window.location.href);
-            url.searchParams.delete('search');
-            window.history.pushState({}, '', url.toString());
+            searchLoading.classList.remove('hidden');
+
+            fetch(url.toString(), {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    // Parse HTML response
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+
+                    // Update tabel
+                    const newTableBody = doc.querySelector('tbody');
+                    if (newTableBody) {
+                        document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
+                    }
+
+                    // Update pagination
+                    const newPagination = doc.querySelector('[class*="pagination"]');
+                    if (newPagination) {
+                        const paginationContainer = document.querySelector('[class*="pagination"]').parentNode;
+                        paginationContainer.innerHTML = newPagination.innerHTML;
+                    }
+
+                    // Update info hasil
+                    const newResultsInfo = doc.querySelector('.text-sm.text-gray-600');
+                    if (newResultsInfo) {
+                        document.querySelector('.text-sm.text-gray-600').textContent = newResultsInfo.textContent;
+                    }
+
+                    searchLoading.classList.add('hidden');
+
+                    // Animasi untuk baris baru
+                    animateRows();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    searchLoading.classList.add('hidden');
+                });
+        }
+
+        // Fungsi untuk animasi baris
+        function animateRows() {
+            document.querySelectorAll('tbody tr').forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateY(10px)';
+                row.style.transition = 'all 0.3s ease-out';
+                row.style.transitionDelay = `${index * 0.05}s`;
+
+                setTimeout(() => {
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateY(0)';
+                }, 50);
+            });
+        }
+
+        // Event listener untuk input search
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchTerm = this.value.trim();
+
+            // Simpan cursor position
+            const cursorPosition = this.selectionStart;
+            localStorage.setItem('searchCursorPosition', cursorPosition);
+
+            searchTimeout = setTimeout(() => {
+                loadData(searchTerm);
+
+                // Update URL tanpa reload
+                const url = new URL(window.location.href);
+                if (searchTerm) {
+                    url.searchParams.set('search', searchTerm);
+                } else {
+                    url.searchParams.delete('search');
+                }
+                window.history.pushState({}, '', url.toString());
+            }, 500); // Debounce 500ms
         });
-    }
 
-    // Handle popstate (back/forward button)
-    window.addEventListener('popstate', function() {
-        const url = new URL(window.location.href);
-        const searchTerm = url.searchParams.get('search') || '';
-        searchInput.value = searchTerm;
-        loadData(searchTerm);
-    });
+        // Handle tombol clear search
+        if (clearSearch) {
+            clearSearch.addEventListener('click', function() {
+                searchInput.value = '';
+                localStorage.removeItem('searchCursorPosition');
+                loadData('');
 
-    // Restore cursor position
-    const savedCursorPosition = localStorage.getItem('searchCursorPosition');
-    if (searchInput.value && savedCursorPosition) {
-        setTimeout(() => {
-            searchInput.focus();
-            searchInput.selectionStart = searchInput.selectionEnd = parseInt(savedCursorPosition);
-            localStorage.removeItem('searchCursorPosition');
-        }, 50);
-    }
+                // Update URL
+                const url = new URL(window.location.href);
+                url.searchParams.delete('search');
+                window.history.pushState({}, '', url.toString());
+            });
+        }
 
-        
+        // Handle popstate (back/forward button)
+        window.addEventListener('popstate', function() {
+            const url = new URL(window.location.href);
+            const searchTerm = url.searchParams.get('search') || '';
+            searchInput.value = searchTerm;
+            loadData(searchTerm);
+        });
+
+        // Restore cursor position
+        const savedCursorPosition = localStorage.getItem('searchCursorPosition');
+        if (searchInput.value && savedCursorPosition) {
+            setTimeout(() => {
+                searchInput.focus();
+                searchInput.selectionStart = searchInput.selectionEnd = parseInt(savedCursorPosition);
+                localStorage.removeItem('searchCursorPosition');
+            }, 50);
+        }
+
+
 
         document.querySelectorAll('tbody tr').forEach((row, index) => {
             row.style.opacity = '0';
@@ -1466,7 +1521,5 @@ let searchTimeout;
     .loading-pulse {
         animation: pulse 1.5s infinite;
     }
-
-    
 </style>
 @endsection

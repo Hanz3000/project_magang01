@@ -179,16 +179,29 @@
                             <p class="text-sm text-gray-500">{{ $pengeluarans->total() }} struk ditemukan</p>
                         </div>
                     </div>
-                    <div class="relative">
-    <input type="text" name="search" id="searchInput" placeholder="Cari pengeluaran..."
-        class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-64 transition-all"
+                    <div class="relative w-64">
+    <!-- Input -->
+    <input type="text" name="search" id="searchInput"
+        class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 w-full transition-all bg-transparent text-sm text-gray-800"
         value="{{ request('search') }}" autocomplete="off">
-    <button type="button" class="absolute left-3 top-2.5 text-gray-400">
+
+    <!-- Teks animasi di dalam input -->
+    <div id="animatedPlaceholder"
+        class="absolute left-10 top-2.5 text-gray-400 text-sm whitespace-nowrap overflow-hidden pointer-events-none w-[calc(100%-3rem)]"
+        style="{{ request('search') ? 'display: none;' : '' }}">
+        <div class="animate-marquee inline-block">
+            Cari berdasarkan Nama SPK, No. Struk atau Pegawai.
+        </div>
+    </div>
+
+    <!-- Icon search -->
+    <button type="button" class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
     </button>
+
     @if (request('search'))
     <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
         title="Bersihkan pencarian">
@@ -198,13 +211,52 @@
         </svg>
     </button>
     @endif
+
+    <!-- Loading -->
     <div id="searchLoading" class="hidden absolute right-10 top-2.5">
-        <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+            viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+            </path>
         </svg>
     </div>
 </div>
+
+<!-- Style animasi marquee -->
+<style>
+@keyframes marquee {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.animate-marquee {
+    animation: marquee 8s linear infinite;
+}
+</style>
+
+<!-- Script untuk sembunyikan animasi saat fokus -->
+<script>
+    const input = document.getElementById('searchInput');
+    const placeholder = document.getElementById('animatedPlaceholder');
+
+    input.addEventListener('focus', () => {
+        placeholder.style.display = 'none';
+    });
+
+    input.addEventListener('blur', () => {
+        if (!input.value) {
+            placeholder.style.display = 'block';
+        }
+    });
+</script>
+
                 </div>
             </div>
 
@@ -229,7 +281,7 @@
                             </th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Jumlah
                             </th>
-                           
+
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi
                             </th>
                         </tr>
@@ -273,7 +325,7 @@
                                 <div class="mb-1">x{{ $item['jumlah'] }}</div>
                                 @endforeach
                             </td>
-                           
+
 
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex justify-center space-x-2">
@@ -486,7 +538,7 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const selectAll = document.getElementById('selectAll');
         const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
         const bulkActions = document.getElementById('bulkActionsContainer');
@@ -519,7 +571,7 @@
 
         // Event: Select All
         if (selectAll) {
-            selectAll.addEventListener('change', function () {
+            selectAll.addEventListener('change', function() {
                 const isChecked = this.checked;
                 rowCheckboxes.forEach(checkbox => {
                     checkbox.checked = isChecked;
@@ -534,14 +586,14 @@
         });
 
         // Event delegation untuk checkbox dinamis (jika ada)
-        document.addEventListener('change', function (e) {
+        document.addEventListener('change', function(e) {
             if (e.target.classList.contains('rowCheckbox')) {
                 updateBulkActions();
             }
         });
 
         // ✅ Fungsi: Clear Selection
-        window.clearSelection = function () {
+        window.clearSelection = function() {
             rowCheckboxes.forEach(checkbox => {
                 checkbox.checked = false;
             });
@@ -552,7 +604,7 @@
         };
 
         // ✅ Fungsi: Konfirmasi Bulk Delete → Buka Modal
-        window.confirmBulkDelete = function () {
+        window.confirmBulkDelete = function() {
             const selectedIds = JSON.parse(selectedIdsInput.value || '[]');
             if (selectedIds.length === 0) {
                 alert('Pilih setidaknya satu data untuk dihapus.');
@@ -566,12 +618,12 @@
         };
 
         // ✅ Fungsi: Submit Bulk Delete
-        window.submitBulkDelete = function () {
+        window.submitBulkDelete = function() {
             document.getElementById('bulkDeleteForm').submit();
         };
 
         // ✅ Fungsi: Tutup Modal Bulk Delete
-        window.closeDeleteModal = function () {
+        window.closeDeleteModal = function() {
             const modal = document.getElementById('deleteModal');
             modal.classList.add('hidden');
             document.body.classList.remove('overflow-hidden');
@@ -594,49 +646,49 @@
             searchLoading.classList.remove('hidden');
 
             fetch(url.toString(), {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.text())
-            .then(html => {
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                // Update tabel
-                const newTableBody = doc.querySelector('tbody');
-                if (newTableBody) {
-                    document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
-                }
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => response.text())
+                .then(html => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
 
-                // Update pagination
-                const newPagination = doc.querySelector('[class*="pagination"]');
-                if (newPagination) {
-                    document.querySelector('[class*="pagination"]').parentNode.innerHTML = 
-                        newPagination.parentNode.innerHTML;
-                }
+                    // Update tabel
+                    const newTableBody = doc.querySelector('tbody');
+                    if (newTableBody) {
+                        document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
+                    }
 
-                // Update info hasil
-                const newResultsInfo = doc.querySelector('.text-sm.text-gray-600');
-                if (newResultsInfo) {
-                    document.querySelector('.text-sm.text-gray-600').textContent = 
-                        newResultsInfo.textContent;
-                }
+                    // Update pagination
+                    const newPagination = doc.querySelector('[class*="pagination"]');
+                    if (newPagination) {
+                        document.querySelector('[class*="pagination"]').parentNode.innerHTML =
+                            newPagination.parentNode.innerHTML;
+                    }
 
-                searchLoading.classList.add('hidden');
-                animateRows();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                searchLoading.classList.add('hidden');
-            });
+                    // Update info hasil
+                    const newResultsInfo = doc.querySelector('.text-sm.text-gray-600');
+                    if (newResultsInfo) {
+                        document.querySelector('.text-sm.text-gray-600').textContent =
+                            newResultsInfo.textContent;
+                    }
+
+                    searchLoading.classList.add('hidden');
+                    animateRows();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    searchLoading.classList.add('hidden');
+                });
         }
 
         // Event listener untuk input search
         if (searchInput) {
             searchInput.addEventListener('input', function() {
                 clearTimeout(searchTimeout);
-                
+
                 // Simpan posisi kursor
                 const cursorPosition = this.selectionStart;
                 localStorage.setItem('searchCursorPosition', cursorPosition);
@@ -644,7 +696,7 @@
                 searchTimeout = setTimeout(() => {
                     const searchTerm = this.value.trim();
                     loadData(searchTerm);
-                    
+
                     // Update URL tanpa reload
                     const url = new URL(window.location.href);
                     if (searchTerm) {
@@ -662,7 +714,7 @@
                     searchInput.value = '';
                     localStorage.removeItem('searchCursorPosition');
                     loadData('');
-                    
+
                     const url = new URL(window.location.href);
                     url.searchParams.delete('search');
                     window.history.pushState({}, '', url.toString());
@@ -715,11 +767,11 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    document.getElementById('imageModal').addEventListener('click', function (e) {
+    document.getElementById('imageModal').addEventListener('click', function(e) {
         if (e.target === this) closeModal();
     });
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !document.getElementById('imageModal').classList.contains('hidden')) {
             closeModal();
         }
@@ -738,11 +790,11 @@
         document.body.classList.remove('overflow-hidden');
     }
 
-    document.getElementById('singleDeleteModal').addEventListener('click', function (e) {
+    document.getElementById('singleDeleteModal').addEventListener('click', function(e) {
         if (e.target === this) closeSingleDeleteModal();
     });
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && !document.getElementById('singleDeleteModal').classList.contains('hidden')) {
             closeSingleDeleteModal();
         }

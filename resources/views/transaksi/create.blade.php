@@ -732,21 +732,24 @@
         width: 10%;
     }
 
-    /* Penyesuaian lebar kolom untuk tabel pengeluaran */
+    /* PERBAIKAN: Penyesuaian lebar kolom untuk tabel pengeluaran agar sejajar */
     .expense-table th:nth-child(1),
     .expense-table td:nth-child(1) {
-        width: 70%;
+        width: 65%;
         min-width: 280px;
+        padding-right: 1.5rem;
     }
 
     .expense-table th:nth-child(2),
     .expense-table td:nth-child(2) {
-        width: 20%;
+        width: 25%;
+        text-align: center;
     }
 
     .expense-table th:nth-child(3),
     .expense-table td:nth-child(3) {
         width: 10%;
+        text-align: center;
     }
 
     .item-table th {
@@ -804,10 +807,22 @@
         text-align: left;
     }
 
-    /* Perataan tengah untuk kolom jumlah dan aksi */
-    .item-table td:nth-child(2),
-    .item-table td:nth-child(3) {
+    /* PERBAIKAN: Perataan tengah untuk kolom jumlah dan aksi pada pengeluaran */
+    .expense-table td:nth-child(2),
+    .expense-table td:nth-child(3) {
         text-align: center;
+    }
+
+    /* Perataan untuk input dalam kolom jumlah pengeluaran */
+    .expense-table td:nth-child(2) .input-group {
+        display: flex;
+        justify-content: center;
+    }
+
+    .expense-table td:nth-child(2) .input-group input {
+        text-align: center;
+        width: 80px;
+        min-width: 80px;
     }
 
     .total-display {
