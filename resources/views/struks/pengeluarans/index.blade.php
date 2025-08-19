@@ -190,7 +190,7 @@
         class="absolute left-10 top-2.5 text-gray-400 text-sm whitespace-nowrap overflow-hidden pointer-events-none w-[calc(100%-3rem)]"
         style="{{ request('search') ? 'display: none;' : '' }}">
         <div class="animate-marquee inline-block">
-            Cari berdasarkan Nama SPK, No. Struk atau Pegawai.
+            Cari berdasarkan Management SPK, No. Struk atau Pegawai.
         </div>
     </div>
 
@@ -268,7 +268,7 @@
                                 <input type="checkbox" id="selectAll" class="checkbox-style">
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Nama Spk
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Management SPK
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.
                                 Struk
