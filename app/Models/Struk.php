@@ -13,6 +13,7 @@ class Struk extends Model
         'tanggal_keluar', // ⬅️ tambahkan ini
         'items',
         'total_harga',
+        'status',
         'foto_struk'
     ];
 }

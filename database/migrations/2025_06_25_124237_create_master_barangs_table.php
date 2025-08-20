@@ -7,15 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::create('master_barangs', function (Blueprint $table) {
+        Schema::create('master_barang', function (Blueprint $table) {
             $table->id();
             $table->string('nama_barang')->unique();
+            $table->enum('status', ['progress', 'completed'])->default('progress'); // 👈 status
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('master_barangs');
+        Schema::dropIfExists('master_barang');
     }
 };

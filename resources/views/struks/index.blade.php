@@ -20,7 +20,7 @@
             <input type="hidden" name="selected_ids" id="selectedIds">
         </form>
 
-        <div class="mb-6">
+        <div class="mb-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
@@ -95,83 +95,40 @@
                         </div>
                     </div>
                     <div class="relative w-64">
-    <!-- Input -->
-    <input type="text" name="search" id="searchInput"
-        class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 w-full transition-all bg-transparent text-sm text-gray-800"
-        value="{{ request('search') }}" autocomplete="off">
-
-    <!-- Teks placeholder animasi -->
-    <div id="animatedPlaceholder"
-        class="absolute left-10 top-2.5 text-gray-400 text-sm whitespace-nowrap overflow-hidden pointer-events-none w-[calc(100%-3rem)]"
-        style="{{ request('search') ? 'display: none;' : '' }}">
-        <div class="animate-marquee inline-block">
-            Cari berdasarkan Toko atau No. Struk
-        </div>
-    </div>
-
-    <!-- Icon search -->
-    <button type="button" class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-    </button>
-
-    <!-- Tombol clear -->
-    @if (request('search'))
-    <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-        title="Bersihkan pencarian">
-        <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M6 18L18 6M6 6l12 12" />
-        </svg>
-    </button>
-    @endif
-
-    <!-- Loading -->
-    <div id="searchLoading" class="hidden absolute right-10 top-2.5">
-        <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
-            viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
-            <path class="opacity-75" fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-        </svg>
-    </div>
-</div>
-
-<!-- Style animasi -->
-<style>
-@keyframes marquee {
-    0% {
-        transform: translateX(100%);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-.animate-marquee {
-    animation: marquee 6s linear infinite;
-}
-</style>
-
-<!-- Script kontrol tampil/hilang placeholder -->
-<script>
-    const input = document.getElementById('searchInput');
-    const placeholder = document.getElementById('animatedPlaceholder');
-
-    input.addEventListener('focus', () => {
-        placeholder.style.display = 'none';
-    });
-
-    input.addEventListener('blur', () => {
-        if (!input.value) {
-            placeholder.style.display = 'block';
-        }
-    });
-</script>
-
+                        <input type="text" name="search" id="searchInput"
+                            class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 w-full transition-all bg-transparent text-sm text-gray-800"
+                            value="{{ request('search') }}" autocomplete="off">
+                        <div id="animatedPlaceholder"
+                            class="absolute left-10 top-2.5 text-gray-400 text-sm whitespace-nowrap overflow-hidden pointer-events-none w-[calc(100%-3rem)]"
+                            style="{{ request('search') ? 'display: none;' : '' }}">
+                            <div class="animate-marquee inline-block">
+                                Cari berdasarkan Toko atau No. Struk
+                            </div>
+                        </div>
+                        <button type="button" class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </button>
+                        @if (request('search'))
+                        <button id="clearSearch" class="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                            title="Bersihkan pencarian">
+                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        @endif
+                        <div id="searchLoading" class="hidden absolute right-10 top-2.5">
+                            <svg class="animate-spin h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none"
+                                viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                            </svg>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -189,6 +146,7 @@
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
                             <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Foto Struk</th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
@@ -197,7 +155,7 @@
                     <tbody class="divide-y divide-gray-200">
                         @forelse ($struks as $index => $struk)
                         @php
-                        $items = is_string($struk->items) ? json_decode($struk->items, true) : [];
+                        $items = is_string($struk->items) ? json_decode($struk->items, true) : $struk->items;
                         if (!is_array($items)) $items = [];
                         $totalHarga = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
                         @endphp
@@ -206,7 +164,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <input type="checkbox" name="selected_ids[]" value="{{ $struk->id }}" class="row-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ $index + 1 }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ $struks->firstItem() + $index }}</td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="font-medium text-gray-900">{{ $struk->nama_toko }}</div>
                             </td>
@@ -222,7 +180,7 @@
                                     <div class="flex items-start whitespace-nowrap">
                                         <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
                                         <span class="text-gray-700">
-                                            {{ $item['nama_barang'] ?? '-' }}
+                                            {{ $item['nama_barang'] ?? $barangList[$item['nama']]?->nama_barang ?? $item['nama'] }}
                                         </span>
                                     </div>
                                     @endforeach
@@ -241,6 +199,11 @@
                                 Rp{{ number_format($totalHarga, 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $struk->status == 'progress' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ ucfirst($struk->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
                                 @if ($struk->foto_struk)
                                 <button onclick="openModal('{{ asset('storage/struk_foto/' . $struk->foto_struk) }}')" class="text-indigo-600 hover:text-indigo-900">
                                     <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,7 +218,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex justify-center space-x-2">
                                     <a href="{{ route('struks.show', $struk->id) }}" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors" title="Lihat Detail">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5琉 class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
@@ -277,83 +240,9 @@
                                 </div>
                             </td>
                         </tr>
-
-                        @if (request('edit') == $struk->id)
-                        <tr class="bg-indigo-50 animate-fadeIn">
-                            <td colspan="9" class="px-0 py-4">
-                                <div class="px-6 max-w-5xl ml-auto">
-                                    <form method="POST" action="{{ route('struks.updateItems', $struk->id) }}" class="space-y-4">
-                                        @csrf
-                                        @method('PUT')
-
-                                        <h4 class="font-medium text-gray-700 mb-2">Edit Item Struk</h4>
-
-                                        <div id="itemsContainer" class="space-y-3">
-                                            @php
-                                            $totalHargaEdit = 0;
-                                            @endphp
-                                            @foreach ($items as $idx => $item)
-                                            @php
-                                            $totalHargaEdit += ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0);
-                                            @endphp
-                                            <div class="flex items-center space-x-4 item-row">
-                                                <input type="hidden" name="item_index[]" value="{{ $idx }}">
-                                                <div class="flex-1 relative">
-                                                    <input type="text" name="nama[]" value="{{ $item['nama_barang'] ?? '' }}" class="w-full border border-gray-300 rounded-lg px-3 py-2 bg-gray-100" readonly>
-                                                </div>
-                                                <input name="jumlah[]" type="number" value="{{ $item['jumlah'] ?? '' }}" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" min="1">
-                                                <input name="harga[]" type="number" value="{{ $item['harga'] ?? '' }}" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga" min="0">
-                                                @if (count($items) > 1)
-                                                <button type="button" onclick="confirmDeleteItem('{{ $struk->id }}', '{{ $idx }}')" class="text-red-500 hover:text-red-700 p-1" title="Hapus">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                                    </svg>
-                                                </button>
-                                                @else
-                                                <span class="w-5 h-5"></span>
-                                                @endif
-                                            </div>
-                                            @endforeach
-                                            <div class="flex justify-end text-gray-700 font-medium">
-                                                Total: Rp{{ number_format($totalHargaEdit, 0, ',', '.') }}
-                                            </div>
-                                        </div>
-
-                                        <div class="flex items-center space-x-4 item-row border-2 border-dashed border-indigo-200 rounded-lg p-3 bg-indigo-25">
-                                            <div class="flex-1 relative">
-                                                <select class="item-search w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white" id="modalNewItemNama">
-                                                    <option value="" disabled selected>Pilih Barang</option>
-                                                    @php
-                                                    $existingItems = collect($struks)->flatMap(function ($struk) {
-                                                    return is_string($struk->items) ? json_decode($struk->items, true) ?? [] : [];
-                                                    })->pluck('nama_barang')->unique()->toArray();
-                                                    @endphp
-                                                    @foreach ($barangList as $barang)
-                                                    @if (!in_array($barang->nama_barang, $existingItems))
-                                                    <option value="{{ $barang->nama_barang }}" data-price="{{ $barang->harga }}">{{ $barang->nama_barang }}</option>
-                                                    @endif
-                                                    @endforeach
-                                                </select>
-                                                <div class="autocomplete-results absolute z-10 w-full mt-1 hidden bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto"></div>
-                                            </div>
-                                            <input type="number" class="w-20 border border-gray-300 rounded-lg px-3 py-2 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="newItemJumlah" min="1">
-                                            <input type="number" class="w-28 border border-gray-300 rounded-lg px-3 py-2 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Harga" id="newItemHarga" min="0">
-
-                                            <button type="button" id="addItemBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm" onclick="addNewItemToModal()">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                                </svg>
-                                                Tambah
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @endif
                         @empty
                         <tr class="animate-fadeIn">
-                            <td colspan="9" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
+                            <td colspan="11" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -412,7 +301,7 @@
     <div class="relative">
         <img id="modalImage" src="" class="max-h-[80vh] rounded shadow-lg select-none">
         <button onclick="closeModal()" class="absolute top-2 right-2 text-white hover:text-gray-300 transition duration-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
@@ -431,8 +320,8 @@
                             </svg>
                         </div>
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-900">Edit Item Struk</h3>
-                            <p class="text-sm text-gray-500">Ubah, tambah, atau hapus item dalam struk</p>
+                            <h3 class="text-lg font-semibold text-gray-900">Edit Struk</h3>
+                            <p class="text-sm text-gray-500">Ubah detail struk, termasuk item dan status</p>
                         </div>
                     </div>
                     <button type="button" onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
@@ -444,9 +333,34 @@
             </div>
 
             <div class="px-6 py-4">
-                <form method="POST" action="" id="editItemsForm">
+                <form method="POST" action="" id="editForm">
                     @csrf
                     @method('PUT')
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nama Toko</label>
+                            <input type="text" name="nama_toko" id="editNamaToko" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Nomor Struk</label>
+                            <input type="text" name="nomor_struk" id="editNomorStruk" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tanggal Masuk</label>
+                            <input type="date" name="tanggal_struk" id="editTanggalStruk" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Tanggal Keluar (Opsional)</label>
+                            <input type="date" name="tanggal_keluar" id="editTanggalKeluar" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Status</label>
+                            <select name="status" id="editStatus" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
+                                <option value="progress">Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-12 gap-4 pb-3 mb-4 border-b border-gray-200">
                         <div class="col-span-5">
                             <label class="block text-sm font-medium text-gray-700 text-center">Nama Barang</label>
@@ -481,16 +395,7 @@
                                         <input type="text" id="filterBarang" class="w-full px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Filter barang...">
                                     </div>
                                     <div class="divide-y divide-gray-100" id="barangListContainer">
-                                        @php
-                                        $existingItems = collect($struks)->flatMap(function ($struk) {
-                                        if (is_object($struk) && isset($struk->items) && is_string($struk->items)) {
-                                        return json_decode($struk->items, true) ?? [];
-                                        }
-                                        return [];
-                                        })->pluck('nama_barang')->unique()->toArray();
-                                        @endphp
                                         @foreach($barangList as $barang)
-                                        @if (!in_array($barang->nama_barang, $existingItems))
                                         <div class="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex justify-between items-center barang-item" data-kode="{{ $barang->kode_barang }}" data-nama="{{ $barang->nama_barang }}" data-harga="{{ $barang->harga }}">
                                             <span>
                                                 <span class="font-mono text-xs text-gray-500">{{ $barang->kode_barang }}</span>
@@ -500,7 +405,6 @@
                                             <span class="text-xs text-gray-500">Rp{{ number_format($barang->harga, 0, ',', '.') }}</span>
                                             @endif
                                         </div>
-                                        @endif
                                         @endforeach
                                     </div>
                                 </div>
@@ -524,18 +428,16 @@
                             </div>
                         </div>
                     </div>
-                </form>
-            </div>
 
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-200 rounded-b-lg">
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
-                        Batal
-                    </button>
-                    <button type="button" onclick="submitEditForm()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium shadow-sm">
-                        Simpan Perubahan
-                    </button>
-                </div>
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
+                            Batal
+                        </button>
+                        <button type="button" onclick="submitEditForm()" class="px-6 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium shadow-sm">
+                            Simpan Perubahan
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -595,41 +497,27 @@
                 bulkActions.classList.remove('hidden');
                 selectedCount.textContent = `${selectedCheckboxes.length} dipilih`;
                 selectedIdsInput.value = selectedIds.join(',');
-
-                if (selectAll) {
-                    selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
-                    selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
-                }
+                selectAll.checked = selectedCheckboxes.length === rowCheckboxes.length;
+                selectAll.indeterminate = selectedCheckboxes.length > 0 && selectedCheckboxes.length < rowCheckboxes.length;
             } else {
                 bulkActions.classList.add('hidden');
                 selectedIdsInput.value = '';
-                if (selectAll) selectAll.checked = false;
+                selectAll.checked = false;
+                selectAll.indeterminate = false;
             }
         }
 
-        if (selectAll) {
-            selectAll.addEventListener('change', function() {
-                const isChecked = this.checked;
-                rowCheckboxes.forEach(checkbox => {
-                    checkbox.checked = isChecked;
-                });
-                updateBulkActions();
+        selectAll.addEventListener('change', function() {
+            const isChecked = this.checked;
+            rowCheckboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
             });
-        }
+            updateBulkActions();
+        });
 
         rowCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', updateBulkActions);
         });
-
-        document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('row-checkbox')) {
-                updateBulkActions();
-            }
-        });
-
-        if (window.location.pathname.includes('pengeluarans')) {
-            document.body.classList.add('pengeluaran-page');
-        }
 
         @if(session('success'))
         setTimeout(() => {
@@ -648,7 +536,6 @@
         const searchLoading = document.getElementById('searchLoading');
         let searchTimeout;
 
-        // Fungsi untuk memuat data via AJAX
         function loadData(searchTerm = '') {
             const url = new URL(window.location.href);
             if (searchTerm) {
@@ -656,6 +543,7 @@
             } else {
                 url.searchParams.delete('search');
             }
+            url.searchParams.delete('page'); // Reset ke halaman 1 saat pencarian berubah
 
             searchLoading.classList.remove('hidden');
 
@@ -666,33 +554,26 @@
                 })
                 .then(response => response.text())
                 .then(html => {
-                    // Parse HTML response
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
-
-                    // Update tabel
                     const newTableBody = doc.querySelector('tbody');
                     if (newTableBody) {
                         document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
                     }
-
-                    // Update pagination
-                    const newPagination = doc.querySelector('[class*="pagination"]');
+                    const newPagination = doc.querySelector('.flex.space-x-1');
                     if (newPagination) {
-                        const paginationContainer = document.querySelector('[class*="pagination"]').parentNode;
-                        paginationContainer.innerHTML = newPagination.innerHTML;
+                        document.querySelector('.flex.space-x-1').innerHTML = newPagination.innerHTML;
                     }
-
-                    // Update info hasil
                     const newResultsInfo = doc.querySelector('.text-sm.text-gray-600');
                     if (newResultsInfo) {
                         document.querySelector('.text-sm.text-gray-600').textContent = newResultsInfo.textContent;
                     }
-
                     searchLoading.classList.add('hidden');
-
-                    // Animasi untuk baris baru
                     animateRows();
+                    // Re-attach event listeners untuk checkbox
+                    document.querySelectorAll('.row-checkbox').forEach(checkbox => {
+                        checkbox.addEventListener('change', updateBulkActions);
+                    });
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -700,14 +581,12 @@
                 });
         }
 
-        // Fungsi untuk animasi baris
         function animateRows() {
             document.querySelectorAll('tbody tr').forEach((row, index) => {
                 row.style.opacity = '0';
                 row.style.transform = 'translateY(10px)';
                 row.style.transition = 'all 0.3s ease-out';
                 row.style.transitionDelay = `${index * 0.05}s`;
-
                 setTimeout(() => {
                     row.style.opacity = '1';
                     row.style.transform = 'translateY(0)';
@@ -715,19 +594,13 @@
             });
         }
 
-        // Event listener untuk input search
         searchInput.addEventListener('input', function() {
             clearTimeout(searchTimeout);
             const searchTerm = this.value.trim();
-
-            // Simpan cursor position
             const cursorPosition = this.selectionStart;
             localStorage.setItem('searchCursorPosition', cursorPosition);
-
             searchTimeout = setTimeout(() => {
                 loadData(searchTerm);
-
-                // Update URL tanpa reload
                 const url = new URL(window.location.href);
                 if (searchTerm) {
                     url.searchParams.set('search', searchTerm);
@@ -735,24 +608,20 @@
                     url.searchParams.delete('search');
                 }
                 window.history.pushState({}, '', url.toString());
-            }, 500); // Debounce 500ms
+            }, 500);
         });
 
-        // Handle tombol clear search
         if (clearSearch) {
             clearSearch.addEventListener('click', function() {
                 searchInput.value = '';
                 localStorage.removeItem('searchCursorPosition');
                 loadData('');
-
-                // Update URL
                 const url = new URL(window.location.href);
                 url.searchParams.delete('search');
                 window.history.pushState({}, '', url.toString());
             });
         }
 
-        // Handle popstate (back/forward button)
         window.addEventListener('popstate', function() {
             const url = new URL(window.location.href);
             const searchTerm = url.searchParams.get('search') || '';
@@ -760,7 +629,6 @@
             loadData(searchTerm);
         });
 
-        // Restore cursor position
         const savedCursorPosition = localStorage.getItem('searchCursorPosition');
         if (searchInput.value && savedCursorPosition) {
             setTimeout(() => {
@@ -770,14 +638,11 @@
             }, 50);
         }
 
-
-
         document.querySelectorAll('tbody tr').forEach((row, index) => {
             row.style.opacity = '0';
             row.style.transform = 'translateY(10px)';
             row.style.transition = 'all 0.3s ease-out';
             row.style.transitionDelay = `${index * 0.05}s`;
-
             setTimeout(() => {
                 row.style.opacity = '1';
                 row.style.transform = 'translateY(0)';
@@ -802,7 +667,6 @@
             alert('Pilih setidaknya satu struk untuk dihapus');
             return;
         }
-
         const count = selectedIds.split(',').length;
         if (confirm(`Apakah Anda yakin ingin menghapus ${count} struk yang dipilih?`)) {
             document.getElementById('bulkDeleteForm').submit();
@@ -838,15 +702,13 @@
         const modal = document.getElementById('editModal');
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        document.getElementById('editItemsForm').action = `/struks/${strukId}/update-items`;
-
+        document.getElementById('editForm').action = `/struks/${strukId}`;
         modal.scrollTop = 0;
-
         loadExistingItems(strukId);
+        loadStrukDetails(strukId);
         initBarangDropdown();
-
         setTimeout(() => {
-            document.getElementById('modalNewItemNama').focus();
+            document.getElementById('editNamaToko').focus();
         }, 100);
     }
 
@@ -855,11 +717,22 @@
         document.body.style.overflow = 'auto';
         document.getElementById('modalItemsContainer').innerHTML = '';
         clearNewItemFields();
-        document.getElementById('editModal').addEventListener('click', function(e) {
-            if (e.target === this) {
-                closeEditModal();
-            }
-        });
+    }
+
+    function loadStrukDetails(strukId) {
+        fetch(`/struks/${strukId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('editNamaToko').value = data.nama_toko || '';
+                document.getElementById('editNomorStruk').value = data.nomor_struk || '';
+                document.getElementById('editTanggalStruk').value = data.tanggal_struk || '';
+                document.getElementById('editTanggalKeluar').value = data.tanggal_keluar || '';
+                document.getElementById('editStatus').value = data.status || 'progress';
+            })
+            .catch(error => {
+                console.error('Error loading struk details:', error);
+                alert('Gagal memuat detail struk.');
+            });
     }
 
     function updateModalTotalPrice() {
@@ -871,6 +744,16 @@
             total += jumlah * harga;
         });
         document.getElementById('modalTotalPrice').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
+        // Update hidden input untuk total_harga
+        let totalHargaInput = document.getElementById('editTotalHarga');
+        if (!totalHargaInput) {
+            totalHargaInput = document.createElement('input');
+            totalHargaInput.type = 'hidden';
+            totalHargaInput.name = 'total_harga';
+            totalHargaInput.id = 'editTotalHarga';
+            document.getElementById('editForm').appendChild(totalHargaInput);
+        }
+        totalHargaInput.value = total;
     }
 
     function loadExistingItems(strukId) {
@@ -883,7 +766,6 @@
                 items.forEach((item, index) => {
                     addItemRowToModal(item, index);
                 });
-
                 if (items.length === 1) {
                     const deleteButton = container.querySelector('button[onclick="removeItemFromModal(this)"]');
                     if (deleteButton) {
@@ -895,6 +777,7 @@
                 updateModalTotalPrice();
             })
             .catch(error => {
+                console.error('Error loading items:', error);
                 container.innerHTML = '<div class="text-red-500">Gagal memuat data item.</div>';
             });
     }
@@ -905,122 +788,36 @@
         document.getElementById('filterBarang').focus();
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('filterBarang').addEventListener('input', function() {
-            const search = this.value.toLowerCase();
-            document.querySelectorAll('.barang-item').forEach(item => {
-                if (item.dataset.nama.toLowerCase().includes(search)) {
-                    item.style.display = 'flex';
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-        });
-
-        document.querySelectorAll('.barang-item').forEach(item => {
-            item.addEventListener('click', function() {
-                document.getElementById('modalNewItemNama').value = this.dataset.nama;
-                document.getElementById('modalNewItemNama').dataset.kode = this.dataset.kode;
-                document.getElementById('modalNewItemHarga').value = this.dataset.harga;
-                document.getElementById('barangDropdown').classList.add('hidden');
-                document.getElementById('modalNewItemJumlah').focus();
-            });
-        });
-
-        document.addEventListener('mousedown', function(e) {
-            const input = document.getElementById('modalNewItemNama');
-            const dropdown = document.getElementById('barangDropdown');
-            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.classList.add('hidden');
-            }
-        });
-
-        document.getElementById('addItemBtn').onclick = function() {
-            const namaInput = document.getElementById('modalNewItemNama');
-            const jumlahInput = document.getElementById('modalNewItemJumlah');
-            const hargaInput = document.getElementById('modalNewItemHarga');
-            const kodeBarang = namaInput.dataset.kode || '';
-
-            const nama = namaInput.value.trim();
-            const jumlah = jumlahInput.value.trim();
-            const harga = hargaInput.value.trim();
-
-            if (!kodeBarang || !nama || !jumlah || !harga) {
-                alert('Mohon pilih barang dari daftar dan lengkapi semua field');
-                return;
-            }
-
-            let valid = false;
-            document.querySelectorAll('.barang-item').forEach(item => {
-                if (item.dataset.kode === kodeBarang) valid = true;
-            });
-            if (!valid) {
-                alert('Silakan pilih barang dari daftar yang tersedia');
-                namaInput.focus();
-                return;
-            }
-
-            addItemRowToModal({
-                nama_barang: nama,
-                nama: kodeBarang,
-                jumlah,
-                harga
-            });
-
-            namaInput.value = '';
-            namaInput.dataset.kode = '';
-            jumlahInput.value = '';
-            hargaInput.value = '';
-            updateModalTotalPrice();
-        };
-    });
-
     function addItemRowToModal(item = {}, index = null) {
         const container = document.getElementById('modalItemsContainer');
         const itemIndex = index !== null ? index : container.children.length;
-
         const willBeOnlyItem = container.children.length === 0;
         const disableDelete = willBeOnlyItem;
 
         const itemRow = document.createElement('div');
         itemRow.className = 'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
-
         itemRow.innerHTML = `
             <div class="col-span-5 flex flex-col">
-        <!-- Nama Barang (untuk ditampilkan) -->
-        <input type="text" value="${item.nama_barang || '-'}"
-            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-base"
-            readonly>
-        
-        <!-- Kode Barang (yang dikirim ke backend) -->
-        <input type="text" name="nama[]" value="${item.nama || item.kode || ''}"
-            class="w-fit border border-indigo-200 rounded px-2 py-1 mt-1 bg-indigo-50 text-xs font-mono text-indigo-700"
-            readonly>
-    </div>
-        </div>
-        <div class="col-span-2">
-            <input name="jumlah[]" type="number" value="${item.jumlah || ''}"
-                class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                placeholder="Jumlah" min="1">
-        </div>
-        <div class="col-span-3">
-            <div class="relative">
-                <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
-                <input name="harga[]" type="number" value="${item.harga || ''}"
-                    class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
-                    placeholder="0" min="0">
+                <input type="text" value="${item.nama_barang || item.nama || '-'}" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-base" readonly>
+                <input type="text" name="nama[]" value="${item.nama || item.kode || ''}" class="w-fit border border-indigo-200 rounded px-2 py-1 mt-1 bg-indigo-50 text-xs font-mono text-indigo-700" readonly>
             </div>
-        </div>
-        <div class="col-span-2 flex justify-center">
-            <button type="button" onclick="removeItemFromModal(this)"
-                class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ${disableDelete ? 'opacity-50 cursor-not-allowed' : ''}"
-                title="Hapus Item" ${disableDelete ? 'disabled' : ''}>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-            </button>
-        </div>
-    `;
+            <div class="col-span-2">
+                <input name="jumlah[]" type="number" value="${item.jumlah || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" min="1">
+            </div>
+            <div class="col-span-3">
+                <div class="relative">
+                    <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
+                    <input name="harga[]" type="number" value="${item.harga || ''}" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="0" min="0">
+                </div>
+            </div>
+            <div class="col-span-2 flex justify-center">
+                <button type="button" onclick="removeItemFromModal(this)" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ${disableDelete ? 'opacity-50 cursor-not-allowed' : ''}" title="Hapus Item" ${disableDelete ? 'disabled' : ''}>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                </button>
+            </div>
+        `;
         container.appendChild(itemRow);
 
         const inputs = itemRow.querySelectorAll('input[name="jumlah[]"], input[name="harga[]"]');
@@ -1049,9 +846,19 @@
             return;
         }
 
+        let valid = false;
+        document.querySelectorAll('.barang-item').forEach(item => {
+            if (item.dataset.kode === kodeBarang) valid = true;
+        });
+        if (!valid) {
+            alert('Silakan pilih barang dari daftar yang tersedia');
+            namaInput.focus();
+            return;
+        }
+
         addItemRowToModal({
-            kode: kodeBarang,
-            nama: namaInput.value.trim(),
+            nama_barang: namaInput.value.trim(),
+            nama: kodeBarang,
             jumlah: jumlahInput.value.trim(),
             harga: hargaInput.value.trim()
         });
@@ -1088,7 +895,7 @@
     }
 
     function submitEditForm() {
-        const form = document.getElementById('editItemsForm');
+        const form = document.getElementById('editForm');
         const container = document.getElementById('modalItemsContainer');
 
         if (container.children.length === 0) {
@@ -1107,10 +914,23 @@
             }
         });
 
+        const namaToko = document.getElementById('editNamaToko').value;
+        const nomorStruk = document.getElementById('editNomorStruk').value;
+        const tanggalStruk = document.getElementById('editTanggalStruk').value;
+        const status = document.getElementById('editStatus').value;
+
+        if (!namaToko || !nomorStruk || !tanggalStruk || !status) {
+            isValid = false;
+        }
+
         if (!isValid) {
             alert('Mohon lengkapi semua field yang diperlukan');
             return;
         }
+
+        // Debugging: Log form data sebelum submit
+        const formData = new FormData(form);
+        console.log('Form data:', Object.fromEntries(formData));
 
         form.submit();
     }
@@ -1141,29 +961,6 @@
         }
     });
 
-    function confirmDeleteItem(strukId, index) {
-        if (confirm('Apakah Anda yakin ingin menghapus item ini?')) {
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = `/struks/${strukId}/item/${index}`;
-
-            const csrfToken = document.createElement('input');
-            csrfToken.type = 'hidden';
-            csrfToken.name = '_token';
-            csrfToken.value = '{{ csrf_token() }}';
-
-            const methodInput = document.createElement('input');
-            methodInput.type = 'hidden';
-            methodInput.name = '_method';
-            methodInput.value = 'DELETE';
-
-            form.appendChild(csrfToken);
-            form.appendChild(methodInput);
-            document.body.appendChild(form);
-            form.submit();
-        }
-    }
-
     function initAutocomplete(inputElement) {
         const resultsContainer = inputElement.nextElementSibling;
         const datalistOptions = Array.from(document.querySelectorAll('#barangDropdown .barang-item'));
@@ -1190,9 +987,9 @@
                     const div = document.createElement('div');
                     div.className = 'px-4 py-2 hover:bg-indigo-50 cursor-pointer flex items-center justify-between';
                     div.innerHTML = `
-                    <span>${item.dataset.nama}</span>
-                    <span class="text-xs text-gray-500">${item.dataset.harga ? 'Rp' + parseInt(item.dataset.harga).toLocaleString('id-ID') : ''}</span>
-                `;
+                        <span>${item.dataset.nama}</span>
+                        <span class="text-xs text-gray-500">${item.dataset.harga ? 'Rp' + parseInt(item.dataset.harga).toLocaleString('id-ID') : ''}</span>
+                    `;
                     div.addEventListener('click', function() {
                         inputElement.value = item.dataset.nama;
                         inputElement.dataset.kode = item.dataset.kode;
@@ -1235,9 +1032,7 @@
             items.forEach(item => item.classList.remove('bg-indigo-100'));
             if (index >= 0) {
                 items[index].classList.add('bg-indigo-100');
-                items[index].scrollIntoView({
-                    block: 'nearest'
-                });
+                items[index].scrollIntoView({ block: 'nearest' });
             }
         });
     }
@@ -1249,10 +1044,9 @@
         const barangItems = document.querySelectorAll('.barang-item');
         const hargaInput = document.getElementById('modalNewItemHarga');
 
-        // Fungsi untuk update dropdown agar hanya tampil barang yang belum dipakai
         function updateAvailableBarangDropdown() {
             const selectedKodeList = Array.from(document.querySelectorAll('input[name="nama[]"]'))
-                .map(input => input.value); // value = kode_barang
+                .map(input => input.value);
 
             barangItems.forEach(item => {
                 const kode = item.dataset.kode;
@@ -1267,18 +1061,16 @@
         inputElement.addEventListener('click', function(e) {
             e.preventDefault();
             dropdown.classList.remove('hidden');
-            updateAvailableBarangDropdown(); // Perbarui daftar sebelum muncul
+            updateAvailableBarangDropdown();
             filterInput.focus();
         });
 
-        // Klik di luar dropdown
         document.addEventListener('click', function(e) {
             if (!inputElement.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.classList.add('hidden');
             }
         });
 
-        // Filter barang di dropdown
         filterInput.addEventListener('input', function() {
             const searchTerm = this.value.toLowerCase();
             barangItems.forEach(item => {
@@ -1287,7 +1079,6 @@
                 const selectedKodeList = Array.from(document.querySelectorAll('input[name="nama[]"]'))
                     .map(input => input.value);
 
-                // Tampilkan hanya jika cocok dengan search dan belum dipilih
                 if (nama.includes(searchTerm) && !selectedKodeList.includes(kode)) {
                     item.style.display = 'flex';
                 } else {
@@ -1296,7 +1087,6 @@
             });
         });
 
-        // Saat item barang diklik
         barangItems.forEach(item => {
             item.addEventListener('click', function() {
                 inputElement.value = this.dataset.nama;
@@ -1315,126 +1105,88 @@
         justify-content: center !important;
         padding-top: 40px;
     }
-
     #editModal .relative {
         display: flex;
         align-items: flex-start;
         justify-content: center;
     }
-
     #editModal .bg-white {
         margin: 0 auto;
         width: 100%;
         max-width: 700px;
     }
-
     #barangDropdown {
         display: none;
     }
-
     #barangDropdown:not(.hidden) {
         display: block;
     }
-
     .barang-item {
         transition: background-color 0.2s;
     }
-
     .barang-item:hover {
         background-color: #f3f4f6;
     }
-
     #filterBarang {
         position: sticky;
         top: 0;
         z-index: 10;
         background: white;
     }
-
     .toggle-label {
         width: 3rem;
         display: block;
     }
-
     .toggle-dot {
         transition: all 0.3s ease-in-out;
     }
-
     body.pengeluaran-page .toggle-label {
         background-color: #4f46e5;
     }
-
     body.pengeluaran-page .toggle-dot {
         transform: translateX(1.5rem);
     }
-
     .toggle-label:hover {
         background-color: #a5b4fc;
     }
-
     body.pengeluaran-page .toggle-label:hover {
         background-color: #4338ca;
     }
-
     @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-20px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-
     .animate-slideIn {
         animation: slideIn 0.3s ease-out forwards;
     }
-
     .animate-fadeIn {
         animation: fadeIn 0.3s ease-out forwards;
     }
-
     .group:hover .group-hover\:opacity-100 {
         opacity: 1;
     }
-
     .group:hover .group-hover\:visible {
         visibility: visible;
     }
-
     .hover-scale {
         transition: transform 0.2s ease;
     }
-
     .hover-scale:hover {
         transform: scale(1.02);
     }
-
     .pagination {
         display: flex;
         justify-content: center;
         list-style: none;
         padding: 0;
     }
-
     .pagination li {
         margin: 0 4px;
     }
-
     .pagination a,
     .pagination span {
         display: inline-block;
@@ -1442,26 +1194,21 @@
         border-radius: 6px;
         text-decoration: none;
     }
-
     .pagination a {
         color: #4f46e5;
         border: 1px solid #e5e7eb;
     }
-
     .pagination a:hover {
         background-color: #f5f3ff;
     }
-
     .pagination .active span {
         background-color: #4f46e5;
         color: white;
     }
-
     .pagination .disabled span {
         color: #9ca3af;
         border-color: #e5e7eb;
     }
-
     .autocomplete-results {
         z-index: 1000;
         max-height: 300px;
@@ -1471,7 +1218,6 @@
         border-radius: 0.5rem;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     }
-
     .autocomplete-results div {
         padding: 10px 12px;
         cursor: pointer;
@@ -1481,43 +1227,28 @@
         align-items: center;
         transition: background-color 0.2s;
     }
-
     .autocomplete-results div:hover {
         background-color: #f3f4f6;
     }
-
     .autocomplete-results div.bg-indigo-100 {
         background-color: #e0e7ff;
     }
-
     .autocomplete-results div span.text-xs {
         font-size: 0.75rem;
         color: #6b7280;
     }
-
     .autocomplete-results .text-gray-500 {
         padding: 12px;
         text-align: center;
     }
-
     * {
         transition: all 0.2s ease;
     }
-
     @keyframes pulse {
-        0% {
-            opacity: 0.6;
-        }
-
-        50% {
-            opacity: 1;
-        }
-
-        100% {
-            opacity: 0.6;
-        }
+        0% { opacity: 0.6; }
+        50% { opacity: 1; }
+        100% { opacity: 0.6; }
     }
-
     .loading-pulse {
         animation: pulse 1.5s infinite;
     }

@@ -9,12 +9,12 @@ class Barang extends Model
 {
     use HasFactory;
 
-    protected $table = 'master_barangs';
+    protected $table = 'master_barang';
 
-    // app/Models/Barang.php
     protected $fillable = [
         'nama_barang',
         'kode_barang',
-        'jumlah', // <- harus ada ini
+        'jumlah',
+        'status', // jangan lupa tambahkan status biar bisa diisi juga
     ];
 }

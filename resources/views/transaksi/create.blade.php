@@ -461,7 +461,6 @@
         font-size: 0.95rem;
         color: var(--dark);
         z-index: 9999;
-        /* Lebar akan di-set dinamis via JavaScript */
         width: auto !important;
         min-width: 280px;
         max-width: min(600px, 90vw);
@@ -694,7 +693,6 @@
         table-layout: fixed;
     }
 
-    /* Perbaikan alignment untuk kolom Barang */
     .item-table td:nth-child(1) .input-group {
         display: flex;
         flex-direction: column;
@@ -705,7 +703,6 @@
         margin-top: 0;
     }
 
-    /* Penyesuaian lebar kolom untuk tabel pemasukan */
     .income-table th:nth-child(1),
     .income-table td:nth-child(1) {
         width: 45%;
@@ -732,7 +729,6 @@
         width: 10%;
     }
 
-    /* PERBAIKAN: Penyesuaian lebar kolom untuk tabel pengeluaran agar sejajar */
     .expense-table th:nth-child(1),
     .expense-table td:nth-child(1) {
         width: 65%;
@@ -768,7 +764,6 @@
         vertical-align: middle;
     }
 
-    /* Perbaikan untuk input group dalam tabel */
     .item-table .input-group {
         margin-bottom: 0;
     }
@@ -778,14 +773,12 @@
         font-size: 0.875rem;
     }
 
-    /* Perbaikan untuk select2 dalam tabel */
     .item-table .select2-container--default .select2-selection--single {
         height: 40px;
         padding: 0.25rem 0.75rem;
         font-size: 0.875rem;
     }
 
-    /* Perbaikan untuk tombol hapus */
     .item-table .btn-danger {
         padding: 0.5rem;
         width: 100%;
@@ -798,7 +791,6 @@
         margin: 0;
     }
 
-    /* Perbaikan untuk stok info */
     .stok-info {
         display: block;
         font-size: 0.75rem;
@@ -807,13 +799,11 @@
         text-align: left;
     }
 
-    /* PERBAIKAN: Perataan tengah untuk kolom jumlah dan aksi pada pengeluaran */
     .expense-table td:nth-child(2),
     .expense-table td:nth-child(3) {
         text-align: center;
     }
 
-    /* Perataan untuk input dalam kolom jumlah pengeluaran */
     .expense-table td:nth-child(2) .input-group {
         display: flex;
         justify-content: center;
@@ -911,7 +901,16 @@
                             <input type="date" name="tanggal_struk" id="tanggal_struk" required
                                 value="{{ old('tanggal_struk', date('Y-m-d')) }}">
                         </div>
+
                         <div class="input-group">
+                            <label for="status">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Status
+                            </label>
+                            <select name="status" id="status" class="form-control" required>
+                                <option value="progress">Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
                         </div>
                     </div>
 
@@ -1019,7 +1018,6 @@
                 </form>
             </div>
 
-            <!-- PENGELUARANNNNN -->
             {{-- Expense Tab Content --}}
             <div id="expense-tab" class="tab-content">
                 <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
@@ -1090,6 +1088,17 @@
                             <input type="text" id="divisi_display"
                                 class="form-input w-full bg-gray-100 text-gray-700 placeholder-gray-400"
                                 placeholder="Terisi otomatis" readonly>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="status">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                Status
+                            </label>
+                            <select name="status" id="status" class="form-control" required>
+                                <option value="progress">Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
                         </div>
                     </div>
 
@@ -1192,7 +1201,6 @@
         let maxLength = 0;
         let longestText = '';
 
-        // Find the longest option text
         options.each(function() {
             const text = $(this).text().trim();
             if (text.length > maxLength && text !== '') {
@@ -1201,7 +1209,6 @@
             }
         });
 
-        // Create a temporary element to measure text width
         const $temp = $('<span>').css({
             'font-family': $('.select2-dropdown').css('font-family') || 'Plus Jakarta Sans, sans-serif',
             'font-size': $('.select2-dropdown').css('font-size') || '0.95rem',
@@ -1215,7 +1222,6 @@
         const textWidth = $temp.outerWidth();
         $temp.remove();
 
-        // Calculate optimal width with padding and arrow space
         const minWidth = 280;
         const maxWidth = Math.min(600, $(window).width() * 0.9);
         const optimalWidth = Math.max(minWidth, Math.min(textWidth + 60, maxWidth));
@@ -1223,7 +1229,7 @@
         return optimalWidth;
     }
 
-    // Preview uploaded image - GLOBAL FUNCTION
+    // Preview uploaded image
     function previewUploadedImage(input, type = 'income') {
         const file = input.files[0];
         if (!file) return;
@@ -1252,7 +1258,7 @@
         reader.readAsDataURL(file);
     }
 
-    // Remove photo functions - GLOBAL FUNCTIONS
+    // Remove photo functions
     function removePhoto() {
         $('#foto_struk').val('');
         $('#preview-image').attr('src', '#');
@@ -1269,7 +1275,7 @@
         $('#expense-file-upload-label').removeClass('has-file');
     }
 
-    // Image modal functions - GLOBAL FUNCTIONS
+    // Image modal functions
     function openImageModal(imageUrl, title) {
         if (!imageUrl) return;
         $('#modalImageContent').attr('src', imageUrl);
@@ -1285,7 +1291,7 @@
         $('body').css('overflow', 'auto');
     }
 
-    // Update stok for expense - GLOBAL FUNCTION
+    // Update stok for expense
     function updateStokExpense(selectElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
@@ -1297,10 +1303,8 @@
 
         stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
 
-        // Remove existing event listener to prevent duplicates
         jumlahInput.removeEventListener('input', jumlahInput.stockUpdateHandler);
         
-        // Create new event handler
         jumlahInput.stockUpdateHandler = function() {
             const inputJumlah = parseInt(jumlahInput.value) || 0;
             const sisaBaru = stokAsli - inputJumlah;
@@ -1314,11 +1318,10 @@
             }
         };
 
-        // Add new event listener
         jumlahInput.addEventListener('input', jumlahInput.stockUpdateHandler);
     }
 
-    // Income items management - GLOBAL FUNCTIONS
+    // Income items management
     function addIncomeItem() {
         const container = document.getElementById('income-items-container');
         if (!container) return;
@@ -1326,15 +1329,11 @@
         const oldRow = container.querySelector('.item-row');
         const newRow = oldRow.cloneNode(true);
         
-        // Update subtotal ID
         newRow.innerHTML = newRow.innerHTML.replace(/id="subtotal-0"/g, `id="subtotal-${incomeIndex}"`);
-
-        // Replace all [0] with [incomeIndex]
         const regex = /\[0\]/g;
         newRow.innerHTML = newRow.innerHTML.replace(regex, `[${incomeIndex}]`);
         newRow.setAttribute('data-item', incomeIndex);
 
-        // Reset inputs
         const inputs = newRow.querySelectorAll('input');
         inputs.forEach(input => {
             if (input.type === 'number') {
@@ -1345,17 +1344,11 @@
             }
         });
 
-        // Reset select dropdown
         const select = newRow.querySelector('.select-barang');
         select.selectedIndex = 0;
-        
-        // Remove existing Select2 container
         $(select).next('.select2-container').remove();
-
-        // Initialize Select2 with optimal width
         initializeSelect2ForElement(select);
 
-        // Add event listeners for quantity and price inputs
         const jumlahInput = newRow.querySelector('.jumlah');
         const hargaInput = newRow.querySelector('.harga');
         
@@ -1403,7 +1396,7 @@
         $('#income-total').text(formatRupiah(total));
     }
 
-    // Expense items management - GLOBAL FUNCTIONS
+    // Expense items management
     function addExpenseItem() {
         const container = $('#expense-items-container');
         if (!container.length) return;
@@ -1411,29 +1404,20 @@
         const oldRow = container.find('.item-row').first();
         const newRow = oldRow.clone();
 
-        // Update index
         newRow.attr('data-item', expenseItemIndex);
         newRow.html(newRow.html().replace(/\[0\]/g, `[${expenseItemIndex}]`));
 
-        // Reset inputs
         newRow.find('input').each(function() {
             if (this.type === 'number') {
                 this.value = this.classList.contains('jumlah') ? 1 : 0;
             }
         });
 
-        // Reset select
         const select = newRow.find('.select-barang');
         select.val('');
         select.next('.select2-container').remove();
-
-        // Re-initialize Select2 with optimal width
         initializeSelect2ForElement(select[0]);
-
-        // Reset stock info
         newRow.find('.stok-info').text('Stok: -');
-
-        // Add event listener for select change
         select.on('change', function() {
             updateStokExpense(this);
         });
@@ -1452,7 +1436,7 @@
         }
     }
 
-    // Initialize Select2 for a single element with optimal width
+    // Initialize Select2 for a single element
     function initializeSelect2ForElement(element) {
         const $element = $(element);
         const isBarangSelect = $element.hasClass('select-barang');
@@ -1468,7 +1452,6 @@
                 dropdownParent: $('.form-card'),
                 dropdownCssClass: 'select2-dropdown-optimal'
             }).on('select2:open', function() {
-                // Set optimal width when dropdown opens
                 const dropdown = $element.data('select2').$dropdown;
                 dropdown.css({
                     'width': optimalWidth + 'px',
@@ -1477,7 +1460,6 @@
                 });
             });
         } else {
-            // Standard initialization for other selects
             $element.select2({
                 placeholder: "Pilih...",
                 width: '100%',
@@ -1488,25 +1470,25 @@
         }
     }
 
-    // Initialize Select2 - GLOBAL FUNCTION
+    // Initialize Select2
     function initSelect2() {
-        // Initialize barang selections with optimal width
         $('.select-barang').each(function() {
             initializeSelect2ForElement(this);
         });
 
-        // Initialize pegawai selection (standard)
         if ($('#pegawai_id').length) {
             initializeSelect2ForElement($('#pegawai_id')[0]);
+        }
+
+        if ($('#status').length) {
+            initializeSelect2ForElement($('#status')[0]);
         }
     }
 
     // Document ready
     $(document).ready(function() {
-        // Initialize Select2
         initSelect2();
 
-        // Tab switching
         $('.tab-button').on('click', function(e) {
             e.preventDefault();
             const tabId = $(this).data('tab');
@@ -1516,7 +1498,6 @@
             $('#' + tabId).addClass('active');
         });
 
-        // Initialize event listeners for income rows
         if ($('#income-items-container .item-row').length) {
             $('#income-items-container .item-row').each(function() {
                 const row = $(this);
@@ -1526,14 +1507,12 @@
             });
         }
 
-        // Close modal when clicking outside
         $('#imageModal').click(function(e) {
             if (e.target === this) {
                 closeImageModal();
             }
         });
 
-        // Autofill divisi, generate Nama SPK & Nomor Struk saat pegawai dipilih
         if ($('#pegawai_id').length) {
             $('#pegawai_id').on('change', function() {
                 const pegawaiId = $(this).val();
@@ -1542,7 +1521,6 @@
                 $('#expense_nomor_struk').val('');
 
                 if (pegawaiId) {
-                    // Generate nama SPK dan divisi
                     $.ajax({
                         url: '/generate-spk',
                         method: 'POST',
@@ -1561,7 +1539,6 @@
                         }
                     });
 
-                    // Generate nomor struk otomatis
                     $.ajax({
                         url: '/pengeluarans/generate-nomor-struk',
                         method: 'GET',
@@ -1578,19 +1555,16 @@
             });
         }
 
-        // Handle Select2 close event to ensure dropdown closes properly
-        $(document).on('select2:close', '.select-barang, #pegawai_id', function() {
+        $(document).on('select2:close', '.select-barang, #pegawai_id, #status', function() {
             $(this).blur();
         });
 
-        // Ensure Select2 dropdown closes when clicking outside
         $(document).on('click', function(e) {
             if (!$(e.target).closest('.select2-container, .select2-dropdown').length) {
                 $('.select2-container--open').find('.select2-selection').trigger('blur');
             }
         });
 
-        // Handle window resize to recalculate dropdown widths
         $(window).on('resize', function() {
             $('.select-barang').each(function() {
                 if ($(this).hasClass('select2-hidden-accessible')) {
