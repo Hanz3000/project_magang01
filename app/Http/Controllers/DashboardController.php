@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use App\Models\Barang;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class DashboardController extends Controller
+final class DashboardController extends Controller
 {
     public function index(Request $request)
     {
@@ -104,7 +104,7 @@ class DashboardController extends Controller
         ]);
     }
 
-    protected function getFilteredCount($query, $timePeriod, $bulan = null, $tahun = null)
+    private function getFilteredCount($query, $timePeriod, $bulan = null, $tahun = null)
     {
         $query = clone $query;
         $model = $query->getModel();
@@ -125,7 +125,7 @@ class DashboardController extends Controller
         return $query->count();
     }
 
-    protected function calculateTotalBarangFiltered(string $model, string $itemsField, string $timePeriod, $bulan = null, $tahun = null): int
+    private function calculateTotalBarangFiltered(string $model, string $itemsField, string $timePeriod, $bulan = null, $tahun = null): int
     {
         $query = $model::query();
         $dateColumn = $model === \App\Models\Struk::class ? 'tanggal_struk' : 'tanggal';
@@ -148,7 +148,7 @@ class DashboardController extends Controller
         }, 0);
     }
 
-    protected function calculateTotalBarang(string $model, string $itemsField): int
+    private function calculateTotalBarang(string $model, string $itemsField): int
     {
         return $model::query()->get()->reduce(function ($carry, $record) use ($itemsField) {
             $items = $this->parseItems($record->{$itemsField});
@@ -156,7 +156,7 @@ class DashboardController extends Controller
         }, 0);
     }
 
-    protected function processAndPaginateBarangList($query, array $filters = [], string $pageName = 'page')
+    private function processAndPaginateBarangList($query, array $filters = [], string $pageName = 'page', $barangMaster = [])
     {
         $barangList = $query->get()->flatMap(function ($struk) {
             $items = $this->parseItems($struk->items);
@@ -167,6 +167,7 @@ class DashboardController extends Controller
                     'nomor_struk' => $struk->nomor_struk,
                     'tanggal' => $struk->tanggal_struk,
                     'tanggal_keluar' => $struk->tanggal_keluar,
+                    'status_progres' => $this->determineStatusProgres($struk, $item),
                 ];
             });
         })->groupBy('nama')->map(function ($items, $nama) {
@@ -187,8 +188,14 @@ class DashboardController extends Controller
                 'nomor_struk' => $latest['nomor_struk'],
                 'tanggal' => $latest['tanggal'],
                 'tanggal_keluar' => $latest['tanggal_keluar'] ?? null,
+                'status_progres' => $latest['status_progres'] ?? 'pending',
             ];
         })->values();
+
+        // Filter out completed items
+        $barangList = $barangList->filter(function ($item) {
+            return $item['status_progres'] !== 'completed';
+        });
 
         if (!empty($filters['search'])) {
             $search = strtolower($filters['search']);
@@ -209,6 +216,12 @@ class DashboardController extends Controller
             case 'tanggal_asc':
                 $barangList = $barangList->sortBy('tanggal')->values();
                 break;
+            case 'status_asc':
+                $barangList = $barangList->sortBy('status_progres')->values();
+                break;
+            case 'status_desc':
+                $barangList = $barangList->sortByDesc('status_progres')->values();
+                break;
             default:
                 $barangList = $barangList->sortByDesc('tanggal')->values();
                 break;
@@ -217,7 +230,28 @@ class DashboardController extends Controller
         return $this->paginateCollection($barangList, 10, $pageName);
     }
 
-    protected function processAndPaginatePengeluaranList($query, array $filters = [], string $pageName = 'page')
+    private function determineStatusProgres($struk, $item): string
+    {
+        // Logika untuk menentukan status progres
+        // Jika ada tanggal keluar, status completed
+        if ($struk->tanggal_keluar) {
+            return 'completed';
+        }
+        
+        // Jika barang memiliki tanggal struk yang sudah lewat lebih dari 7 hari
+        if ($struk->tanggal_struk && now()->diffInDays($struk->tanggal_struk) > 7) {
+            return 'in_progress';
+        }
+        
+        // Jika jumlah barang lebih dari 10, anggap sedang diproses
+        if ($item['jumlah'] > 10) {
+            return 'in_progress';
+        }
+        
+        return 'pending';
+    }
+
+    private function processAndPaginatePengeluaranList($query, array $filters = [], string $pageName = 'page', $barangMaster = [])
     {
         $pengeluaranList = $query->get()->flatMap(function ($pengeluaran) {
             $items = $this->parseItems($pengeluaran->daftar_barang);
@@ -250,7 +284,7 @@ class DashboardController extends Controller
         return $this->paginateCollection($pengeluaranList, 10, $pageName);
     }
 
-    protected function generateAndPaginateHistoryBarang(string $pageName = 'page')
+    private function generateAndPaginateHistoryBarang(string $pageName = 'page', $barangMaster = [])
     {
         $masuk = Struk::query()->get()->flatMap(function ($struk) {
             return collect($this->parseItems($struk->items))->map(function ($item) use ($struk) {
@@ -261,6 +295,7 @@ class DashboardController extends Controller
                     'nomor_struk' => $struk->nomor_struk,
                     'tanggal' => $struk->tanggal_struk,
                     'timestamp' => strtotime($struk->tanggal_struk),
+                    'status_progres' => $this->determineStatusProgres($struk, $item),
                 ];
             });
         });
@@ -289,7 +324,7 @@ class DashboardController extends Controller
         return $this->paginateCollection($history, 10, $pageName);
     }
 
-    protected function parseItems($items): array
+    private function parseItems($items): array
     {
         if (is_string($items)) {
             $decoded = json_decode($items, true);
@@ -306,12 +341,12 @@ class DashboardController extends Controller
         return [];
     }
 
-    protected function sortCollection(Collection $collection, ?string $sort, array $sortOptions, string $defaultSort): Collection
+    private function sortCollection(Collection $collection, ?string $sort, array $sortOptions, string $defaultSort): Collection
     {
         return ($sortOptions[$sort] ?? $sortOptions[$defaultSort])($collection);
     }
 
-    protected function paginateCollection(Collection $collection, int $perPage = 10, string $pageName = 'page'): LengthAwarePaginator
+    private function paginateCollection(Collection $collection, int $perPage = 10, string $pageName = 'page'): LengthAwarePaginator
     {
         $currentPage = LengthAwarePaginator::resolveCurrentPage($pageName);
         $currentItems = $collection->slice(($currentPage - 1) * $perPage, $perPage)->values();

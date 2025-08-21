@@ -295,12 +295,14 @@
                     <select name="sort"
                         class="border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <option value="">Sortir berdasarkan</option>
-                        <option value="tanggal_desc" {{ request('sort') == 'tanggal_desc' ? 'selected' : '' }}>Tanggal
-                            Terbaru</option>
-                        <option value="tanggal_asc" {{ request('sort') == 'tanggal_asc' ? 'selected' : '' }}>Tanggal
-                            Terlama</option>
+                        <option value="tanggal_desc" {{ request('sort') == 'tanggal_desc' ? 'selected' : '' }}>Tanggal Terbaru</option>
+                        <option value="tanggal_asc" {{ request('sort') == 'tanggal_asc' ? 'selected' : '' }}>Tanggal Terlama</option>
                         <option value="nama_asc" {{ request('sort') == 'nama_asc' ? 'selected' : '' }}>Nama A-Z</option>
                         <option value="nama_desc" {{ request('sort') == 'nama_desc' ? 'selected' : '' }}>Nama Z-A
+                        </option>
+                        <option value="status_asc" {{ request('sort') == 'status_asc' ? 'selected' : '' }}>Status (A-Z)
+                        </option>
+                        <option value="status_desc" {{ request('sort') == 'status_desc' ? 'selected' : '' }}>Status (Z-A)
                         </option>
                     </select>
                     <!-- Tombol -->
@@ -335,6 +337,9 @@
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Tanggal Masuk</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Status</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -353,10 +358,33 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
                             </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @php
+                                    $status = $item['status_progres'] ?? 'pending';
+                                    $statusColors = [
+                                        'completed' => 'bg-blue-100 text-blue-800',
+                                        'in_progress' => 'bg-blue-100 text-blue-800',
+                                        'pending' => 'bg-blue-100 text-blue-800',
+                                        'cancelled' => 'bg-blue-100 text-blue-800'
+                                    ];
+                                    // Mengubah teks status untuk pending dan in_progress menjadi "Progres"
+                                    $statusTexts = [
+                                        'completed' => 'Selesai',
+                                        'in_progress' => 'Progres',
+                                        'pending' => 'Progres',
+                                        'cancelled' => 'Dibatalkan'
+                                    ];
+                                    $colorClass = $statusColors[$status] ?? $statusColors['pending'];
+                                    $statusText = $statusTexts[$status] ?? 'Progres';
+                                @endphp
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $colorClass }}">
+                                    {{ $statusText }}
+                                </span>
+                            </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
                                 <div class="flex flex-col items-center justify-center py-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
