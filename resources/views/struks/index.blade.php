@@ -22,10 +22,10 @@
 
         <div class="mb-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
-                    <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
-                </div>
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
+                <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
+            </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto items-center">
                     @php
                     $isPemasukan = request()->routeIs('struks.index');
@@ -102,7 +102,7 @@
                             class="absolute left-10 top-2.5 text-gray-400 text-sm whitespace-nowrap overflow-hidden pointer-events-none w-[calc(100%-3rem)]"
                             style="{{ request('search') ? 'display: none;' : '' }}">
                             <div class="animate-marquee inline-block">
-                                Cari berdasarkan Toko atau No. Struk
+                                Cari berdasarkan Nama Toko atau No. Struk
                             </div>
                         </div>
                         <button type="button" class="absolute left-3 top-2.5 text-gray-400 pointer-events-none">
@@ -140,7 +140,7 @@
                                 <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             </th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
-                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Toko</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Nama Toko</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk</th>
                             <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang</th>
@@ -218,7 +218,7 @@
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex justify-center space-x-2">
                                     <a href="{{ route('struks.show', $struk->id) }}" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors" title="Lihat Detail">
-                                        <svg class="w-5 h-5琉 class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                         </svg>
@@ -348,10 +348,6 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Tanggal Masuk</label>
                             <input type="date" name="tanggal_struk" id="editTanggalStruk" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700">Tanggal Keluar (Opsional)</label>
-                            <input type="date" name="tanggal_keluar" id="editTanggalKeluar" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Status</label>
@@ -543,7 +539,7 @@
             } else {
                 url.searchParams.delete('search');
             }
-            url.searchParams.delete('page'); // Reset ke halaman 1 saat pencarian berubah
+            url.searchParams.delete('page');
 
             searchLoading.classList.remove('hidden');
 
@@ -570,7 +566,6 @@
                     }
                     searchLoading.classList.add('hidden');
                     animateRows();
-                    // Re-attach event listeners untuk checkbox
                     document.querySelectorAll('.row-checkbox').forEach(checkbox => {
                         checkbox.addEventListener('change', updateBulkActions);
                     });
@@ -697,20 +692,88 @@
 
     let currentEditStrukId = null;
 
-    function openEditModal(strukId) {
-        currentEditStrukId = strukId;
-        const modal = document.getElementById('editModal');
-        modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-        document.getElementById('editForm').action = `/struks/${strukId}`;
-        modal.scrollTop = 0;
-        loadExistingItems(strukId);
-        loadStrukDetails(strukId);
-        initBarangDropdown();
-        setTimeout(() => {
-            document.getElementById('editNamaToko').focus();
-        }, 100);
+// ...existing code...
+function openEditModal(strukId) {
+    currentEditStrukId = strukId;
+    const modal = document.getElementById('editModal');
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('editForm').action = `/struks/${strukId}`;
+    modal.scrollTop = 0;
+
+    // Ambil data dari baris tabel
+    const row = document.querySelector(`input.row-checkbox[value="${strukId}"]`).closest('tr');
+    document.getElementById('editNamaToko').value = row.querySelector('td:nth-child(3) .font-medium').textContent.trim();
+    document.getElementById('editNomorStruk').value = row.querySelector('td:nth-child(4)').textContent.trim();
+
+    // Format tanggal dari "26 Aug 2025" ke "2025-08-26"
+    const tanggalText = row.querySelector('td:nth-child(5) .text-gray-900').textContent.trim();
+    const bulanMap = {
+        Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
+        Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+    };
+    const tanggalArr = tanggalText.split(' ');
+    let tanggalFormatted = '';
+    if (tanggalArr.length === 3) {
+        tanggalFormatted = `${tanggalArr[2]}-${bulanMap[tanggalArr[1]]}-${tanggalArr[0].padStart(2, '0')}`;
     }
+    document.getElementById('editTanggalStruk').value = tanggalFormatted;
+
+    document.getElementById('editStatus').value = row.querySelector('td:nth-child(9) span').textContent.trim().toLowerCase();
+
+    // Ambil item barang dari data asli struk (window.strukItemsData)
+    let items = [];
+    if (window.strukItemsData && window.strukItemsData[strukId]) {
+        items = window.strukItemsData[strukId];
+    } else {
+        // fallback: ambil dari tampilan (tanpa harga satuan)
+        const barangCells = row.querySelectorAll('td:nth-child(6) .flex.items-start');
+        const jumlahCells = row.querySelectorAll('td:nth-child(7) .text-gray-500');
+        barangCells.forEach((barangDiv, i) => {
+            const namaBarang = barangDiv.querySelector('.text-gray-700').textContent.trim();
+            const jumlah = jumlahCells[i]?.textContent.replace('x', '').trim() || '';
+            items.push({
+                nama_barang: namaBarang,
+                nama: namaBarang,
+                jumlah: jumlah,
+                harga: ''
+            });
+        });
+    }
+
+    // Isi item di modal
+    const container = document.getElementById('modalItemsContainer');
+    container.innerHTML = '';
+    items.forEach((item, index) => {
+        addItemRowToModal(item, index);
+    });
+
+    // Ambil total harga dari kolom tabel
+    const totalText = row.querySelector('td:nth-child(8)').textContent.replace(/[^\d]/g, '');
+    const totalHarga = parseInt(totalText) || 0;
+    document.getElementById('modalTotalPrice').textContent = `Total: Rp${totalHarga.toLocaleString('id-ID')}`;
+    let totalHargaInput = document.getElementById('editTotalHarga');
+    if (!totalHargaInput) {
+        totalHargaInput = document.createElement('input');
+        totalHargaInput.type = 'hidden';
+        totalHargaInput.name = 'total_harga';
+        totalHargaInput.id = 'editTotalHarga';
+        document.getElementById('editForm').appendChild(totalHargaInput);
+    }
+    totalHargaInput.value = totalHarga;
+
+    initBarangDropdown();
+    setTimeout(() => {
+        document.getElementById('editNamaToko').focus();
+    }, 100);
+}
+
+// Tambahkan di bawah <script> agar window.strukItemsData tersedia
+window.strukItemsData = {
+    @foreach($struks as $struk)
+        {{ $struk->id }}: {!! json_encode(is_string($struk->items) ? json_decode($struk->items, true) : $struk->items) !!},
+    @endforeach
+};
 
     function closeEditModal() {
         document.getElementById('editModal').classList.add('hidden');
@@ -726,12 +789,10 @@
                 document.getElementById('editNamaToko').value = data.nama_toko || '';
                 document.getElementById('editNomorStruk').value = data.nomor_struk || '';
                 document.getElementById('editTanggalStruk').value = data.tanggal_struk || '';
-                document.getElementById('editTanggalKeluar').value = data.tanggal_keluar || '';
                 document.getElementById('editStatus').value = data.status || 'progress';
             })
             .catch(error => {
                 console.error('Error loading struk details:', error);
-                alert('Gagal memuat detail struk.');
             });
     }
 
@@ -744,7 +805,6 @@
             total += jumlah * harga;
         });
         document.getElementById('modalTotalPrice').textContent = `Total: Rp${total.toLocaleString('id-ID')}`;
-        // Update hidden input untuk total_harga
         let totalHargaInput = document.getElementById('editTotalHarga');
         if (!totalHargaInput) {
             totalHargaInput = document.createElement('input');
@@ -842,13 +902,13 @@
         const kodeBarang = namaInput.dataset.kode || '';
 
         if (!kodeBarang || !namaInput.value.trim() || !jumlahInput.value.trim() || !hargaInput.value.trim()) {
-            alert('Mohon pilih barang dari daftar dan lengkapi semua field');
+            alert('Mohon pilih barang dari daftar dan lengkapi semua field (nama, jumlah, dan harga). Pastikan Anda memilih barang dari dropdown.');
             return;
         }
 
         let valid = false;
         document.querySelectorAll('.barang-item').forEach(item => {
-            if (item.dataset.kode === kodeBarang) valid = true;
+            if (item.dataset.kode === kodeBarang && item.style.display !== 'none') valid = true;
         });
         if (!valid) {
             alert('Silakan pilih barang dari daftar yang tersedia');
@@ -927,10 +987,6 @@
             alert('Mohon lengkapi semua field yang diperlukan');
             return;
         }
-
-        // Debugging: Log form data sebelum submit
-        const formData = new FormData(form);
-        console.log('Form data:', Object.fromEntries(formData));
 
         form.submit();
     }
@@ -1091,7 +1147,7 @@
             item.addEventListener('click', function() {
                 inputElement.value = this.dataset.nama;
                 inputElement.dataset.kode = this.dataset.kode;
-                hargaInput.value = this.dataset.harga;
+                hargaInput.value = this.dataset.harga || '';
                 dropdown.classList.add('hidden');
                 document.getElementById('modalNewItemJumlah').focus();
             });
@@ -1153,71 +1209,27 @@
         background-color: #4338ca;
     }
     @keyframes slideIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-slideIn {
-        animation: slideIn 0.3s ease-out forwards;
-    }
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out forwards;
-    }
-    .group:hover .group-hover\:opacity-100 {
-        opacity: 1;
-    }
-    .group:hover .group-hover\:visible {
-        visibility: visible;
-    }
-    .hover-scale {
-        transition: transform 0.2s ease;
-    }
-    .hover-scale:hover {
-        transform: scale(1.02);
-    }
-    .pagination {
-        display: flex;
-        justify-content: center;
-        list-style: none;
-        padding: 0;
-    }
-    .pagination li {
-        margin: 0 4px;
-    }
-    .pagination a,
-    .pagination span {
-        display: inline-block;
-        padding: 8px 12px;
-        border-radius: 6px;
-        text-decoration: none;
-    }
-    .pagination a {
-        color: #4f46e5;
-        border: 1px solid #e5e7eb;
-    }
-    .pagination a:hover {
-        background-color: #f5f3ff;
-    }
-    .pagination .active span {
-        background-color: #4f46e5;
-        color: white;
-    }
-    .pagination .disabled span {
-        color: #9ca3af;
-        border-color: #e5e7eb;
-    }
-    .autocomplete-results {
-        z-index: 1000;
-        max-height: 300px;
-        overflow-y: auto;
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .toggle-dot {
+            transition: all 0.3s ease-in-out;
+        }
+        .autocomplete-results {
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+        }
     .autocomplete-results div {
         padding: 10px 12px;
         cursor: pointer;

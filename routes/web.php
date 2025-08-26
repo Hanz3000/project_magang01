@@ -57,6 +57,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/{struk}', [StrukController::class, 'show'])->name('struks.show');
         Route::get('/{struk}/edit', [StrukController::class, 'edit'])->name('struks.edit');
         Route::put('/{struk}', [StrukController::class, 'update'])->name('struks.update');
+        Route::put('/struks/{id}', [StrukController::class, 'update'])->name('struks.update');
         Route::delete('/{struk}', [StrukController::class, 'destroy'])->name('struks.destroy');
 
 

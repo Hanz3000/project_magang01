@@ -128,80 +128,40 @@ class StrukController extends Controller
         return view('struks.edit', compact('struk', 'barangList', 'barang'));
     }
 
-    public function update(Request $request, Struk $struk)
+    public function update(Request $request, $id)
     {
-        Log::info('Starting update for struk ID: ' . $struk->id, ['request_data' => $request->all()]);
+        $struk = Struk::findOrFail($id);
 
-        $validatedData = $request->validate([
-            'nama_toko' => 'required|string|max:255',
-            'nomor_struk' => 'required|string|max:255|unique:struks,nomor_struk,' . $struk->id,
+        $validated = $request->validate([
+            'nama_toko' => 'required|string',
+            'nomor_struk' => 'required|string',
             'tanggal_struk' => 'required|date',
-            'tanggal_keluar' => 'nullable|date',
-            'items' => 'required|array|min:1',
-            // <-- perbaikan: arahkan ke master_barang
-            'items.*.nama' => 'required|exists:master_barang,kode_barang',
-            'items.*.jumlah' => 'required|integer|min:1',
-            'items.*.harga' => 'required|numeric|min:0',
-            'total_harga' => 'required|numeric|min:0',
-            'status' => 'required|in:progress,completed',
-            'foto_struk' => 'nullable|image|max:2048',
+            'status' => 'required|string',
+            'nama' => 'required|array',
+            'jumlah' => 'required|array',
+            'harga' => 'required|array',
+            'total_harga' => 'required|numeric',
         ]);
 
-        Log::info('Validated data for struk ID: ' . $struk->id, ['validated_data' => $validatedData]);
-
-        DB::beginTransaction();
-        try {
-            $oldItems = json_decode($struk->items, true) ?? [];
-            foreach ($oldItems as $item) {
-                $barang = Barang::where('kode_barang', $item['nama'])->first();
-                if ($barang) {
-                    $barang->jumlah -= $item['jumlah'];
-                    $barang->save();
-                    Log::info('Reduced stock for barang: ' . $item['nama'], ['new_jumlah' => $barang->jumlah]);
-                }
-            }
-
-            if ($request->hasFile('foto_struk')) {
-                if ($struk->foto_struk) {
-                    Storage::disk('public')->delete('struk_foto/' . $struk->foto_struk);
-                }
-                $fotoPath = $request->file('foto_struk')->store('struk_foto', 'public');
-                $validatedData['foto_struk'] = basename($fotoPath);
-            } else {
-                $validatedData['foto_struk'] = $struk->foto_struk;
-            }
-
-            foreach ($validatedData['items'] as $item) {
-                $barang = Barang::where('kode_barang', $item['nama'])->firstOrFail();
-                $barang->jumlah += $item['jumlah'];
-                $barang->save();
-                Log::info('Increased stock for barang: ' . $item['nama'], ['new_jumlah' => $barang->jumlah]);
-            }
-
-            $struk->update([
-                'nama_toko' => $validatedData['nama_toko'],
-                'nomor_struk' => $validatedData['nomor_struk'],
-                'tanggal_struk' => $validatedData['tanggal_struk'],
-                'tanggal_keluar' => $validatedData['tanggal_keluar'] ?? null,
-                'items' => json_encode($validatedData['items']),
-                'total_harga' => $validatedData['total_harga'],
-                'foto_struk' => $validatedData['foto_struk'],
-                'status' => $request->status,
-            ]);
-
-            Log::info('Struk updated successfully', ['struk_id' => $struk->id, 'status' => $struk->status]);
-
-            DB::commit();
-            return redirect()->route('struks.index', ['status' => $validatedData['status']])
-                ->with('success', 'Struk berhasil diperbarui!');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Failed to update struk ID: ' . $struk->id, ['error' => $e->getMessage()]);
-            if ($request->hasFile('foto_struk')) {
-                Storage::disk('public')->delete('struk_foto/' . basename($request->file('foto_struk')->store('struk_foto', 'public')));
-            }
-            return back()->withErrors('Gagal mengupdate struk: ' . $e->getMessage())->withInput();
+        $items = [];
+        foreach ($validated['nama'] as $i => $nama) {
+            $items[] = [
+                'nama' => $nama,
+                'jumlah' => $validated['jumlah'][$i],
+                'harga' => $validated['harga'][$i],
+            ];
         }
+
+        $struk->update([
+            'nama_toko' => $validated['nama_toko'],
+            'nomor_struk' => $validated['nomor_struk'],
+            'tanggal_struk' => $validated['tanggal_struk'],
+            'status' => $validated['status'],
+            'items' => json_encode($items),
+            'total_harga' => $validated['total_harga'],
+        ]);
+
+        return redirect()->route('struks.index')->with('success', 'Struk berhasil diupdate!');
     }
 
     public function destroy(Struk $struk)
