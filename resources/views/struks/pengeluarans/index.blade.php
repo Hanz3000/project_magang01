@@ -281,9 +281,11 @@
                             </th>
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Jumlah
                             </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Status</th>
 
                             <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi
                             </th>
+                            
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -319,13 +321,18 @@
                                 @endforeach
                             </td>
 
-
+                            
                             <td class="px-6 py-4 whitespace-nowrap align-top text-gray-400 text-center">
                                 @foreach ($pengeluaran->daftar_barang as $item)
                                 <div class="mb-1">x{{ $item['jumlah'] }}</div>
                                 @endforeach
                             </td>
-
+                            <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full 
+                                    {{ $pengeluaran->status == 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+                                    {{ ucfirst($pengeluaran->status) }}
+                                </span>
+                            </td>
 
                             <td class="px-6 py-4 whitespace-nowrap text-center">
                                 <div class="flex justify-center space-x-2">

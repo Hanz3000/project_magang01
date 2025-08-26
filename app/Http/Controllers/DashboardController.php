@@ -12,97 +12,113 @@ use Illuminate\Pagination\LengthAwarePaginator;
 final class DashboardController extends Controller
 {
     public function index(Request $request)
-    {
-        $timePeriod = $request->input('time_period', 'all');
-        $bulan = $request->input('bulan', now()->month);
-        $tahun = $request->input('tahun', now()->year);
+{
+    $timePeriod = $request->input('time_period', 'all');
+    $bulan = $request->input('bulan', now()->month);
+    $tahun = $request->input('tahun', now()->year);
 
-        $totalStrukPemasukan = $this->getFilteredCount(Struk::query(), $timePeriod, $bulan, $tahun);
-        $totalStrukPengeluaran = $this->getFilteredCount(Pengeluaran::query(), $timePeriod, $bulan, $tahun);
-        $totalStruk = $totalStrukPemasukan + $totalStrukPengeluaran;
+    $totalStrukPemasukan = $this->getFilteredCount(Struk::query(), $timePeriod, $bulan, $tahun);
+    $totalStrukPengeluaran = $this->getFilteredCount(Pengeluaran::query(), $timePeriod, $bulan, $tahun);
+    $totalStruk = $totalStrukPemasukan + $totalStrukPengeluaran;
 
-        $latestStruk = Struk::latest()->first();
-        $latestPengeluaranStruk = Pengeluaran::latest()->first();
+    $latestStruk = Struk::latest()->first();
+    $latestPengeluaranStruk = Pengeluaran::latest()->first();
 
-        $totalBarangMasuk = $this->calculateTotalBarangFiltered(Struk::class, 'items', $timePeriod, $bulan, $tahun);
-        $totalBarangKeluar = $this->calculateTotalBarangFiltered(Pengeluaran::class, 'daftar_barang', $timePeriod, $bulan, $tahun);
+    $totalBarangMasuk = $this->calculateTotalBarangFiltered(Struk::class, 'items', $timePeriod, $bulan, $tahun);
+    $totalBarangKeluar = $this->calculateTotalBarangFiltered(Pengeluaran::class, 'daftar_barang', $timePeriod, $bulan, $tahun);
 
-        $strukQuery = Struk::query();
-        $pengeluaranQuery = Pengeluaran::query();
+    $strukQuery = Struk::query();
+    $pengeluaranQuery = Pengeluaran::query();
 
-        switch ($timePeriod) {
-            case 'daily':
-                $strukQuery->whereDate('tanggal_struk', today());
-                $pengeluaranQuery->whereDate('tanggal', today());
-                break;
-            case 'weekly':
-                $strukQuery->whereBetween('tanggal_struk', [now()->startOfWeek(), now()->endOfWeek()]);
-                $pengeluaranQuery->whereBetween('tanggal', [now()->startOfWeek(), now()->endOfWeek()]);
-                break;
-            case 'monthly':
-                $strukQuery->whereMonth('tanggal_struk', $bulan)->whereYear('tanggal_struk', $tahun);
-                $pengeluaranQuery->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
-                break;
-        }
-
-        $barangMaster = Barang::pluck('nama_barang', 'kode_barang');
-
-        $barangList = $this->processAndPaginateBarangList(
-            $strukQuery,
-            $request->only(['search', 'sort']),
-            'page_barang',
-            $barangMaster
-        );
-
-        $pengeluaranBarangList = $this->processAndPaginatePengeluaranList(
-            $pengeluaranQuery,
-            $request->only(['search_pengeluaran', 'sort_pengeluaran']),
-            'page_pengeluaran',
-            $barangMaster
-        );
-
-        $historyBarang = $this->generateAndPaginateHistoryBarang('page_history', $barangMaster);
-
-        $labels = [];
-        $dataMasuk = [];
-        $dataKeluar = [];
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
-            $labels[] = now()->subDays($i)->format('d-m-Y');
-
-            $masuk = Struk::whereDate('tanggal_struk', $date)->get()->reduce(function ($carry, $struk) {
-                $items = $this->parseItems($struk->items);
-                return $carry + collect($items)->sum('jumlah');
-            }, 0);
-            $dataMasuk[] = $masuk;
-
-            $keluar = Pengeluaran::whereDate('tanggal', $date)->get()->reduce(function ($carry, $pengeluaran) {
-                $items = $this->parseItems($pengeluaran->daftar_barang);
-                return $carry + collect($items)->sum('jumlah');
-            }, 0);
-            $dataKeluar[] = $keluar;
-        }
-
-        return view('dashboard', [
-            'barangList' => $barangList,
-            'pengeluaranBarangList' => $pengeluaranBarangList,
-            'historyBarang' => $historyBarang,
-            'totalStruk' => $totalStruk,
-            'latestStruk' => $latestStruk,
-            'latestPengeluaranStruk' => $latestPengeluaranStruk,
-            'totalPemasukan' => $totalStrukPemasukan,
-            'totalPengeluaran' => $totalStrukPengeluaran,
-            'totalBarangMasuk' => $totalBarangMasuk,
-            'totalBarangKeluar' => $totalBarangKeluar,
-            'timePeriod' => $timePeriod,
-            'bulan' => $bulan,
-            'tahun' => $tahun,
-            'labels' => $labels,
-            'dataMasuk' => $dataMasuk,
-            'dataKeluar' => $dataKeluar,
-            'barangMaster' => $barangMaster,
-        ]);
+    switch ($timePeriod) {
+        case 'daily':
+            $strukQuery->whereDate('tanggal_struk', today());
+            $pengeluaranQuery->whereDate('tanggal', today());
+            break;
+        case 'weekly':
+            $strukQuery->whereBetween('tanggal_struk', [now()->startOfWeek(), now()->endOfWeek()]);
+            $pengeluaranQuery->whereBetween('tanggal', [now()->startOfWeek(), now()->endOfWeek()]);
+            break;
+        case 'monthly':
+            $strukQuery->whereMonth('tanggal_struk', $bulan)->whereYear('tanggal_struk', $tahun);
+            $pengeluaranQuery->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+            break;
     }
+
+    $barangMaster = Barang::pluck('nama_barang', 'kode_barang');
+
+    $barangList = $this->processAndPaginateBarangList(
+        $strukQuery,
+        $request->only(['search', 'sort']),
+        'page_barang',
+        $barangMaster
+    );
+
+    $pengeluaranBarangList = $this->processAndPaginatePengeluaranList(
+        $pengeluaranQuery,
+        $request->only(['search_pengeluaran', 'sort_pengeluaran']),
+        'page_pengeluaran',
+        $barangMaster
+    );
+
+    $historyBarang = $this->generateAndPaginateHistoryBarang('page_history', $barangMaster);
+
+    $labels = [];
+    $dataMasuk = [];
+    $dataKeluar = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $date = now()->subDays($i)->format('Y-m-d');
+        $labels[] = now()->subDays($i)->format('d-m-Y');
+
+        $masuk = Struk::whereDate('tanggal_struk', $date)->get()->reduce(function ($carry, $struk) {
+            $items = $this->parseItems($struk->items);
+            return $carry + collect($items)->sum('jumlah');
+        }, 0);
+        $dataMasuk[] = $masuk;
+
+        $keluar = Pengeluaran::whereDate('tanggal', $date)->get()->reduce(function ($carry, $pengeluaran) {
+            $items = $this->parseItems($pengeluaran->daftar_barang);
+            return $carry + collect($items)->sum('jumlah');
+        }, 0);
+        $dataKeluar[] = $keluar;
+    }
+
+    $pengeluarans = Pengeluaran::with('pegawai')
+    ->where('status', 'progress')
+    ->latest()
+    ->paginate(10, ['*'], 'page_progress')
+    ->appends($request->query());
+
+    // 🔽 Tambahan: ambil pengeluaran dengan status completed
+    $completedPengeluarans = Pengeluaran::with('pegawai')
+        ->where('status', 'completed')
+        ->latest()
+        ->paginate(10, ['*'], 'page_completed')
+        ->appends($request->query());
+
+    return view('dashboard', [
+        'barangList' => $barangList,
+        'pengeluaranBarangList' => $pengeluaranBarangList,
+        'historyBarang' => $historyBarang,
+        'totalStruk' => $totalStruk,
+        'latestStruk' => $latestStruk,
+        'latestPengeluaranStruk' => $latestPengeluaranStruk,
+        'totalPemasukan' => $totalStrukPemasukan,
+        'totalPengeluaran' => $totalStrukPengeluaran,
+        'totalBarangMasuk' => $totalBarangMasuk,
+        'totalBarangKeluar' => $totalBarangKeluar,
+        'timePeriod' => $timePeriod,
+        'bulan' => $bulan,
+        'tahun' => $tahun,
+        'labels' => $labels,
+        'dataMasuk' => $dataMasuk,
+        'dataKeluar' => $dataKeluar,
+        'barangMaster' => $barangMaster,
+        'pengeluarans' => $pengeluarans,
+        'completedPengeluarans' => $completedPengeluarans, // ✅ tambahan baru
+    ]);
+}
+
 
     private function getFilteredCount($query, $timePeriod, $bulan = null, $tahun = null)
     {

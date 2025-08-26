@@ -15,11 +15,12 @@ class PengeluaranController extends Controller
 {
     public function index(Request $request)
 {
-    $query = Pengeluaran::with(['pegawai', 'income']);
+    // Mulai dari query, tapi eksklusif hanya yang belum selesai
+    $query = Pengeluaran::with(['pegawai', 'income'])->where('status', '!=', 'completed');
 
+    // Filter pencarian
     if ($request->has('search') && $request->search != '') {
         $searchTerm = strtolower($request->search);
-        
         $query->where(function($q) use ($searchTerm) {
             $q->whereRaw('LOWER(nama_toko) LIKE ?', ['%' . $searchTerm . '%'])
               ->orWhereRaw('LOWER(nomor_struk) LIKE ?', ['%' . $searchTerm . '%'])
@@ -29,12 +30,18 @@ class PengeluaranController extends Controller
         });
     }
 
-    $pengeluarans = $query->latest()->paginate(10);
+    // Filter status (opsional: progress / in_progress)
+    $status = $request->get('status');
+    if ($status === 'in_progress') {
+        $query->where('status', 'progress');
+    }
+    // Jika ingin tampilkan semua yang belum completed, biarkan tanpa filter tambahan
+
+    $pengeluarans = $query->latest()->paginate(10)->appends($request->query());
     $barangs = Barang::pluck('nama_barang', 'kode_barang');
 
     return view('struks.pengeluarans.index', [
         'pengeluarans' => $pengeluarans,
-        'struks' => Struk::paginate(10),
         'barangs' => $barangs,
     ]);
 }
@@ -53,68 +60,69 @@ class PengeluaranController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'pegawai_id' => 'required|exists:pegawais,id',
-            'tanggal' => 'required|date',
-            'keterangan' => 'nullable|string',
-            'items' => 'required|array|min:1',
-            'items.*.nama' => 'required|string',
-            'items.*.jumlah' => 'required|integer|min:1',
-        ]);
+{
+    $validated = $request->validate([
+        'pegawai_id' => 'required|exists:pegawais,id',
+        'tanggal' => 'required|date',
+        'keterangan' => 'nullable|string',
+        'items' => 'required|array|min:1',
+        'items.*.nama' => 'required|string',
+        'items.*.jumlah' => 'required|integer|min:1',
+        'status' => 'required|in:progress,completed', // ✅ Tambahkan validasi
+    ]);
 
-        // Generate nomor struk otomatis
-        $validated['nomor_struk'] = $this->generateNomorStruk();
+    // Generate nomor struk otomatis
+    $validated['nomor_struk'] = $this->generateNomorStruk();
 
-        // Generate Nama SPK dan simpan di kolom nama_toko
-        $validated['nama_toko'] = $this->generateNamaSpkFromPegawaiId($validated['pegawai_id']); // ✅ Benar
+    // Generate Nama SPK dan simpan di kolom nama_toko
+    $validated['nama_toko'] = $this->generateNamaSpkFromPegawaiId($validated['pegawai_id']);
 
+    // Validasi stok barang
+    foreach ($validated['items'] as $item) {
+        $kodeBarang = $item['nama'];
+        $jumlah = $item['jumlah'];
 
-        // Validasi stok barang
-        foreach ($validated['items'] as $item) {
-            $kodeBarang = $item['nama'];
-            $jumlah = $item['jumlah'];
-
-            $barang = Barang::where('kode_barang', $kodeBarang)->first();
-            if (!$barang) {
-                return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
-            }
-
-            if ($barang->jumlah < $jumlah) {
-                return back()->withErrors([
-                    'Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah
-                ]);
-            }
+        $barang = Barang::where('kode_barang', $kodeBarang)->first();
+        if (!$barang) {
+            return back()->withErrors(['Barang dengan kode ' . $kodeBarang . ' tidak ditemukan.']);
         }
 
-        // Kurangi stok barang
-        foreach ($validated['items'] as $item) {
-            $barang = Barang::where('kode_barang', $item['nama'])->first();
-            $barang->jumlah -= $item['jumlah'];
-            $barang->save();
+        if ($barang->jumlah < $jumlah) {
+            return back()->withErrors([
+                'Stok barang "' . $barang->nama_barang . '" tidak mencukupi. Stok tersedia: ' . $barang->jumlah
+            ]);
         }
-
-        $pengeluaranData = [
-            'nama_toko' => $validated['nama_toko'], // Simpan Nama SPK di kolom nama_toko
-            'nomor_struk' => $validated['nomor_struk'],
-            'pegawai_id' => $validated['pegawai_id'],
-            'tanggal' => $validated['tanggal'],
-            'keterangan' => $validated['keterangan'] ?? null,
-            'daftar_barang' => json_encode($validated['items']),
-            'jumlah_item' => collect($validated['items'])->sum('jumlah'),
-        ];
-
-        try {
-            Pengeluaran::create($pengeluaranData);
-        } catch (\Illuminate\Database\QueryException $e) {
-            if (str_contains($e->getMessage(), 'Duplicate entry')) {
-                return back()->withErrors(['Nomor struk sudah digunakan. Silahkan coba lagi.']);
-            }
-            throw $e;
-        }
-
-        return redirect()->route('pengeluarans.index')->with('created', 'Pengeluaran berhasil disimpan dan stok dikurangi.');
     }
+
+    // Kurangi stok barang
+    foreach ($validated['items'] as $item) {
+        $barang = Barang::where('kode_barang', $item['nama'])->first();
+        $barang->jumlah -= $item['jumlah'];
+        $barang->save();
+    }
+
+    $pengeluaranData = [
+        'nama_toko' => $validated['nama_toko'],
+        'nomor_struk' => $validated['nomor_struk'],
+        'pegawai_id' => $validated['pegawai_id'],
+        'tanggal' => $validated['tanggal'],
+        'keterangan' => $validated['keterangan'] ?? null,
+        'daftar_barang' => json_encode($validated['items']),
+        'jumlah_item' => collect($validated['items'])->sum('jumlah'),
+        'status' => $validated['status'], // ✅ Sudah ambil dari form
+    ];
+
+    try {
+        Pengeluaran::create($pengeluaranData);
+    } catch (\Illuminate\Database\QueryException $e) {
+        if (str_contains($e->getMessage(), 'Duplicate entry')) {
+            return back()->withErrors(['Nomor struk sudah digunakan. Silahkan coba lagi.']);
+        }
+        throw $e;
+    }
+
+    return redirect()->route('pengeluarans.index')->with('created', 'Pengeluaran berhasil disimpan dan stok dikurangi.');
+}
 
     public function show($id)
     {
@@ -142,6 +150,7 @@ class PengeluaranController extends Controller
             'pegawai_id' => 'required|exists:pegawais,id',
             'tanggal' => 'required|date',
             'keterangan' => 'nullable|string',
+            'status' => 'required|in:progress,completed',
         ];
 
         // Validasi jika input manual (bukan dari struk)
@@ -161,6 +170,7 @@ class PengeluaranController extends Controller
                 'pegawai_id' => $validated['pegawai_id'],
                 'tanggal' => $validated['tanggal'],
                 'keterangan' => $validated['keterangan'] ?? null,
+                'status' => $validated['status'],
             ];
 
             // Jika bukan dari struk, update daftar_barang dan stok

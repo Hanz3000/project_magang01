@@ -20,6 +20,7 @@ class Pengeluaran extends Model
         'bukti_pembayaran',
         'pegawai_id', // tambahkan pegawai_id ke fillable
         'tanggal_struk',
+        'status',
     ];
 
     protected $casts = [

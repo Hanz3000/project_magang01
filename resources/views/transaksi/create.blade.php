@@ -1095,7 +1095,7 @@
                                 <i class="fas fa-info-circle mr-1"></i>
                                 Status
                             </label>
-                            <select name="status" id="status" class="form-control" required>
+                           <select name="status" id="status_pengeluaran" class="form-control" required>
                                 <option value="progress">Progress</option>
                                 <option value="completed">Completed</option>
                             </select>
@@ -1116,6 +1116,7 @@
                                 <th>Aksi</th>
                             </tr>
                         </thead>
+                        
                         <tbody id="expense-items-container">
                             <tr class="item-row" data-item="0">
                                 <td>

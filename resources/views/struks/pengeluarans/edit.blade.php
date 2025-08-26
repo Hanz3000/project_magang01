@@ -28,13 +28,24 @@
            value="{{ $pengeluaran->pegawai->nama }}" readonly>
     <input type="hidden" name="pegawai_id" value="{{ $pengeluaran->pegawai_id }}">
 </div>
-
+          <label for="status"><i class="fas fa-info-circle mr-1"></i>Status</label>
+          <select name="status" id="status" class="form-control" required>
+    <option value="progress"
+        {{ old('status', $pengeluaran->status) == 'progress' ? 'selected' : '' }}>
+        Progress
+    </option>
+    <option value="completed"
+        {{ old('status', $pengeluaran->status) == 'completed' ? 'selected' : '' }}>
+        Completed
+    </option>
+</select>
             <div class="space-y-3" id="items-container">
                 <div class="grid grid-cols-3 gap-4 font-medium text-gray-700 pb-2 border-b">
                     <div>Nama Barang</div>
                     <div>Jumlah</div>
                     <div>Aksi</div>
                 </div>
+                <div class="input-group">
 
                 @foreach ($pengeluaran->daftar_barang as $index => $item)
                 @php
@@ -52,6 +63,7 @@
                             Stok: <span class="stok-tersedia" data-awal="{{ $stokTersedia }}">{{ $stokTersedia }}</span>
                         </div>
                     </div>
+                    
                     <div>
                         <input type="number" name="existing_items[{{ $index }}][jumlah]" value="{{ $item['jumlah'] }}" min="1"
                             class="w-full border rounded px-3 py-2 existing-jumlah-input">

@@ -58,7 +58,15 @@
                     </table>
                 </div>
             </div>
-
+            <div class="grid grid-cols-2 gap-4">
+    <div>
+        <strong>Status:</strong>
+        <span class="ml-2 px-2 py-1 text-sm rounded 
+            {{ $pengeluaran->status == 'completed' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' }}">
+            {{ ucfirst($pengeluaran->status) }}
+        </span>
+    </div>
+</div>
             <!-- Tombol Aksi -->
             <div class="flex justify-between print:hidden">
                 <a href="{{ route('pengeluarans.index') }}"

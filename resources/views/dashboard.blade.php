@@ -421,6 +421,7 @@
                     </svg>
                     Daftar Pengeluaran Barang
                 </h2>
+                
                 <form action="{{ route('dashboard') }}" method="GET"
                     class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex space-x-2">
                     <input type="text" name="search_pengeluaran" value="{{ request('search_pengeluaran') }}"
@@ -472,7 +473,7 @@
                                 Tanggal Keluar</th>
                         </tr>
                     </thead>
-
+                
                     <tbody class="bg-white divide-y divide-gray-200">
                         @forelse ($pengeluaranBarangList as $item)
                         <tr class="hover:bg-gray-50 transition-colors duration-150">
@@ -509,6 +510,7 @@
                     </tbody>
                 </table>
             </div>
+            
             <div class="mt-4">
                 {{ $pengeluaranBarangList->links('vendor.pagination.custom') }}
                 <div class="showing-results mt-2 text-sm text-gray-600 text-center">
@@ -517,6 +519,110 @@
                 </div>
             </div>
         </div>
+       <!-- Daftar Pengeluaran (Progress) -->
+<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Pengeluaran (Progress)</h2>
+    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pegawai</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nomor SPK</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse ($pengeluarans as $pengeluaran)
+                    @php
+                        $items = is_string($pengeluaran->daftar_barang) 
+                            ? json_decode($pengeluaran->daftar_barang, true) 
+                            : $pengeluaran->daftar_barang;
+
+                        $firstItem = collect($items)->first();
+                        $namaBarang = $firstItem['nama'] ?? '-';
+                        $totalJumlah = collect($items)->sum('jumlah');
+                    @endphp
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ $loop->iteration }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $pengeluaran->pegawai->nama ?? '-' }}</td>
+                    <td class="px-6 py-4 text-sm font-mono">{{ $pengeluaran->nomor_struk }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $namaBarang }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 font-medium text-center">{{ $totalJumlah }}</td>
+                    <td class="px-6 py-4 text-sm">{{ $pengeluaran->tanggal }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                            Progress
+                        </span>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada pengeluaran progress.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-4">
+        {{ $pengeluarans->links('vendor.pagination.custom') }}
+    </div>
+</div>
+<!-- Daftar Pengeluaran (Completed) -->
+<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">Pengeluaran (Completed)</h2>
+    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pegawai</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nomor SPK</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+                @forelse ($completedPengeluarans as $pengeluaran)
+                    @php
+                        $items = is_string($pengeluaran->daftar_barang) 
+                            ? json_decode($pengeluaran->daftar_barang, true) 
+                            : $pengeluaran->daftar_barang;
+
+                        $firstItem = collect($items)->first();
+                        $namaBarang = $firstItem['nama'] ?? '-';
+                        $totalJumlah = collect($items)->sum('jumlah');
+                    @endphp
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-500">{{ $loop->iteration }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $pengeluaran->pegawai->nama ?? '-' }}</td>
+                    <td class="px-6 py-4 text-sm font-mono">{{ $pengeluaran->nomor_struk }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">{{ $namaBarang }}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900 font-medium text-center">{{ $totalJumlah }}</td>
+                    <td class="px-6 py-4 text-sm">{{ $pengeluaran->tanggal }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            Completed
+                        </span>
+                    </td>
+                </tr>
+                @empty
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada pengeluaran completed.</td>
+                </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+    <div class="mt-4">
+        {{ $completedPengeluarans->links('vendor.pagination.custom') }}
+    </div>
+</div>
     </div>
 
     <style>
