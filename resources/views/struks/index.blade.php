@@ -199,7 +199,7 @@
                                 Rp{{ number_format($totalHarga, 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $struk->status == 'progress' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800' }}">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $struk->status == 'progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
                                     {{ ucfirst($struk->status) }}
                                 </span>
                             </td>
@@ -692,88 +692,87 @@
 
     let currentEditStrukId = null;
 
-// ...existing code...
-function openEditModal(strukId) {
-    currentEditStrukId = strukId;
-    const modal = document.getElementById('editModal');
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-    document.getElementById('editForm').action = `/struks/${strukId}`;
-    modal.scrollTop = 0;
+    function openEditModal(strukId) {
+        currentEditStrukId = strukId;
+        const modal = document.getElementById('editModal');
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        document.getElementById('editForm').action = `/struks/${strukId}`;
+        modal.scrollTop = 0;
 
-    // Ambil data dari baris tabel
-    const row = document.querySelector(`input.row-checkbox[value="${strukId}"]`).closest('tr');
-    document.getElementById('editNamaToko').value = row.querySelector('td:nth-child(3) .font-medium').textContent.trim();
-    document.getElementById('editNomorStruk').value = row.querySelector('td:nth-child(4)').textContent.trim();
+        // Ambil data dari baris tabel
+        const row = document.querySelector(`input.row-checkbox[value="${strukId}"]`).closest('tr');
+        document.getElementById('editNamaToko').value = row.querySelector('td:nth-child(3) .font-medium').textContent.trim();
+        document.getElementById('editNomorStruk').value = row.querySelector('td:nth-child(4)').textContent.trim();
 
-    // Format tanggal dari "26 Aug 2025" ke "2025-08-26"
-    const tanggalText = row.querySelector('td:nth-child(5) .text-gray-900').textContent.trim();
-    const bulanMap = {
-        Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-        Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
-    };
-    const tanggalArr = tanggalText.split(' ');
-    let tanggalFormatted = '';
-    if (tanggalArr.length === 3) {
-        tanggalFormatted = `${tanggalArr[2]}-${bulanMap[tanggalArr[1]]}-${tanggalArr[0].padStart(2, '0')}`;
-    }
-    document.getElementById('editTanggalStruk').value = tanggalFormatted;
+        // Format tanggal dari "26 Aug 2025" ke "2025-08-26"
+        const tanggalText = row.querySelector('td:nth-child(5) .text-gray-900').textContent.trim();
+        const bulanMap = {
+            Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
+            Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+        };
+        const tanggalArr = tanggalText.split(' ');
+        let tanggalFormatted = '';
+        if (tanggalArr.length === 3) {
+            tanggalFormatted = `${tanggalArr[2]}-${bulanMap[tanggalArr[1]]}-${tanggalArr[0].padStart(2, '0')}`;
+        }
+        document.getElementById('editTanggalStruk').value = tanggalFormatted;
 
-    document.getElementById('editStatus').value = row.querySelector('td:nth-child(9) span').textContent.trim().toLowerCase();
+        document.getElementById('editStatus').value = row.querySelector('td:nth-child(9) span').textContent.trim().toLowerCase();
 
-    // Ambil item barang dari data asli struk (window.strukItemsData)
-    let items = [];
-    if (window.strukItemsData && window.strukItemsData[strukId]) {
-        items = window.strukItemsData[strukId];
-    } else {
-        // fallback: ambil dari tampilan (tanpa harga satuan)
-        const barangCells = row.querySelectorAll('td:nth-child(6) .flex.items-start');
-        const jumlahCells = row.querySelectorAll('td:nth-child(7) .text-gray-500');
-        barangCells.forEach((barangDiv, i) => {
-            const namaBarang = barangDiv.querySelector('.text-gray-700').textContent.trim();
-            const jumlah = jumlahCells[i]?.textContent.replace('x', '').trim() || '';
-            items.push({
-                nama_barang: namaBarang,
-                nama: namaBarang,
-                jumlah: jumlah,
-                harga: ''
+        // Ambil item barang dari data asli struk (window.strukItemsData)
+        let items = [];
+        if (window.strukItemsData && window.strukItemsData[strukId]) {
+            items = window.strukItemsData[strukId];
+        } else {
+            // fallback: ambil dari tampilan (tanpa harga satuan)
+            const barangCells = row.querySelectorAll('td:nth-child(6) .flex.items-start');
+            const jumlahCells = row.querySelectorAll('td:nth-child(7) .text-gray-500');
+            barangCells.forEach((barangDiv, i) => {
+                const namaBarang = barangDiv.querySelector('.text-gray-700').textContent.trim();
+                const jumlah = jumlahCells[i]?.textContent.replace('x', '').trim() || '';
+                items.push({
+                    nama_barang: namaBarang,
+                    nama: namaBarang,
+                    jumlah: jumlah,
+                    harga: ''
+                });
             });
+        }
+
+        // Isi item di modal
+        const container = document.getElementById('modalItemsContainer');
+        container.innerHTML = '';
+        items.forEach((item, index) => {
+            addItemRowToModal(item, index);
         });
+
+        // Ambil total harga dari kolom tabel
+        const totalText = row.querySelector('td:nth-child(8)').textContent.replace(/[^\d]/g, '');
+        const totalHarga = parseInt(totalText) || 0;
+        document.getElementById('modalTotalPrice').textContent = `Total: Rp${totalHarga.toLocaleString('id-ID')}`;
+        let totalHargaInput = document.getElementById('editTotalHarga');
+        if (!totalHargaInput) {
+            totalHargaInput = document.createElement('input');
+            totalHargaInput.type = 'hidden';
+            totalHargaInput.name = 'total_harga';
+            totalHargaInput.id = 'editTotalHarga';
+            document.getElementById('editForm').appendChild(totalHargaInput);
+        }
+        totalHargaInput.value = totalHarga;
+
+        initBarangDropdown();
+        setTimeout(() => {
+            document.getElementById('editNamaToko').focus();
+        }, 100);
     }
 
-    // Isi item di modal
-    const container = document.getElementById('modalItemsContainer');
-    container.innerHTML = '';
-    items.forEach((item, index) => {
-        addItemRowToModal(item, index);
-    });
-
-    // Ambil total harga dari kolom tabel
-    const totalText = row.querySelector('td:nth-child(8)').textContent.replace(/[^\d]/g, '');
-    const totalHarga = parseInt(totalText) || 0;
-    document.getElementById('modalTotalPrice').textContent = `Total: Rp${totalHarga.toLocaleString('id-ID')}`;
-    let totalHargaInput = document.getElementById('editTotalHarga');
-    if (!totalHargaInput) {
-        totalHargaInput = document.createElement('input');
-        totalHargaInput.type = 'hidden';
-        totalHargaInput.name = 'total_harga';
-        totalHargaInput.id = 'editTotalHarga';
-        document.getElementById('editForm').appendChild(totalHargaInput);
-    }
-    totalHargaInput.value = totalHarga;
-
-    initBarangDropdown();
-    setTimeout(() => {
-        document.getElementById('editNamaToko').focus();
-    }, 100);
-}
-
-// Tambahkan di bawah <script> agar window.strukItemsData tersedia
-window.strukItemsData = {
-    @foreach($struks as $struk)
-        {{ $struk->id }}: {!! json_encode(is_string($struk->items) ? json_decode($struk->items, true) : $struk->items) !!},
-    @endforeach
-};
+    // Tambahkan di bawah <script> agar window.strukItemsData tersedia
+    window.strukItemsData = {
+        @foreach($struks as $struk)
+            {{ $struk->id }}: {!! json_encode(is_string($struk->items) ? json_decode($struk->items, true) : $struk->items) !!},
+        @endforeach
+    };
 
     function closeEditModal() {
         document.getElementById('editModal').classList.add('hidden');

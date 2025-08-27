@@ -29,7 +29,6 @@
                         <option value="all" {{ !request('time_period') || request('time_period') == 'all' ? 'selected' : '' }}>Semua</option>
                     </select>
 
-                    {{-- Tampilkan select bulan & tahun hanya jika bulanan --}}
                     <div id="bulan-tahun-filter"
                         class="{{ (request('time_period') == 'monthly' || $timePeriod == 'monthly') ? '' : 'hidden' }} flex gap-2">
                         <select name="bulan" class="border border-gray-300 rounded-md px-3 py-2 text-sm bg-gray-50 font-semibold">
@@ -287,11 +286,9 @@
                 </h2>
                 <form action="{{ route('dashboard') }}" method="GET"
                     class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex space-x-2">
-                    <!-- Pencarian -->
                     <input type="text" name="search" value="{{ request('search') }}"
                         class="flex-grow md:w-64 border border-gray-300 px-4 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent text-sm"
                         placeholder="Cari nama barang...">
-                    <!-- Sortir -->
                     <select name="sort"
                         class="border border-gray-300 px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <option value="">Sortir berdasarkan</option>
@@ -305,7 +302,6 @@
                         <option value="status_desc" {{ request('sort') == 'status_desc' ? 'selected' : '' }}>Status (Z-A)
                         </option>
                     </select>
-                    <!-- Tombol -->
                     <button type="submit"
                         class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 text-sm flex items-center justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
@@ -319,7 +315,7 @@
             </div>
 
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="pemasukanTable">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col"
@@ -339,44 +335,48 @@
                                 Tanggal Masuk</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Status</th>
+                                <select id="statusFilterPemasukan" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300">
+                                    <option value="">Semua Status</option>
+                                    <option value="progress">Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($barangList as $nama => $item)
-                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        @forelse ($pemasukans as $pemasukan)
+                        @php
+                            $items = is_string($pemasukan->items) 
+                                ? json_decode($pemasukan->items, true) 
+                                : ($pemasukan->items ?? []);
+                            $firstItem = collect($items)->first();
+                            $namaBarang = $firstItem['nama'] ?? '-';
+                            $totalJumlah = collect($items)->sum('jumlah');
+                            $status = $pemasukan->status ?? 'progress';
+                            $statusColors = [
+                                'completed' => 'bg-green-100 text-green-800',
+                                'progress' => 'bg-yellow-100 text-yellow-800'
+                            ];
+                            $statusTexts = [
+                                'completed' => 'Completed',
+                                'progress' => 'Progress'
+                            ];
+                            $colorClass = $statusColors[$status] ?? $statusColors['progress'];
+                            $statusText = $statusTexts[$status] ?? 'Progress';
+                        @endphp
+                        <tr class="pemasukan-row {{ strtolower($status) }}" data-status="{{ strtolower($status) }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $barangMaster[$item['nama']] ?? $item['nama'] }}
+                                {{ $barangMaster[$namaBarang] ?? $namaBarang }}
                             </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] ?? '0' }}
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $totalJumlah ?? '0' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $pemasukan->nomor_struk ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['nomor_struk'] ?? '-' }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
+                                {{ $pemasukan->tanggal_struk ? \Carbon\Carbon::parse($pemasukan->tanggal_struk)->format('d-m-Y') : '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $status = $item['status_progres'] ?? 'pending';
-                                    $statusColors = [
-                                        'completed' => 'bg-blue-100 text-blue-800',
-                                        'in_progress' => 'bg-blue-100 text-blue-800',
-                                        'pending' => 'bg-blue-100 text-blue-800',
-                                        'cancelled' => 'bg-blue-100 text-blue-800'
-                                    ];
-                                    // Mengubah teks status untuk pending dan in_progress menjadi "Progres"
-                                    $statusTexts = [
-                                        'completed' => 'Selesai',
-                                        'in_progress' => 'Progres',
-                                        'pending' => 'Progres',
-                                        'cancelled' => 'Dibatalkan'
-                                    ];
-                                    $colorClass = $statusColors[$status] ?? $statusColors['pending'];
-                                    $statusText = $statusTexts[$status] ?? 'Progres';
-                                @endphp
                                 <span class="px-2 py-1 text-xs font-medium rounded-full {{ $colorClass }}">
                                     {{ $statusText }}
                                 </span>
@@ -384,7 +384,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
                                 <div class="flex flex-col items-center justify-center py-6">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
@@ -402,15 +402,15 @@
                 </table>
             </div>
             <div class="mt-4">
-                {{ $barangList->links('vendor.pagination.custom') }}
+                {{ $pemasukans->links('vendor.pagination.custom') }}
                 <div class="showing-results mt-2 text-sm text-gray-600 text-center">
-                    Menampilkan {{ $barangList->firstItem() }} sampai {{ $barangList->lastItem() }} dari
-                    {{ $barangList->total() }} hasil
+                    Menampilkan {{ $pemasukans->firstItem() }} sampai {{ $pemasukans->lastItem() }} dari
+                    {{ $pemasukans->total() }} hasil
                 </div>
             </div>
         </div>
 
-        <!-- Item Pengeluaran Terbaru -->
+        <!-- Item Pengeluaran -->
         <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                 <h2 class="text-xl font-semibold text-gray-800 flex items-center">
@@ -421,7 +421,6 @@
                     </svg>
                     Daftar Pengeluaran Barang
                 </h2>
-                
                 <form action="{{ route('dashboard') }}" method="GET"
                     class="mt-3 md:mt-0 flex-shrink-0 w-full md:w-auto md:inline-flex space-x-2">
                     <input type="text" name="search_pengeluaran" value="{{ request('search_pengeluaran') }}"
@@ -453,12 +452,18 @@
                 </form>
             </div>
             <div class="overflow-x-auto border border-gray-200 rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200" id="pengeluaranTable">
                     <thead class="bg-gray-50">
                         <tr>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 No</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Pegawai</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Nomor SPK</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Nama Barang</th>
@@ -467,33 +472,62 @@
                                 Jumlah</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Nomor SPK</th>
+                                Tanggal Keluar</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Tanggal Keluar</th>
+                                <select id="statusFilterPengeluaran" class="border border-red-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-300">
+                                    <option value="">Semua Status</option>
+                                    <option value="progress">Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </th>
                         </tr>
                     </thead>
-                
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($pengeluaranBarangList as $item)
-                        <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        @forelse ($pengeluarans as $pengeluaran)
+                        @php
+                            $items = is_string($pengeluaran->daftar_barang) 
+                                ? json_decode($pengeluaran->daftar_barang, true) 
+                                : $pengeluaran->daftar_barang;
+                            $firstItem = collect($items)->first();
+                            $namaBarang = $firstItem['nama'] ?? '-';
+                            $totalJumlah = collect($items)->sum('jumlah');
+                            $status = $pengeluaran->status ?? 'progress';
+                            $statusColors = [
+                                'completed' => 'bg-green-100 text-green-800',
+                                'progress' => 'bg-yellow-100 text-yellow-800'
+                            ];
+                            $statusTexts = [
+                                'completed' => 'Completed',
+                                'progress' => 'Progress'
+                            ];
+                            $colorClass = $statusColors[$status] ?? $statusColors['progress'];
+                            $statusText = $statusTexts[$status] ?? 'Progress';
+                        @endphp
+                        <tr class="pengeluaran-row {{ strtolower($status) }}" data-status="{{ strtolower($status) }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $loop->iteration }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                {{ $barangMaster[$item['nama_barang']] ?? $item['nama_barang'] }}
-                            </td>
-
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $item['jumlah'] ?? '0' }}
+                                {{ $pengeluaran->pegawai->nama ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['nomor_struk'] ?? '-' }}
+                                {{ $pengeluaran->nomor_struk ?? '-' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $item['tanggal'] ? \Carbon\Carbon::parse($item['tanggal'])->format('d-m-Y') : '-' }}
+                                {{ $barangMaster[$namaBarang] ?? $namaBarang }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ $totalJumlah ?? '0' }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {{ $pengeluaran->tanggal ? \Carbon\Carbon::parse($pengeluaran->tanggal)->format('d-m-Y') : '-' }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $colorClass }}">
+                                    {{ $statusText }}
+                                </span>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="6" class="px-6 py-8 text-center text-sm text-gray-500">
+                            <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500">
                                 <div class="flex flex-col items-center justify-center">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-400" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
@@ -510,123 +544,18 @@
                     </tbody>
                 </table>
             </div>
-            
             <div class="mt-4">
-                {{ $pengeluaranBarangList->links('vendor.pagination.custom') }}
+                {{ $pengeluarans->links('vendor.pagination.custom') }}
                 <div class="showing-results mt-2 text-sm text-gray-600 text-center">
-                    Menampilkan {{ $pengeluaranBarangList->firstItem() }} sampai
-                    {{ $pengeluaranBarangList->lastItem() }} dari {{ $pengeluaranBarangList->total() }} hasil
+                    Menampilkan {{ $pengeluarans->firstItem() }} sampai
+                    {{ $pengeluarans->lastItem() }} dari {{ $pengeluarans->total() }} hasil
                 </div>
             </div>
         </div>
-       <!-- Daftar Pengeluaran (Progress) -->
-<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Pengeluaran (Progress)</h2>
-    <div class="overflow-x-auto border border-gray-200 rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pegawai</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nomor SPK</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($pengeluarans as $pengeluaran)
-                    @php
-                        $items = is_string($pengeluaran->daftar_barang) 
-                            ? json_decode($pengeluaran->daftar_barang, true) 
-                            : $pengeluaran->daftar_barang;
 
-                        $firstItem = collect($items)->first();
-                        $namaBarang = $firstItem['nama'] ?? '-';
-                        $totalJumlah = collect($items)->sum('jumlah');
-                    @endphp
-                <tr>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ $loop->iteration }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $pengeluaran->pegawai->nama ?? '-' }}</td>
-                    <td class="px-6 py-4 text-sm font-mono">{{ $pengeluaran->nomor_struk }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $namaBarang }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 font-medium text-center">{{ $totalJumlah }}</td>
-                    <td class="px-6 py-4 text-sm">{{ $pengeluaran->tanggal }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                            Progress
-                        </span>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada pengeluaran progress.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-4">
-        {{ $pengeluarans->links('vendor.pagination.custom') }}
-    </div>
-</div>
-<!-- Daftar Pengeluaran (Completed) -->
-<div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100 mt-6">
-    <h2 class="text-xl font-semibold text-gray-800 mb-4">Pengeluaran (Completed)</h2>
-    <div class="overflow-x-auto border border-gray-200 rounded-lg">
-        <table class="min-w-full divide-y divide-gray-200">
-            <thead class="bg-gray-50">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pegawai</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nomor SPK</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Barang</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Jumlah</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tanggal</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-gray-200">
-                @forelse ($completedPengeluarans as $pengeluaran)
-                    @php
-                        $items = is_string($pengeluaran->daftar_barang) 
-                            ? json_decode($pengeluaran->daftar_barang, true) 
-                            : $pengeluaran->daftar_barang;
-
-                        $firstItem = collect($items)->first();
-                        $namaBarang = $firstItem['nama'] ?? '-';
-                        $totalJumlah = collect($items)->sum('jumlah');
-                    @endphp
-                <tr>
-                    <td class="px-6 py-4 text-sm text-gray-500">{{ $loop->iteration }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $pengeluaran->pegawai->nama ?? '-' }}</td>
-                    <td class="px-6 py-4 text-sm font-mono">{{ $pengeluaran->nomor_struk }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900">{{ $namaBarang }}</td>
-                    <td class="px-6 py-4 text-sm text-gray-900 font-medium text-center">{{ $totalJumlah }}</td>
-                    <td class="px-6 py-4 text-sm">{{ $pengeluaran->tanggal }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                            Completed
-                        </span>
-                    </td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="7" class="text-center py-4 text-gray-500">Tidak ada pengeluaran completed.</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-    <div class="mt-4">
-        {{ $completedPengeluarans->links('vendor.pagination.custom') }}
-    </div>
-</div>
     </div>
 
     <style>
-        /* Custom Pagination Styles */
         .pagination {
             display: flex;
             justify-content: center;
@@ -676,7 +605,6 @@
             border-color: #3b82f6;
         }
 
-        /* Showing results text */
         .showing-results {
             color: #6b7280;
             font-size: 0.875rem;
@@ -701,6 +629,36 @@
                     }
                 });
             }
+
+            // Real-time status filter for Pemasukan
+            const statusFilterPemasukan = document.getElementById('statusFilterPemasukan');
+            const pemasukanRows = document.querySelectorAll('#pemasukanTable .pemasukan-row');
+            statusFilterPemasukan.addEventListener('change', function() {
+                const selectedStatus = this.value.toLowerCase();
+                pemasukanRows.forEach(row => {
+                    const rowStatus = row.getAttribute('data-status');
+                    if (selectedStatus === '' || rowStatus === selectedStatus) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+
+            // Real-time status filter for Pengeluaran
+            const statusFilterPengeluaran = document.getElementById('statusFilterPengeluaran');
+            const pengeluaranRows = document.querySelectorAll('#pengeluaranTable .pengeluaran-row');
+            statusFilterPengeluaran.addEventListener('change', function() {
+                const selectedStatus = this.value.toLowerCase();
+                pengeluaranRows.forEach(row => {
+                    const rowStatus = row.getAttribute('data-status');
+                    if (selectedStatus === '' || rowStatus === selectedStatus) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
         });
     </script>
-    @endsection
+@endsection
