@@ -117,14 +117,14 @@ final class DashboardController extends Controller
         $completedPemasukans = $this->paginateCollection($completedPemasukans, 10, 'page_pemasukan_completed');
 
         // Fetch Pengeluaran with status 'progress'
-        $pengeluarans = Pengeluaran::with('pegawai')
+        $pengeluarans = $pengeluaranQuery->with('pegawai')
             ->where('status', 'progress')
             ->latest()
             ->paginate(10, ['*'], 'page_progress')
             ->appends($request->query());
 
         // Fetch Pengeluaran with status 'completed'
-        $completedPengeluarans = Pengeluaran::with('pegawai')
+        $completedPengeluarans = $pengeluaranQuery->with('pegawai')
             ->where('status', 'completed')
             ->latest()
             ->paginate(10, ['*'], 'page_completed')
