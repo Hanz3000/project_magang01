@@ -24,6 +24,15 @@ final class DashboardController extends Controller
         $latestStruk = Struk::latest()->first();
         $latestPengeluaranStruk = Pengeluaran::latest()->first();
 
+        // Process latest struk items for consistent display
+        if ($latestStruk) {
+            $latestStruk->processed_items = $this->parseItems($latestStruk->items);
+        }
+        
+        if ($latestPengeluaranStruk) {
+            $latestPengeluaranStruk->processed_items = $this->parseItems($latestPengeluaranStruk->daftar_barang);
+        }
+
         $totalBarangMasuk = $this->calculateTotalBarangFiltered(Struk::class, 'items', $timePeriod, $bulan, $tahun);
         $totalBarangKeluar = $this->calculateTotalBarangFiltered(Pengeluaran::class, 'daftar_barang', $timePeriod, $bulan, $tahun);
 

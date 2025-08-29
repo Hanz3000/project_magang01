@@ -96,7 +96,7 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
                     <div>
@@ -175,6 +175,12 @@
                 </div>
 
                 @if (isset($latestStruk) && $latestStruk)
+                @php
+                    $items = is_string($latestStruk->items ?? null) ? json_decode($latestStruk->items, true) :
+                    ($latestStruk->items ?? []);
+                    $firstItem = collect($items)->first();
+                    $namaBarang = $firstItem['nama'] ?? '-';
+                @endphp
                 <div class="space-y-3 text-gray-700">
                     <div class="flex items-center">
                         <span class="w-24 text-gray-500">Nama Toko:</span>
@@ -190,17 +196,7 @@
                     </div>
                     <div class="flex items-center">
                         <span class="w-24 text-gray-500">Nama Barang:</span>
-                        <span class="font-medium">
-                            @php
-                            $items = is_string($latestStruk->items ?? null) ? json_decode($latestStruk->items, true) :
-                            ($latestStruk->items ?? []);
-                            @endphp
-                            @if(!empty($items))
-                            {{ implode(', ', array_column($items, 'nama')) }}
-                            @else
-                            -
-                            @endif
-                        </span>
+                        <span class="font-medium">{{ $barangMaster[$namaBarang] ?? $namaBarang }}</span>
                     </div>
                 </div>
                 @else
@@ -230,6 +226,13 @@
                 </div>
 
                 @if (isset($latestPengeluaranStruk) && $latestPengeluaranStruk)
+                @php
+                    $itemsKeluar = is_string($latestPengeluaranStruk->daftar_barang ?? null) ?
+                    json_decode($latestPengeluaranStruk->daftar_barang, true) :
+                    ($latestPengeluaranStruk->daftar_barang ?? []);
+                    $firstItemKeluar = collect($itemsKeluar)->first();
+                    $namaBarangKeluar = $firstItemKeluar['nama'] ?? '-';
+                @endphp
                 <div class="space-y-3 text-gray-700">
                     <div class="flex items-center">
                         <span class="w-24 text-gray-500">Nama Spk:</span>
@@ -245,18 +248,7 @@
                     </div>
                     <div class="flex items-center">
                         <span class="w-24 text-gray-500">Nama Barang:</span>
-                        <span class="font-medium">
-                            @php
-                            $itemsKeluar = is_string($latestPengeluaranStruk->daftar_barang ?? null) ?
-                            json_decode($latestPengeluaranStruk->daftar_barang, true) :
-                            ($latestPengeluaranStruk->daftar_barang ?? []);
-                            @endphp
-                            @if(!empty($itemsKeluar))
-                            {{ implode(', ', array_column($itemsKeluar, 'nama')) }}
-                            @else
-                            -
-                            @endif
-                        </span>
+                        <span class="font-medium">{{ $barangMaster[$namaBarangKeluar] ?? $namaBarangKeluar }}</span>
                     </div>
                 </div>
                 @else
