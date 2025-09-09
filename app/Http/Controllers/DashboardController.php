@@ -107,14 +107,11 @@ final class DashboardController extends Controller
             });
         });
 
-        // Filter for Progress
-        $pemasukans = $pemasukanList->filter(function ($item) {
-            return $item['status_progres'] === 'progress' || $item['status_progres'] === 'pending';
-        })->map(function ($item) {
-            return $item['struk'];
-        })->unique('id')->values();
-
-        $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan_progress');
+        // Kirimkan SEMUA Struk unik (baik progress maupun completed) ke view
+$pemasukans = $pemasukanList->map(function ($item) {
+    return $item['struk'];
+})->unique('id')->values();
+$pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
 
         // Filter for Completed
         $completedPemasukans = $pemasukanList->filter(function ($item) {
@@ -125,18 +122,10 @@ final class DashboardController extends Controller
 
         $completedPemasukans = $this->paginateCollection($completedPemasukans, 10, 'page_pemasukan_completed');
 
-        // Fetch Pengeluaran with status 'progress'
-        $pengeluarans = $pengeluaranQuery->with('pegawai')
-            ->where('status', 'progress')
+        // Fetch SEMUA Pengeluaran (Progress dan Completed)
+        $pengeluarans = Pengeluaran::with('pegawai')
             ->latest()
-            ->paginate(10, ['*'], 'page_progress')
-            ->appends($request->query());
-
-        // Fetch Pengeluaran with status 'completed'
-        $completedPengeluarans = $pengeluaranQuery->with('pegawai')
-            ->where('status', 'completed')
-            ->latest()
-            ->paginate(10, ['*'], 'page_completed')
+            ->paginate(10, ['*'], 'page_pengeluaran')
             ->appends($request->query());
 
         return view('dashboard', [
@@ -160,7 +149,7 @@ final class DashboardController extends Controller
             'pemasukans' => $pemasukans,
             'completedPemasukans' => $completedPemasukans,
             'pengeluarans' => $pengeluarans,
-            'completedPengeluarans' => $completedPengeluarans,
+            // 'completedPengeluarans' => $completedPengeluarans,
         ]);
     }
 
