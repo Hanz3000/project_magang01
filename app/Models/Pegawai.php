@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\Division;
 
 class Pegawai extends Model
 {
@@ -13,31 +12,22 @@ class Pegawai extends Model
     protected $fillable = [
         'nama',
         'nip',
-        'user_id',
         'divisi_id',
+        'user_id',
+        'password',
     ];
 
-    /**
-     * Relasi: Pegawai dimiliki oleh satu User
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $hidden = [
+        'password',
+    ];
 
-    /**
-     * Relasi: Pegawai dimiliki oleh satu Divisi
-     */
     public function divisi()
     {
-        return $this->belongsTo(Division::class, 'divisi_id');
+        return $this->belongsTo(Division::class);
     }
 
-    /**
-     * Relasi: Pegawai memiliki banyak Pengeluaran
-     */
-    public function pengeluarans()
+        public function user()
     {
-        return $this->hasMany(Pengeluaran::class);
+        return $this->belongsTo(User::class);
     }
 }

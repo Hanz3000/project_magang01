@@ -14,9 +14,6 @@ use App\Http\Controllers\PegawaiController;
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
-
 
 // ------------------- FORGOT PASSWORD -------------------
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showForm'])->name('password.request');
@@ -25,9 +22,8 @@ Route::get('/reset-password/{token}', [ForgotPasswordController::class, 'showRes
 Route::post('/reset-password', [ForgotPasswordController::class, 'resetPassword'])->name('password.update');
 
 // ------------------- PROFILE -------------------
-
 Route::middleware(['auth'])->group(function () {
-    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.edit'); // ini penting
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.edit');
     Route::post('/profile', [ProfileController::class, 'update'])->name('profile.update');
 });
 
@@ -59,7 +55,6 @@ Route::middleware('auth')->group(function () {
         Route::put('/{struk}', [StrukController::class, 'update'])->name('struks.update');
         Route::put('/struks/{id}', [StrukController::class, 'update'])->name('struks.update');
         Route::delete('/{struk}', [StrukController::class, 'destroy'])->name('struks.destroy');
-
 
         // Item routes
         Route::get('/{struk}/items', [StrukController::class, 'items']);

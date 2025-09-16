@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('master_barangs', function (Blueprint $table) {
+        Schema::table('master_barang', function (Blueprint $table) {
             $table->integer('jumlah')->default(0);
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('master_barangs', function (Blueprint $table) {
+        Schema::table('master_barang', function (Blueprint $table) {
             //
         });
     }

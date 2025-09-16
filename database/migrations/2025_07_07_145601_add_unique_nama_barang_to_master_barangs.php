@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('master_barangs', function (Blueprint $table) {
+        Schema::table('master_barang', function (Blueprint $table) {
             $table->unique('nama_barang');
         });
     }
 
     public function down()
     {
-        Schema::table('master_barangs', function (Blueprint $table) {
+        Schema::table('master_barang', function (Blueprint $table) {
             $table->dropUnique(['nama_barang']);
         });
     }

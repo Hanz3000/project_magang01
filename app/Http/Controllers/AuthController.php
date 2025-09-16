@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Models\Pegawai;
 
 class AuthController extends Controller
 {
@@ -14,64 +15,48 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-
+    // Proses login
     public function login(Request $request)
     {
         // Validasi form login
         $credentials = $request->validate([
-            'email' => 'required|email',
+            'nip' => 'required|digits:8',
             'password' => 'required',
         ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
+            'nip.required' => 'NIP wajib diisi.',
+            'nip.digits' => 'NIP harus 8 digit angka.',
             'password.required' => 'Password wajib diisi.',
         ]);
 
-        // Coba login
-        $remember = $request->has('remember');
-        if (Auth::attempt($credentials, $remember)) {
-            $request->session()->regenerate();
-            $request->session()->put('show_welcome', true);
-            return redirect()->intended('/');
-        }
+        // Cari pegawai berdasarkan NIP
+        $pegawai = Pegawai::where('nip', $request->nip)->with('user')->first();
 
-        // Jika gagal login, kembali dengan error
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->withInput(); // agar input email tetap muncul di form
-    }
+// Verifikasi password dari tabel users
+if ($pegawai && $pegawai->user && Hash::check($request->password, $pegawai->user->password)) {
+    // Login user ke guard Laravel
+    Auth::login($pegawai->user);
 
-    // Menampilkan form registrasi
-    public function showRegisterForm()
-    {
-        return view('auth.register');
-    }
+    // Simpan ke session tambahan
+    $request->session()->regenerate();
+    $request->session()->put('show_welcome', true);
+    $request->session()->put('pegawai_id', $pegawai->id);
+    $request->session()->put('user_id', $pegawai->user->id);
 
-    // Proses registrasi
-    public function register(Request $request)
-    {
-        $validatedData = $request->validate([
-            'name' => 'required|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
+    return redirect()->intended('/dashboard');
+}
 
-        $validatedData['password'] = bcrypt($validatedData['password']);
-
-        $user = User::create($validatedData);
-
-        Auth::login($user);
-
-        return redirect('/');
+// Jika gagal login
+return back()->withErrors([
+    'nip' => 'NIP atau password salah.',
+])->withInput();
     }
 
     // Proses logout
     public function logout(Request $request)
     {
-        Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        $request->session()->forget(['pegawai_id', 'user_id']);
 
         return redirect('/login');
     }

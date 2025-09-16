@@ -4,17 +4,20 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
-    public function up(): void
+return new class extends Migration
+{
+    public function up()
     {
-        Schema::table('master_barang', function (Blueprint $table) {
-            $table->enum('status', ['progress', 'completed'])->default('progress')->after('nama_barang');
+        Schema::table('struks', function (Blueprint $table) {
+            $table->string('status')
+                  ->default('progress')
+                  ->check("status IN ('progress','completed')");
         });
     }
 
-    public function down(): void
+    public function down()
     {
-        Schema::table('master_barang', function (Blueprint $table) {
+        Schema::table('struks', function (Blueprint $table) {
             $table->dropColumn('status');
         });
     }

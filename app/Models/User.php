@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -12,8 +11,7 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'name',
-        'email',
+        'nip',
         'password',
     ];
 
@@ -22,14 +20,15 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    // kasih tahu Laravel kalau login pakai nip
+    public function getAuthIdentifierName()
+    {
+        return 'nip';
+    }
 
-   
-public function pegawai()
-{
-    return $this->hasOne(Pegawai::class);
-}
-
+    // relasi ke Pegawai
+    public function pegawai()
+    {
+        return $this->hasOne(Pegawai::class, 'user_id');
+    }
 }

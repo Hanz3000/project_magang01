@@ -42,12 +42,10 @@
         }
 
         @keyframes float {
-
             0%,
             100% {
                 transform: translateY(0);
             }
-
             50% {
                 transform: translateY(-10px);
             }
@@ -58,7 +56,6 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
-
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -70,7 +67,6 @@
                 transform: scale(0.95);
                 opacity: 0;
             }
-
             to {
                 transform: scale(1);
                 opacity: 1;
@@ -81,11 +77,9 @@
             0% {
                 background-position: 0% 50%;
             }
-
             50% {
                 background-position: 100% 50%;
             }
-
             100% {
                 background-position: 0% 50%;
             }
@@ -167,7 +161,7 @@
                 <i class="fas fa-box-open text-primary-600 text-3xl"></i>
             </div>
             <h2 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang</h2>
-            <p class="text-slate-500">Masuk ke akun inventaris Anda</p>
+            <p class="text-slate-500">Masuk dengan NIP Anda</p>
         </div>
 
         @if ($errors->any())
@@ -188,14 +182,14 @@
             @csrf
 
             <div class="animate-fadeIn" style="animation-delay: 0.4s;">
-                <label for="email" class="block text-sm font-medium text-slate-700 mb-2">Alamat Email</label>
+                <label for="nip" class="block text-sm font-medium text-slate-700 mb-2">NIP</label>
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-envelope text-slate-400"></i>
+                        <i class="fas fa-id-card text-slate-400"></i>
                     </div>
-                    <input type="email" id="email" name="email"
+                    <input type="text" id="nip" name="nip"
                         class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl input-field focus:border-primary-500 focus:ring-primary-500"
-                        placeholder="Masukan alamat email" value="{{ old('email') }}" required autofocus>
+                        placeholder="Masukkan NIP (8 digit)" value="{{ old('nip') }}" required autofocus pattern="\d{8}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
                 </div>
             </div>
 
@@ -234,8 +228,8 @@
         </form>
 
         <div class="text-center text-sm mt-6 animate-fadeIn" style="animation-delay: 1s;">
-            <p class="text-sm text-gray-600">Akun hanya diberikan oleh admin Master Data. Hubungi bagian kepegawaian jika belum punya akun.</p>
-                   </div>
+            <p class="text-sm text-gray-600">NIP dan kata sandi diberikan oleh admin Master Data. Hubungi bagian kepegawaian jika ada masalah.</p>
+        </div>
     </div>
 
     <script>

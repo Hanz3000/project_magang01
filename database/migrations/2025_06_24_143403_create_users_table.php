@@ -6,16 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
-        if (!Schema::hasTable('users')) {
-            Schema::create('users', function (Blueprint $table) {
-                // struktur tabel
-            });
-        }
+        Schema::create('users', function (Blueprint $table) {
+            $table->id();
+            $table->string('nip')->unique(); // NIP unik untuk login
+            $table->string('name');
+            $table->string('password');
+            $table->enum('role', ['admin', 'user'])->default('user'); // role untuk akses
+            $table->rememberToken(); // untuk keperluan "remember me" di auth
+            $table->timestamps();
+        });
     }
 
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
         Schema::dropIfExists('users');
     }
