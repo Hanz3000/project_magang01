@@ -31,7 +31,7 @@
 
             <div class="grid md:grid-cols-2 gap-6">
                 {{-- Nama --}}
-                <div class="mb-5">
+                <div class="mb-5 md:col-span-2">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Nama Lengkap</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -39,23 +39,7 @@
                                 <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                             </svg>
                         </div>
-                        <input type="text" value="{{ $user->name }}"
-                            class="pl-10 w-full border bg-gray-100 cursor-not-allowed border-gray-300 rounded-lg px-4 py-2"
-                            disabled>
-                    </div>
-                </div>
-
-                {{-- Email --}}
-                <div class="mb-5">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Email</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                            </svg>
-                        </div>
-                        <input type="email" value="{{ $user->email }}"
+                        <input type="text" name="name" value="{{ $user->name }}"
                             class="pl-10 w-full border bg-gray-100 cursor-not-allowed border-gray-300 rounded-lg px-4 py-2"
                             disabled>
                     </div>

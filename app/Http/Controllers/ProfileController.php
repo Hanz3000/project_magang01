@@ -8,12 +8,11 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-   public function show()
-{
-    $user = Auth::user()->load('pegawai.divisi');
-    return view('layouts.profile', compact('user'));
-}
-
+    public function show()
+    {
+        $user = Auth::user()->load('pegawai.divisi');
+        return view('layouts.profile', compact('user'));
+    }
 
     public function update(Request $request)
     {
@@ -30,6 +29,14 @@ class ProfileController extends Controller
         }
         $user->save();
 
-         return redirect()->route('dashboard')->with('success', 'Profil berhasil diperbarui.');
+        // Log the user out after updating the profile
+        Auth::logout();
+
+        // Invalidate the session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Redirect to login page with success message
+        return redirect()->route('login')->with('success', 'Profil berhasil diperbarui. Silakan login kembali.');
     }
 }
