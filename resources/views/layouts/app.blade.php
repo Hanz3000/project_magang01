@@ -484,7 +484,7 @@
 </head>
 
 <body class="min-h-screen"
-    x-data="{ sidebarOpen: true, showWelcome: {{ session('show_welcome', false) ? 'true' : 'false' }} }"
+    x-data="{ sidebarOpen: window.matchMedia('(min-width: 768px)').matches, showWelcome: {{ session('show_welcome', false) ? 'true' : 'false' }} }"
     x-init="if(showWelcome){ setTimeout(() => showWelcome = false, 3000); }">
     <!-- Welcome Animation -->
     <div x-show="showWelcome" x-transition:leave="transition ease-in duration-300"
@@ -515,7 +515,7 @@
         <!-- Sidebar -->
         <aside
             class="sidebar-gradient text-white shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative flex flex-col overflow-hidden"
-            :class="sidebarOpen ? 'w-64 px-4' : 'w-20 px-2'">
+            :class="sidebarOpen ? 'w-64 px-4' : 'w-20 px-2 sidebar-small'">
 
             <!-- Header Logo -->
             <div class="flex items-center p-4 border-b border-white/20">
@@ -554,11 +554,12 @@
                                         d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                                 </svg>
                             </div>
-                            <div x-show="sidebarOpen" x-transition
-                                class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Dashboard</span>
-                                <p class="text-xs text-slate-300">Beranda sistem</p>
-                            </div>
+                            <template x-if="sidebarOpen">
+                                <div class="whitespace-nowrap text-left">
+                                    <span class="font-medium block">Dashboard</span>
+                                    <p class="text-xs text-slate-300">Beranda sistem</p>
+                                </div>
+                            </template>
                         </a>
                     </li>
 
@@ -573,11 +574,12 @@
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
-                            <div x-show="sidebarOpen" x-transition
-                                class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Pemasukan</span>
-                                <p class="text-xs text-slate-300">Data pemasukan</p>
-                            </div>
+                            <template x-if="sidebarOpen">
+                                <div class="whitespace-nowrap text-left">
+                                    <span class="font-medium block">Pemasukan</span>
+                                    <p class="text-xs text-slate-300">Data pemasukan</p>
+                                </div>
+                            </template>
                         </a>
                     </li>
 
@@ -592,11 +594,12 @@
                                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                             </div>
-                            <div x-show="sidebarOpen" x-transition
-                                class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Pengeluaran</span>
-                                <p class="text-xs text-slate-300">Data pengeluaran</p>
-                            </div>
+                            <template x-if="sidebarOpen">
+                                <div class="whitespace-nowrap text-left">
+                                    <span class="font-medium block">Pengeluaran</span>
+                                    <p class="text-xs text-slate-300">Data pengeluaran</p>
+                                </div>
+                            </template>
                         </a>
                     </li>
 
@@ -611,11 +614,12 @@
                                         d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                 </svg>
                             </div>
-                            <div x-show="sidebarOpen" x-transition
-                                class="whitespace-nowrap text-left">
-                                <span class="font-medium block">Tambah Transaksi</span>
-                                <p class="text-xs text-slate-300">Buat transaksi baru</p>
-                            </div>
+                            <template x-if="sidebarOpen">
+                                <div class="whitespace-nowrap text-left">
+                                    <span class="font-medium block">Tambah Transaksi</span>
+                                    <p class="text-xs text-slate-300">Buat transaksi baru</p>
+                                </div>
+                            </template>
                         </a>
                     </li>
 
@@ -711,8 +715,6 @@
             <!-- Content Area -->
             <div class="p-6 min-h-full">
                 <div class="content-area p-6 fade-in">
-
-
                     <!-- Main Content -->
                     @yield('content')
                 </div>
@@ -844,6 +846,16 @@
                 }
             });
         }
+
+        // Otomatisasi sidebar berdasarkan lebar layar
+        const mediaQuery = window.matchMedia('(min-width: 768px)');
+        function handleSidebarChange(e) {
+            $nextTick(() => {
+                sidebarOpen = e.matches;
+            });
+        }
+        mediaQuery.addEventListener('change', handleSidebarChange);
+        handleSidebarChange(mediaQuery); // Panggil langsung saat halaman dimuat
     </script>
 </body>
 
