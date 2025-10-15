@@ -1,4 +1,4 @@
-    @extends('layouts.app')
+@extends('layouts.app')
 
     @section('content')
     <div class="min-h-screen bg-gray-50 flex items-center justify-center py-4 px-2 sm:px-4 lg:px-8">
@@ -275,7 +275,7 @@
                         class="mt-2 sm:mt-0 flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                         <input type="text" name="search" value="{{ request('search') }}"
                             class="flex-grow border border-gray-300 px-2 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300 text-sm w-full sm:w-40"
-                            placeholder="Cari nama barang...">
+                            placeholder="Cari nama barang pemasukan...">
                         <select name="sort"
                             class="border border-gray-300 px-2 py-1 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 w-full sm:w-40">
                             <option value="">Sortir berdasarkan</option>
@@ -322,15 +322,18 @@
                     @endphp
                     <div class="bg-gray-50 p-3 rounded-lg mb-2 border pemasukan-card {{ strtolower($status) }}" data-status="{{ strtolower($status) }}">
                         <div class="flex justify-between items-start">
-                            <div class="font-medium text-gray-900 truncate">{{ $barangMaster[$namaBarang] ?? $namaBarang }}</div>
+                            <div class="font-medium text-gray-900 truncate">
+                                <span class="mr-2 text-blue-600 font-bold">#{{ $loop->iteration }}</span>
+                                {{ $barangMaster[$namaBarang] ?? $namaBarang }}
+                            </div>
                             <span class="px-1 py-0.5 text-xs font-medium rounded-full {{ $colorClass }}">
                                 {{ $statusText }}
                             </span>
                         </div>
-                        <div class="mt-2 text-xs text-gray-600 grid grid-cols-2 gap-1">
+                        <div class="mt-2 text-xs text-gray-600 grid grid-cols-1 gap-1">
                             <div>Jumlah: <span class="font-medium">{{ $totalJumlah ?? '0' }}</span></div>
                             <div>No Struk: <span class="font-medium">{{ $pemasukan->nomor_struk ?? '-' }}</span></div>
-                            <div class="col-span-2">Tanggal: <span class="font-medium">{{ $pemasukan->tanggal_struk ? \Carbon\Carbon::parse($pemasukan->tanggal_struk)->format('d-m-Y') : '-' }}</span></div>
+                            <div>Tanggal: <span class="font-medium">{{ $pemasukan->tanggal_struk ? \Carbon\Carbon::parse($pemasukan->tanggal_struk)->format('d-m-Y') : '-' }}</span></div>
                         </div>
                     </div>
                     @empty
@@ -489,12 +492,15 @@
                     @endphp
                     <div class="bg-gray-50 p-3 rounded-lg mb-2 border pengeluaran-card {{ strtolower($status) }}" data-status="{{ strtolower($status) }}">
                         <div class="flex justify-between items-start">
-                            <div class="font-medium text-gray-900 truncate">{{ $barangMaster[$namaBarang] ?? $namaBarang }}</div>
+                            <div class="font-medium text-gray-900 truncate">
+                                <span class="mr-2 text-red-600 font-bold">#{{ $loop->iteration }}</span>
+                                {{ $barangMaster[$namaBarang] ?? $namaBarang }}
+                            </div>
                             <span class="px-1 py-0.5 text-xs font-medium rounded-full {{ $colorClass }}">
                                 {{ $statusText }}
                             </span>
                         </div>
-                        <div class="mt-2 text-xs text-gray-600 grid grid-cols-2 gap-1">
+                        <div class="mt-2 text-xs text-gray-600 grid grid-cols-1 gap-1">
                             <div>Pegawai: <span class="font-medium">{{ $pengeluaran->pegawai->nama ?? '-' }}</span></div>
                             <div>Jumlah: <span class="font-medium">{{ $totalJumlah ?? '0' }}</span></div>
                             <div>No SPK: <span class="font-medium">{{ $pengeluaran->nomor_struk ?? '-' }}</span></div>

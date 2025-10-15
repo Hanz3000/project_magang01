@@ -101,9 +101,8 @@
                 <div class="flex justify-between items-center mb-3">
                     <h3 class="font-medium">+ Tambah Item Baru</h3>
                 </div>
-
-                <div class="grid grid-cols-2 gap-4 mb-3">
-                    <div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                    <div class="flex flex-col">
                         <label class="block text-sm text-gray-500 mb-1">Cari barang atau pilih dari daftar</label>
                         <select class="w-full border rounded px-3 py-2 barang-select">
                             <option value="">-- Pilih Barang --</option>
@@ -116,16 +115,17 @@
                             @endforeach
                         </select>
                     </div>
-                    <div>
+                    <div class="flex flex-col">
                         <label class="block text-sm text-gray-500 mb-1">Jumlah</label>
                         <input type="number" class="w-full border rounded px-3 py-2 new-jumlah-input" value="1" min="1">
                     </div>
                 </div>
-
-                <button type="button" id="tambah-barang"
-                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                    + Tambah
-                </button>
+                <div class="flex justify-start">
+                    <button type="button" id="tambah-barang"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                        + Tambah
+                    </button>
+                </div>
             </div>
 
             <!-- Tombol Aksi -->

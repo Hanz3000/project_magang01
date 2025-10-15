@@ -25,18 +25,24 @@
         --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         background-color: #f1f5f9;
         color: var(--dark);
         line-height: 1.5;
+        overflow-x: hidden;
+        margin: 0;
     }
 
-    /* === FORM CONTAINER === */
     .form-container {
         max-width: 960px;
-        margin: 2rem auto;
-        padding: 0 1.25rem;
+        margin: 1.5rem auto;
+        padding: 0 1rem;
+        width: 100%;
     }
 
     .form-card {
@@ -46,7 +52,7 @@
         border: 1px solid var(--gray);
         overflow: hidden;
         transition: var(--transition);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .form-card:hover {
@@ -54,29 +60,28 @@
     }
 
     .form-inner {
-        padding: 2.5rem;
+        padding: 1.5rem;
     }
 
-    /* === FORM ELEMENTS === */
     .section-title {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-        font-size: 1.25rem;
+        gap: 0.5rem;
+        font-size: 1.125rem;
         font-weight: 700;
         color: var(--dark);
-        margin-bottom: 1.5rem;
-        padding-bottom: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
         border-bottom: 1px solid var(--gray);
         letter-spacing: -0.01em;
     }
 
     .section-title i {
-        font-size: 1.2em;
+        font-size: 1.1em;
         color: var(--primary);
         background: rgba(79, 70, 229, 0.1);
-        width: 2.5rem;
-        height: 2.5rem;
+        width: 2rem;
+        height: 2rem;
         border-radius: 50%;
         display: inline-flex;
         align-items: center;
@@ -85,35 +90,35 @@
 
     .form-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 1.5rem;
-        margin-bottom: 2rem;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
     }
 
     .input-group {
         position: relative;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1rem;
     }
 
     .input-group label {
-        font-size: 0.9375rem;
+        font-size: 0.875rem;
         font-weight: 600;
         color: var(--secondary-dark);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
         display: block;
     }
 
     .input-group input,
     .input-group select {
         width: 100%;
-        padding: 0.875rem 1.25rem;
+        padding: 0.75rem 1rem;
         border: 1px solid var(--gray);
         border-radius: var(--border-radius);
-        font-size: 1rem;
+        font-size: 0.9375rem;
         background: var(--light);
         color: var(--dark);
         transition: var(--transition);
-        margin-top: 0.25rem;
+        margin-top: 0.125rem;
     }
 
     .input-group input:focus,
@@ -129,32 +134,33 @@
         opacity: 1;
     }
 
-    /* === BUTTONS === */
     .button-group {
         display: flex;
-        gap: 1rem;
-        justify-content: flex-end;
-        margin-top: 2.5rem;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
     }
 
     .btn {
-        padding: 0.875rem 1.75rem;
+        padding: 0.75rem 1.25rem;
         border-radius: var(--border-radius);
         font-weight: 600;
-        font-size: 1rem;
+        font-size: 0.9375rem;
         border: none;
         cursor: pointer;
         transition: var(--transition);
-        display: inline-flex;
+        display: flex;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
         box-shadow: var(--shadow-sm);
+        width: 100%;
+        text-align: center;
     }
 
     .btn-primary {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
         color: #fff;
-        border: none;
     }
 
     .btn-primary:hover,
@@ -188,22 +194,21 @@
         color: #991b1b;
     }
 
-    /* === ALERTS === */
     .alert {
-        padding: 1rem 1.5rem;
+        padding: 0.75rem 1rem;
         border-radius: var(--border-radius);
-        margin-bottom: 1.75rem;
-        font-size: 1rem;
+        margin-bottom: 1rem;
+        font-size: 0.9375rem;
         background: var(--light);
         color: var(--dark);
         display: flex;
         align-items: flex-start;
-        gap: 0.75rem;
+        gap: 0.5rem;
         border-left: 4px solid;
     }
 
     .alert i {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         margin-top: 0.125rem;
     }
 
@@ -224,11 +229,10 @@
     }
 
     .alert ul {
-        margin-top: 0.5rem;
-        padding-left: 1.5rem;
+        margin-top: 0.25rem;
+        padding-left: 1rem;
     }
 
-    /* === TAB STYLES === */
     .tab-container {
         display: flex;
         flex-direction: column;
@@ -237,15 +241,15 @@
 
     .tab-header {
         display: flex;
+        flex-wrap: wrap;
         border-bottom: 1px solid var(--gray);
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
         background: var(--light);
         border-radius: var(--border-radius) var(--border-radius) 0 0;
-        overflow: hidden;
     }
 
     .tab-button {
-        padding: 1rem 2rem;
+        padding: 0.75rem 1.5rem;
         background: none;
         border: none;
         cursor: pointer;
@@ -253,10 +257,12 @@
         color: var(--primary);
         border-bottom: 3px solid transparent;
         transition: var(--transition);
-        font-size: 1rem;
+        font-size: 0.9375rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        flex: 1;
+        text-align: center;
     }
 
     .tab-button.active,
@@ -274,7 +280,7 @@
     .tab-content {
         display: none;
         flex: 1;
-        padding: 1.5rem 0 0 0;
+        padding: 1rem 0 0 0;
         background: transparent;
     }
 
@@ -282,10 +288,9 @@
         display: block;
     }
 
-    /* === ENHANCED FILE UPLOAD STYLES === */
     .file-upload-wrapper {
         position: relative;
-        margin-bottom: 1.5rem;
+        margin-bottom: 1rem;
     }
 
     .file-upload-input {
@@ -302,7 +307,7 @@
         display: block;
         border: 2px dashed var(--gray);
         border-radius: var(--border-radius);
-        padding: 2.5rem;
+        padding: 1.5rem;
         text-align: center;
         cursor: pointer;
         background: var(--light);
@@ -314,42 +319,41 @@
     .file-upload-label:hover {
         border-color: var(--primary);
         background: rgba(79, 70, 229, 0.05);
-        transform: translateY(-2px);
         box-shadow: var(--shadow);
     }
 
     .file-upload-icon {
-        font-size: 2.5rem;
+        font-size: 2rem;
         color: var(--primary);
-        margin-bottom: 1rem;
-        transition: all 0.3s ease;
+        margin-bottom: 0.75rem;
     }
 
     .file-upload-title {
-        font-size: 1.125rem;
+        font-size: 1rem;
         font-weight: 600;
         color: var(--dark);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.25rem;
     }
 
     .file-upload-description {
         color: var(--secondary);
         margin-bottom: 0.25rem;
+        font-size: 0.875rem;
     }
 
     .file-upload-requirements {
         color: var(--secondary-light);
-        font-size: 0.875rem;
+        font-size: 0.75rem;
     }
 
     .file-preview-container {
-        margin-top: 1.5rem;
+        margin-top: 1rem;
         animation: fadeIn 0.3s ease;
     }
 
     .file-preview-image {
         max-width: 100%;
-        max-height: 200px;
+        max-height: 150px;
         border-radius: calc(var(--border-radius) - 0.25rem);
         box-shadow: var(--shadow-sm);
         margin: 0 auto;
@@ -365,17 +369,17 @@
     }
 
     .file-preview-info {
-        margin-top: 1rem;
+        margin-top: 0.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 1rem;
+        gap: 0.75rem;
     }
 
     .file-name {
-        font-size: 0.875rem;
+        font-size: 0.75rem;
         color: var(--secondary-dark);
-        max-width: 200px;
+        max-width: 150px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -391,7 +395,7 @@
         display: inline-flex;
         align-items: center;
         gap: 0.25rem;
-        padding: 0.5rem 1rem;
+        padding: 0.5rem 0.75rem;
         border-radius: var(--border-radius);
         background: rgba(239, 68, 68, 0.1);
     }
@@ -413,14 +417,13 @@
         display: none;
     }
 
-    /* === OPTIMIZED SELECT2 DROPDOWN STYLES === */
     .select2-container--default .select2-selection--single {
         background: var(--light);
         border: 1px solid var(--gray);
         border-radius: var(--border-radius);
-        height: 48px;
+        height: 40px;
         padding: 0.5rem 1rem;
-        font-size: 1rem;
+        font-size: 0.9375rem;
         color: var(--dark);
         transition: var(--transition);
         display: flex;
@@ -447,27 +450,44 @@
 
     .select2-container--default .select2-selection--single .select2-selection__arrow {
         height: 100%;
-        right: 1rem;
+        right: 0.75rem;
         top: 50%;
         transform: translateY(-50%);
     }
 
-    /* Dropdown dengan lebar optimal */
-    .select2-dropdown {
-        border-radius: var(--border-radius);
-        border: 1px solid var(--gray);
-        box-shadow: var(--shadow-md);
-        background: #fff;
-        font-size: 0.95rem;
-        color: var(--dark);
-        z-index: 9999;
-        width: auto !important;
-        min-width: 280px;
-        max-width: min(600px, 90vw);
-    }
+#status.select2-hidden-accessible + .select2-container .select2-selection--single,
+#status_pengeluaran.select2-hidden-accessible + .select2-container .select2-selection--single {
+    border: 1.5px solid var(--gray);
+    box-shadow: none !important;
+    outline: none !important;
+    background: var(--light);
+    color: var(--dark);
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    width: 100%;
+    transition: var(--transition);
+}
 
+#status.select2-hidden-accessible + .select2-container .select2-selection--single:focus,
+#status_pengeluaran.select2-hidden-accessible + .select2-container .select2-selection--single:focus {
+    border-color: var(--primary);
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.select2-dropdown {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray);
+    padding: 0;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    left: 0 !important;
+}
     .select2-results__options {
-        max-height: 250px;
+        max-height: 200px;
         overflow-y: auto;
         scrollbar-width: thin;
         scrollbar-color: var(--gray) transparent;
@@ -487,7 +507,7 @@
     }
 
     .select2-results__option {
-        padding: 0.75rem 1rem;
+        padding: 0.5rem 0.75rem;
         transition: var(--transition);
         white-space: normal;
         word-wrap: break-word;
@@ -516,7 +536,7 @@
 
     .select2-container--default .select2-selection--single .select2-selection__clear {
         color: var(--error);
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         margin-right: 0.5rem;
     }
 
@@ -524,7 +544,6 @@
         width: 100% !important;
     }
 
-    /* === MODAL STYLES === */
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -539,6 +558,7 @@
         opacity: 0;
         visibility: hidden;
         transition: var(--transition);
+        overflow-x: hidden;
     }
 
     .modal-overlay.active {
@@ -550,9 +570,9 @@
         background: #fff;
         border-radius: var(--border-radius);
         box-shadow: var(--shadow-lg);
-        width: 90%;
-        max-width: 800px;
-        max-height: 90vh;
+        width: 95%;
+        max-width: 600px;
+        max-height: 85vh;
         overflow-y: auto;
         transform: translateY(20px);
         transition: var(--transition);
@@ -563,7 +583,7 @@
     }
 
     .modal-header {
-        padding: 1.5rem;
+        padding: 1rem;
         border-bottom: 1px solid var(--gray);
         display: flex;
         align-items: center;
@@ -571,7 +591,7 @@
     }
 
     .modal-title {
-        font-size: 1.25rem;
+        font-size: 1.125rem;
         font-weight: 600;
         color: var(--dark);
     }
@@ -579,7 +599,7 @@
     .modal-close {
         background: none;
         border: none;
-        font-size: 1.5rem;
+        font-size: 1.25rem;
         cursor: pointer;
         color: var(--secondary);
         transition: var(--transition);
@@ -590,198 +610,78 @@
     }
 
     .modal-body {
-        padding: 1.5rem;
+        padding: 1rem;
     }
 
     .modal-image {
         width: 100%;
         height: auto;
-        max-height: 70vh;
+        max-height: 60vh;
         object-fit: contain;
         border-radius: calc(var(--border-radius) - 0.25rem);
     }
 
-    /* === ANIMATIONS === */
     @keyframes fadeIn {
         from {
             opacity: 0;
             transform: translateY(10px);
         }
-
         to {
             opacity: 1;
             transform: translateY(0);
         }
     }
 
-    /* === RESPONSIVE ADJUSTMENTS === */
-    @media (max-width: 768px) {
-        .form-inner {
-            padding: 1.5rem;
-        }
-
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .tab-header {
-            flex-direction: row;
-            overflow-x: auto;
-            padding-bottom: 0;
-        }
-
-        .tab-button {
-            white-space: nowrap;
-        }
-
-        .button-group {
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .modal-content {
-            width: 95%;
-        }
-
-        .select2-dropdown {
-            max-width: 95vw;
-            min-width: 250px;
-        }
-        
-        .item-table td:nth-child(1) {
-            min-width: 180px;
-            width: 50%;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .form-inner {
-            padding: 1rem;
-        }
-
-        .section-title {
-            font-size: 1.125rem;
-        }
-
-        .item-table th,
-        .item-table td {
-            padding: 0.75rem;
-        }
-
-        .select2-dropdown {
-            max-width: 90vw;
-            min-width: 200px;
-        }
-    }
-
-    /* === IMPROVED ITEM TABLE STYLES === */
     .item-table {
         width: 100%;
-        border-collapse: separate;
-        border-spacing: 0;
-        margin-bottom: 1.5rem;
+        border-collapse: collapse;
+        margin-bottom: 1rem;
         background: #fff;
         border-radius: var(--border-radius);
         overflow: hidden;
         box-shadow: var(--shadow-sm);
         border: 1px solid var(--gray);
-        table-layout: fixed;
     }
 
-    .item-table td:nth-child(1) .input-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .item-table td:nth-child(1) .select2-container {
-        margin-top: 0;
-    }
-
-    .income-table th:nth-child(1),
-    .income-table td:nth-child(1) {
-        width: 45%;
-        min-width: 280px;
-    }
-
-    .income-table th:nth-child(2),
-    .income-table td:nth-child(2) {
-        width: 15%;
-    }
-
-    .income-table th:nth-child(3),
-    .income-table td:nth-child(3) {
-        width: 20%;
-    }
-
-    .income-table th:nth-child(4),
-    .income-table td:nth-child(4) {
-        width: 20%;
-    }
-
-    .income-table th:nth-child(5),
-    .income-table td:nth-child(5) {
-        width: 10%;
-    }
-
-    .expense-table th:nth-child(1),
-    .expense-table td:nth-child(1) {
-        width: 65%;
-        min-width: 280px;
-        padding-right: 1.5rem;
-    }
-
-    .expense-table th:nth-child(2),
-    .expense-table td:nth-child(2) {
-        width: 25%;
-        text-align: center;
-    }
-
-    .expense-table th:nth-child(3),
-    .expense-table td:nth-child(3) {
-        width: 10%;
-        text-align: center;
+    .item-table th,
+    .item-table td {
+        border-bottom: 1px solid var(--gray);
+        padding: 0.5rem;
+        vertical-align: middle;
+        text-align: left;
     }
 
     .item-table th {
         background: var(--light);
         color: var(--secondary-dark);
         font-weight: 600;
-        border-bottom: 1px solid var(--gray);
-        padding: 0.75rem 1rem;
-        text-align: center;
-    }
-
-    .item-table td {
-        border-bottom: 1px solid var(--gray);
-        color: var(--dark);
-        padding: 0.75rem 1rem;
-        vertical-align: middle;
-    }
-
-    .item-table .input-group {
-        margin-bottom: 0;
-    }
-
-    .item-table .input-group input {
-        padding: 0.5rem 0.75rem;
         font-size: 0.875rem;
     }
 
+    .item-table td {
+        color: var(--dark);
+    }
+
+    .item-table .input-group {
+        margin-bottom: 0.5rem;
+    }
+
+    .item-table .input-group input {
+        padding: 0.5rem;
+        font-size: 0.875rem;
+        width: 100%;
+    }
+
     .item-table .select2-container--default .select2-selection--single {
-        height: 40px;
-        padding: 0.25rem 0.75rem;
+        height: 36px;
+        padding: 0.25rem 0.5rem;
         font-size: 0.875rem;
     }
 
     .item-table .btn-danger {
         padding: 0.5rem;
         width: 100%;
+        height: 100%;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -799,369 +699,549 @@
         text-align: left;
     }
 
-    .expense-table td:nth-child(2),
-    .expense-table td:nth-child(3) {
+    .income-table td:nth-child(2) .input-group input,
+    .income-table td:nth-child(3) .input-group input {
         text-align: center;
+        width: 100%;
+        min-width: 0;
     }
 
-    .expense-table td:nth-child(2) .input-group {
-        display: flex;
-        justify-content: center;
-    }
-
-    .expense-table td:nth-child(2) .input-group input {
-        text-align: center;
-        width: 80px;
-        min-width: 80px;
+    .income-table td:nth-child(4) .subtotal-display {
+        text-align: right;
     }
 
     .total-display {
         text-align: right;
-        font-size: 1.125rem;
-        margin-bottom: 1.5rem;
-        padding: 1rem;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
         background: var(--light);
         border-radius: var(--border-radius);
         border: 1px solid var(--gray);
     }
+
+    /* Dropdown Status agar rapi dan tidak melebihi kolom */
+#status.select2-hidden-accessible + .select2-container .select2-dropdown,
+#status_pengeluaran.select2-hidden-accessible + .select2-container .select2-dropdown {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    left: 0 !important;
+    box-sizing: border-box;
+    word-break: break-word;
+    white-space: normal;
+}
+
+#status.select2-hidden-accessible + .select2-container .select2-selection--single,
+#status_pengeluaran.select2-hidden-accessible + .select2-container .select2-selection--single {
+    border: 1.5px solid var(--gray);
+    box-shadow: none !important;
+    outline: none !important;
+    background: var(--light);
+    color: var(--dark);
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    width: 100%;
+    transition: var(--transition);
+}
+
+#status.select2-hidden-accessible + .select2-container .select2-selection--single:focus,
+#status_pengeluaran.select2-hidden-accessible + .select2-container .select2-selection--single:focus {
+    border-color: var(--primary);
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+.select2-dropdown {
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray);
+    padding: 0;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    left: 0 !important;
+}
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        .form-inner {
+            padding: 2rem;
+        }
+
+        .button-group {
+            flex-direction: row;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            width: auto;
+        }
+
+        .tab-button {
+            flex: 0 1 auto;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .item-table,
+        .item-table thead,
+        .item-table tbody,
+        .item-table tr {
+            display: block;
+            width: 100%;
+        }
+        .item-table thead {
+            display: none;
+        }
+        .item-table tr {
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-sm);
+            background: #fff;
+            padding: 0.5rem;
+            max-width: 100%;
+        }
+        .item-table td {
+            display: block;
+            width: 100%;
+            align-items: center;
+            padding: 0.5rem 0.25rem !important;
+            font-size: 0.85rem;
+            border: none;
+            position: relative;
+            box-sizing: border-box;
+            word-break: break-word;
+            max-width: 100%;
+        }
+        .item-table td::before {
+            content: attr(data-label);
+            flex: 0 0 110px;
+            font-weight: 600;
+            color: var(--secondary-dark);
+            margin-right: 0.5rem;
+            font-size: 0.85rem;
+            text-align: left;
+            min-width: 90px;
+            max-width: 40vw;
+            word-break: break-word;
+        }
+        .item-table .input-group input,
+        .item-table .input-group select {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+        }
+        .item-table .btn-danger {
+            min-width: 36px;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .subtotal-display {
+            font-size: 0.85rem !important;
+            text-align: left;
+            word-break: break-word;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .form-container,
+        .form-card,
+        .form-inner {
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
+            box-sizing: border-box;
+            overflow-x: hidden !important;
+        }
+        
+        .item-table {
+            display: block;
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+            box-sizing: border-box;
+        }
+        
+        .item-table td {
+            font-size: 0.75rem !important;
+            padding: 0.5rem 0.25rem !important;
+            word-break: break-word;
+        }
+        
+        .item-table .btn-danger {
+            min-width: 36px;
+            padding: 0.5rem !important;
+            font-size: 1rem !important;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .subtotal-display {
+            font-size: 0.8rem !important;
+            text-align: center;
+        }
+        
+        .section-title {
+            font-size: 1rem;
+        }
+        
+        .tab-button {
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+        }
+    }
+
+    @media (max-width: 767px) {
+    .select2-dropdown {
+        max-width: 350px !important; /* Sesuaikan dengan lebar kolom */
+        min-width: 180px !important;
+        box-sizing: border-box;
+        word-break: break-word;
+        white-space: normal;
+    }
+    }
+
+    @media (max-width: 480px) {
+    #status.select2-hidden-accessible + .select2-container .select2-dropdown,
+    #status_pengeluaran.select2-hidden-accessible + .select2-container .select2-dropdown {
+        max-width: 98vw !important;
+        width: 98vw !important;
+    }
+}
 </style>
 
 <!-- Income/Expense Form -->
-<div class="form-card">
-    <div class="form-inner">
-        {{-- Notifications --}}
-        @if (session('success'))
-        <div class="alert alert-success">
-            <i class="fas fa-check-circle"></i>
-            <div class="alert-content">
-                {{ session('success') }}
+<div class="form-container">
+    <div class="form-card">
+        <div class="form-inner">
+            {{-- Notifications --}}
+            @if (session('success'))
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                <div class="alert-content">
+                    {{ session('success') }}
+                </div>
             </div>
-        </div>
-        @endif
+            @endif
 
-        @if ($errors->any())
-        <div class="alert alert-error">
-            <i class="fas fa-exclamation-triangle"></i>
-            <div class="alert-content">
-                <strong>Terjadi kesalahan:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            @if ($errors->any())
+            <div class="alert alert-error">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="alert-content">
+                    <strong>Terjadi kesalahan:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             </div>
-        </div>
-        @endif
+            @endif
 
-        {{-- Tab Container --}}
-        <div class="tab-container">
-            <div class="tab-header">
-                <button class="tab-button active" data-tab="income-tab">
-                    <i class="fas fa-sign-in-alt"></i> Pemasukan
-                </button>
-                <button class="tab-button" data-tab="expense-tab">
-                    <i class="fas fa-sign-out-alt"></i> Pengeluaran
-                </button>
-            </div>
+            {{-- Tab Container --}}
+            <div class="tab-container">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="income-tab">
+                        <i class="fas fa-sign-in-alt"></i> Pemasukan
+                    </button>
+                    <button class="tab-button" data-tab="expense-tab">
+                        <i class="fas fa-sign-out-alt"></i> Pengeluaran
+                    </button>
+                </div>
 
-            {{-- Income Tab Content --}}
-            <div id="income-tab" class="tab-content active">
-                <form action="{{ route('struks.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
+                {{-- Income Tab Content --}}
+                <div id="income-tab" class="tab-content active">
+                    <form action="{{ route('struks.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
 
-                    <div class="section-title">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Buat Pemasukan</span>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="nama_toko">
-                                <i class="fas fa-store mr-1"></i>
-                                Nama Toko
-                            </label>
-                            <input type="text" name="nama_toko" id="nama_toko" placeholder="Masukkan nama toko"
-                                required>
+                        <div class="section-title">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Buat Pemasukan</span>
                         </div>
 
-                        <div class="input-group">
-                            <label for="nomor_struk">
-                                <i class="fas fa-receipt mr-1"></i>
-                                Nomor Struk
-                            </label>
-                            <input type="text" name="nomor_struk" id="nomor_struk"
-                                placeholder="Masukkan nomor struk" required>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="tanggal_struk">
-                                <i class="fas fa-calendar-alt mr-1"></i>
-                                Tanggal Masuk
-                            </label>
-                            <input type="date" name="tanggal_struk" id="tanggal_struk" required
-                                value="{{ old('tanggal_struk', date('Y-m-d')) }}">
-                        </div>
-
-                        <div class="input-group">
-                            <label for="status">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Status
-                            </label>
-                            <select name="status" id="status" class="form-control" required>
-                                <option value="progress">Progress</option>
-                                <option value="completed">Completed</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    {{-- Items --}}
-                    <div class="section-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Daftar Barang</span>
-                    </div>
-
-                    <table class="item-table income-table">
-                        <thead>
-                            <tr>
-                                <th>Barang</th>
-                                <th>Jumlah</th>
-                                <th>Harga Satuan</th>
-                                <th>Subtotal</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="income-items-container">
-                            <tr class="item-row" data-item="0">
-                                <td>
-                                    <div class="input-group">
-                                        <select name="items[0][nama]" class="select-barang" required>
-                                            <option value="">Pilih Barang</option>
-                                            @foreach ($barangList as $barang)
-                                            <option value="{{ $barang->kode_barang }}">
-                                                {{ $barang->nama_barang }} ({{ $barang->kode_barang }})
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="input-group">
-                                        <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="input-group">
-                                        <input type="number" name="items[0][harga]" class="harga" min="0" required placeholder="0">
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="subtotal-display" id="subtotal-0">Rp 0</div>
-                                    <input type="hidden" name="items[0][subtotal]" class="subtotal" value="0">
-                                </td>
-                                <td>
-                                    <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div class="text-center mb-6">
-                        <button type="button" onclick="addIncomeItem()" class="btn btn-secondary">
-                            <i class="fas fa-plus mr-2"></i>Tambah Barang
-                        </button>
-                    </div>
-
-                    <div class="total-display">
-                        <strong>Total Pemasukan:</strong> <span id="income-total">Rp 0</span>
-                        <input type="hidden" name="total_harga" id="total_harga" value="0">
-                    </div>
-
-                    {{-- Receipt Photo --}}
-                    <div class="section-title">
-                        <i class="fas fa-camera"></i>
-                        <span>Foto Struk</span>
-                    </div>
-
-                    <div class="file-upload-wrapper">
-                        <input type="file" name="foto_struk" id="foto_struk" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this)">
-                        <label for="foto_struk" class="file-upload-label" id="file-upload-label">
-                            <div class="file-upload-content text-center">
-                                <div class="file-upload-icon">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                </div>
-                                <h4 class="file-upload-title">Upload Foto Struk</h4>
-                                <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
-                                <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="nama_toko">
+                                    <i class="fas fa-store mr-1"></i>
+                                    Nama Toko
+                                </label>
+                                <input type="text" name="nama_toko" id="nama_toko" placeholder="Masukkan nama toko" required>
                             </div>
-                            <div class="file-preview-container hidden" id="file-preview-container">
-                                <img id="preview-image" src="#" alt="Preview" class="file-preview-image">
-                                <div class="file-preview-info">
-                                    <span id="file-name" class="file-name"></span>
-                                    <button type="button" onclick="removePhoto()" class="remove-file-btn">
-                                        <i class="fas fa-trash"></i> Hapus
-                                    </button>
-                                </div>
+
+                            <div class="input-group">
+                                <label for="nomor_struk">
+                                    <i class="fas fa-receipt mr-1"></i>
+                                    Nomor Struk
+                                </label>
+                                <input type="text" name="nomor_struk" id="nomor_struk" placeholder="Masukkan nomor struk" required>
                             </div>
-                        </label>
-                    </div>
 
-                    <div class="button-group">
-                        <a href="{{ route('struks.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left mr-2"></i>Kembali
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-2"></i>Simpan Pemasukan
-                        </button>
-                    </div>
-                </form>
-            </div>
+                            <div class="input-group">
+                                <label for="tanggal_struk">
+                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                    Tanggal Masuk
+                                </label>
+                                <input type="date" name="tanggal_struk" id="tanggal_struk" required value="{{ old('tanggal_struk', date('Y-m-d')) }}">
+                            </div>
 
-            {{-- Expense Tab Content --}}
-            <div id="expense-tab" class="tab-content">
-                <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-
-                    <div class="section-title">
-                        <i class="fas fa-money-bill-wave"></i>
-                        <span>Buat Pengeluaran</span>
-                    </div>
-
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label for="expense_nama_spk">
-                                <i class="fas fa-file-signature mr-1"></i>
-                                Nama SPK
-                            </label>
-                            <input 
-                                type="text" 
-                                name="nama_spk" 
-                                id="expense_nama_spk"
-                                class="form-input w-full bg-gray-100 text-gray-500 opacity-80 cursor-not-allowed"
-                                placeholder="Terisi otomatis" 
-                                readonly>
-                            <small class="text-gray-400">Format: SPK-[DIVISI]-[NIP 2 digit]-[001]</small>
+                            <div class="input-group">
+                                <label for="status">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Status
+                                </label>
+                                <select name="status" id="status" class="form-control" required>
+                                    <option value="progress">Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="input-group">
-                            <label for="expense_nomor_struk">
-                                <i class="fas fa-receipt mr-1"></i>
-                                Nomor Struk
-                            </label>
-                            <input type="text" name="nomor_struk" id="expense_nomor_struk"
-                                   value="{{ $nextSpkNumber ?? '' }}"
-                                   class="form-input w-full bg-gray-100 text-gray-500 placeholder-gray-400 opacity-80 cursor-not-allowed"
-                                   placeholder="Terisi otomatis" readonly>
-                            <small class="text-gray-400">Format: spk/DD/MM/YYXXXXX</small>
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="expense_tanggal">
-                                <i class="fas fa-calendar-alt mr-1"></i>
-                                Tanggal Pengeluaran
-                            </label>
-                            <input type="date" name="tanggal" id="expense_tanggal" required
-                                value="{{ old('tanggal', date('Y-m-d')) }}">
+                        {{-- Items --}}
+                        <div class="section-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Daftar Barang</span>
                         </div>
 
-                        <div class="input-group">
-                            <label for="pegawai_id">
-                                <i class="fas fa-user-tie mr-1"></i>
-                                Pegawai
-                            </label>
-                            <select name="pegawai_id" id="pegawai_id" required>
-                                <option value="">Pilih Pegawai</option>
-                                @foreach ($pegawais as $pegawai)
-                                <option value="{{ $pegawai->id }}" data-divisi="{{ $pegawai->divisi }}">
-                                    {{ $pegawai->nama }}
-                                </option>
-                                @endforeach
-                            </select>
+                        <table class="item-table income-table">
+                            <thead>
+                                <tr>
+                                    <th>Detail Barang</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="income-items-container">
+                                <tr class="item-row" data-item="0">
+                                    <td data-label="Detail Barang">
+                                        <div class="input-group">
+                                            <label>Barang</label>
+                                            <select name="items[0][nama]" class="select-barang" required>
+                                                <option value="">Pilih Barang</option>
+                                                @foreach ($barangList as $barang)
+                                                <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
+    {{ $barang->nama_barang }} ({{ $barang->kode_barang }})
+</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Jumlah</label>
+                                            <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Harga Satuan</label>
+                                            <input type="number" name="items[0][harga]" class="harga" min="0" required placeholder="0">
+                                        </div>
+                                        <div class="input-group">
+                                            <label>Subtotal</label>
+                                            <div class="subtotal-display" id="subtotal-0">Rp 0</div>
+                                            <input type="hidden" name="items[0][subtotal]" class="subtotal" value="0">
+                                        </div>
+                                    </td>
+                                    <td data-label="Aksi" style="width: 60px;">
+                                        <button type="button" onclick="removeIncomeItem(this)" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="text-center mb-4">
+                            <button type="button" onclick="addIncomeItem()" class="btn btn-secondary">
+                                <i class="fas fa-plus mr-2"></i>Tambah Barang
+                            </button>
                         </div>
 
-                        <div class="input-group">
-                            <label for="divisi_display">
-                                <i class="fas fa-sitemap mr-1"></i>
-                                Divisi
-                            </label>
-                            <input type="text" id="divisi_display"
-                                class="form-input w-full bg-gray-100 text-gray-700 placeholder-gray-400"
-                                placeholder="Terisi otomatis" readonly>
+                        <div class="total-display">
+                            <strong>Total Pemasukan:</strong> <span id="income-total">Rp 0</span>
+                            <input type="hidden" name="total_harga" id="total_harga" value="0">
                         </div>
 
-                        <div class="input-group">
-                            <label for="status">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                Status
-                            </label>
-                           <select name="status" id="status_pengeluaran" class="form-control" required>
-                                <option value="progress">Progress</option>
-                                <option value="completed">Completed</option>
-                            </select>
+                        {{-- Receipt Photo --}}
+                        <div class="section-title">
+                            <i class="fas fa-camera"></i>
+                            <span>Foto Struk</span>
                         </div>
-                    </div>
 
-                    {{-- Items --}}
-                    <div class="section-title">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Daftar Barang</span>
-                    </div>
-
-                    <table class="item-table expense-table">
-                        <thead>
-                            <tr>
-                                <th>Barang</th>
-                                <th>Jumlah</th>
-                                <th>Aksi</th>
-                            </tr>
-                        </thead>
-                        
-                        <tbody id="expense-items-container">
-                            <tr class="item-row" data-item="0">
-                                <td>
-                                    <div class="input-group">
-                                        <select name="items[0][nama]" class="select-barang" required onchange="updateStokExpense(this)">
-                                            <option value="">Pilih Barang</option>
-                                            @foreach ($barangList as $barang)
-                                            <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
-                                                {{ $barang->nama_barang }} ({{ $barang->kode_barang }}) - Stok: {{ $barang->jumlah }}
-                                            </option>
-                                            @endforeach
-                                        </select>
-                                        <span class="stok-info">Stok: -</span>
+                        <div class="file-upload-wrapper">
+                            <input type="file" name="foto_struk" id="foto_struk" accept="image/*" class="file-upload-input" onchange="previewUploadedImage(this)">
+                            <label for="foto_struk" class="file-upload-label" id="file-upload-label">
+                                <div class="file-upload-content text-center">
+                                    <div class="file-upload-icon">
+                                        <i class="fas fa-cloud-upload-alt"></i>
                                     </div>
-                                </td>
-                                <td>
-                                    <div class="input-group">
-                                        <input type="number" name="items[0][jumlah]" class="jumlah" min="1"
-                                            value="1" required>
+                                    <h4 class="file-upload-title">Upload Foto Struk</h4>
+                                    <p class="file-upload-description">Seret & lepas file di sini atau klik untuk memilih</p>
+                                    <p class="file-upload-requirements">Format: JPG, PNG (Maks. 2MB)</p>
+                                </div>
+                                <div class="file-preview-container hidden" id="file-preview-container">
+                                    <img id="preview-image" src="#" alt="Preview" class="file-preview-image">
+                                    <div class="file-preview-info">
+                                        <span id="file-name" class="file-name"></span>
+                                        <button type="button" onclick="removePhoto()" class="remove-file-btn">
+                                            <i class="fas fa-trash"></i> Hapus
+                                        </button>
                                     </div>
-                                </td>
-                                <td>
-                                    <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </div>
+                            </label>
+                        </div>
 
-                    <div class="text-center mb-6">
-                        <button type="button" onclick="addExpenseItem()" class="btn btn-secondary">
-                            <i class="fas fa-plus mr-2"></i>Tambah Barang
-                        </button>
-                    </div>
+                        <div class="button-group">
+                            <a href="{{ route('struks.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Simpan Pemasukan
+                            </button>
+                        </div>
+                    </form>
+                </div>
 
-                    <div class="button-group">
-                        <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left mr-2"></i>Kembali
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save mr-2"></i>Simpan Pengeluaran
-                        </button>
-                    </div>
-                </form>
+                {{-- Expense Tab Content --}}
+                <div id="expense-tab" class="tab-content">
+                    <form action="{{ route('pengeluarans.store') }}" method="POST" enctype="multipart/form-data">
+                        @csrf
+
+                        <div class="section-title">
+                            <i class="fas fa-money-bill-wave"></i>
+                            <span>Buat Pengeluaran</span>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="input-group">
+                                <label for="expense_nama_spk">
+                                    <i class="fas fa-file-signature mr-1"></i>
+                                    Nama SPK
+                                </label>
+                                <input type="text" name="nama_spk" id="expense_nama_spk" class="form-input w-full bg-gray-100 text-gray-500 opacity-80 cursor-not-allowed" placeholder="Terisi otomatis" readonly>
+                                <small class="text-gray-400">Format: SPK-[DIVISI]-[NIP 2 digit]-[001]</small>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="expense_nomor_struk">
+                                    <i class="fas fa-receipt mr-1"></i>
+                                    Nomor Struk
+                                </label>
+                                <input type="text" name="nomor_struk" id="expense_nomor_struk" value="{{ $nextSpkNumber ?? '' }}" class="form-input w-full bg-gray-100 text-gray-500 placeholder-gray-400 opacity-80 cursor-not-allowed" placeholder="Terisi otomatis" readonly>
+                                <small class="text-gray-400">Format: spk/DD/MM/YYXXXXX</small>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="expense_tanggal">
+                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                    Tanggal Pengeluaran
+                                </label>
+                                <input type="date" name="tanggal" id="expense_tanggal" required value="{{ old('tanggal', date('Y-m-d')) }}">
+                            </div>
+
+                            <div class="input-group">
+                                <label for="pegawai_id">
+                                    <i class="fas fa-user-tie mr-1"></i>
+                                    Pegawai
+                                </label>
+                                <select name="pegawai_id" id="pegawai_id" required>
+                                    <option value="">Pilih Pegawai</option>
+                                    @foreach ($pegawais as $pegawai)
+                                    <option value="{{ $pegawai->id }}" data-divisi="{{ $pegawai->divisi }}">
+                                        {{ $pegawai->nama }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="divisi_display">
+                                    <i class="fas fa-sitemap mr-1"></i>
+                                    Divisi
+                                </label>
+                                <input type="text" id="divisi_display" class="form-input w-full bg-gray-100 text-gray-700 placeholder-gray-400" placeholder="Terisi otomatis" readonly>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="status">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Status
+                                </label>
+                                <select name="status" id="status_pengeluaran" class="form-control" required>
+                                    <option value="progress">Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {{-- Items --}}
+                        <div class="section-title">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span>Daftar Barang</span>
+                        </div>
+
+                        <table class="item-table expense-table">
+                            <thead>
+                                <tr>
+                                    <th>Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expense-items-container">
+                                <tr class="item-row" data-item="0">
+                                    <td data-label="Barang">
+                                        <div class="input-group">
+                                            <select name="items[0][nama]" class="select-barang" required onchange="updateStokExpense(this)">
+                                                <option value="">Pilih Barang</option>
+                                                @foreach ($barangList as $barang)
+                                                <option value="{{ $barang->kode_barang }}" data-stok="{{ $barang->jumlah }}">
+                                                    {{ $barang->nama_barang }} ({{ $barang->kode_barang }}) - Stok: {{ $barang->jumlah }}
+                                                </option>
+                                                @endforeach
+                                            </select>
+                                            <span class="stok-info">Stok: -</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="Jumlah">
+                                        <div class="input-group">
+                                            <input type="number" name="items[0][jumlah]" class="jumlah" min="1" value="1" required>
+                                        </div>
+                                    </td>
+                                    <td data-label="Aksi" style="width: 60px;">
+                                        <button type="button" onclick="removeExpenseItem(this)" class="btn btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="text-center mb-4">
+                            <button type="button" onclick="addExpenseItem()" class="btn btn-secondary">
+                                <i class="fas fa-plus mr-2"></i>Tambah Barang
+                            </button>
+                        </div>
+
+                        <div class="button-group">
+                            <a href="{{ route('pengeluarans.index') }}" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-2"></i>Kembali
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save mr-2"></i>Simpan Pengeluaran
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -1180,22 +1260,18 @@
     </div>
 </div>
 
-{{-- JavaScript --}}
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script>
-    // Global variables
     let incomeIndex = 1;
     let expenseItemIndex = 1;
 
-    // Format currency
     function formatRupiah(angka) {
         if (!angka) return 'Rp 0';
         return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
 
-    // Calculate optimal dropdown width based on content
     function calculateOptimalDropdownWidth(selectElement) {
         const $select = $(selectElement);
         const options = $select.find('option');
@@ -1212,25 +1288,24 @@
 
         const $temp = $('<span>').css({
             'font-family': $('.select2-dropdown').css('font-family') || 'Plus Jakarta Sans, sans-serif',
-            'font-size': $('.select2-dropdown').css('font-size') || '0.95rem',
+            'font-size': $('.select2-dropdown').css('font-size') || '0.875rem',
             'font-weight': 'normal',
             'position': 'absolute',
             'visibility': 'hidden',
             'white-space': 'nowrap',
-            'padding': '0.75rem 1rem'
+            'padding': '0.5rem 0.75rem'
         }).text(longestText).appendTo('body');
 
         const textWidth = $temp.outerWidth();
         $temp.remove();
 
-        const minWidth = 280;
-        const maxWidth = Math.min(600, $(window).width() * 0.9);
-        const optimalWidth = Math.max(minWidth, Math.min(textWidth + 60, maxWidth));
+        const minWidth = 200;
+        const maxWidth = Math.min(600, $(window).width() * 0.95);
+        const optimalWidth = Math.max(minWidth, Math.min(textWidth + 40, maxWidth));
 
         return optimalWidth;
     }
 
-    // Preview uploaded image
     function previewUploadedImage(input, type = 'income') {
         const file = input.files[0];
         if (!file) return;
@@ -1259,7 +1334,6 @@
         reader.readAsDataURL(file);
     }
 
-    // Remove photo functions
     function removePhoto() {
         $('#foto_struk').val('');
         $('#preview-image').attr('src', '#');
@@ -1276,7 +1350,6 @@
         $('#expense-file-upload-label').removeClass('has-file');
     }
 
-    // Image modal functions
     function openImageModal(imageUrl, title) {
         if (!imageUrl) return;
         $('#modalImageContent').attr('src', imageUrl);
@@ -1292,7 +1365,6 @@
         $('body').css('overflow', 'auto');
     }
 
-    // Update stok for expense
     function updateStokExpense(selectElement) {
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const stokAsli = parseInt(selectedOption.getAttribute('data-stok')) || 0;
@@ -1305,7 +1377,7 @@
         stokInfo.textContent = `Stok: ${sisa >= 0 ? sisa : 0}`;
 
         jumlahInput.removeEventListener('input', jumlahInput.stockUpdateHandler);
-        
+
         jumlahInput.stockUpdateHandler = function() {
             const inputJumlah = parseInt(jumlahInput.value) || 0;
             const sisaBaru = stokAsli - inputJumlah;
@@ -1322,14 +1394,30 @@
         jumlahInput.addEventListener('input', jumlahInput.stockUpdateHandler);
     }
 
-    // Income items management
+    function updateIncomeStok(selectElement) {
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const kodeBarang = selectedOption.value;
+        const stok = parseInt(selectedOption.getAttribute('data-stok')) || 0;
+        const row = selectElement.closest('tr');
+        const jumlahInput = row.querySelector('.jumlah');
+        jumlahInput.max = stok > 0 ? stok : 1;
+
+        jumlahInput.addEventListener('input', function() {
+            let val = parseInt(jumlahInput.value) || 1;
+            if (val > stok) {
+                jumlahInput.value = stok;
+                alert('Jumlah melebihi stok tersedia!');
+            }
+        });
+    }
+
     function addIncomeItem() {
         const container = document.getElementById('income-items-container');
         if (!container) return;
 
         const oldRow = container.querySelector('.item-row');
         const newRow = oldRow.cloneNode(true);
-        
+
         newRow.innerHTML = newRow.innerHTML.replace(/id="subtotal-0"/g, `id="subtotal-${incomeIndex}"`);
         const regex = /\[0\]/g;
         newRow.innerHTML = newRow.innerHTML.replace(regex, `[${incomeIndex}]`);
@@ -1350,9 +1438,14 @@
         $(select).next('.select2-container').remove();
         initializeSelect2ForElement(select);
 
+        // Tambahkan event untuk update stok
+        select.addEventListener('change', function() {
+            updateIncomeStok(this);
+        });
+
         const jumlahInput = newRow.querySelector('.jumlah');
         const hargaInput = newRow.querySelector('.harga');
-        
+
         jumlahInput.addEventListener('input', function() {
             updateIncomeSubtotal($(newRow));
         });
@@ -1397,7 +1490,6 @@
         $('#income-total').text(formatRupiah(total));
     }
 
-    // Expense items management
     function addExpenseItem() {
         const container = $('#expense-items-container');
         if (!container.length) return;
@@ -1437,14 +1529,13 @@
         }
     }
 
-    // Initialize Select2 for a single element
     function initializeSelect2ForElement(element) {
         const $element = $(element);
         const isBarangSelect = $element.hasClass('select-barang');
-        
+
         if (isBarangSelect) {
             const optimalWidth = calculateOptimalDropdownWidth(element);
-            
+
             $element.select2({
                 placeholder: "Pilih barang...",
                 width: '100%',
@@ -1456,8 +1547,8 @@
                 const dropdown = $element.data('select2').$dropdown;
                 dropdown.css({
                     'width': optimalWidth + 'px',
-                    'min-width': '280px',
-                    'max-width': Math.min(600, $(window).width() * 0.9) + 'px'
+                    'min-width': '200px',
+                    'max-width': Math.min(600, $(window).width() * 0.95) + 'px'
                 });
             });
         } else {
@@ -1471,7 +1562,6 @@
         }
     }
 
-    // Initialize Select2
     function initSelect2() {
         $('.select-barang').each(function() {
             initializeSelect2ForElement(this);
@@ -1486,7 +1576,6 @@
         }
     }
 
-    // Document ready
     $(document).ready(function() {
         initSelect2();
 
@@ -1525,7 +1614,7 @@
                     $.ajax({
                         url: '/generate-spk',
                         method: 'POST',
-                        data: { 
+                        data: {
                             pegawai_id: pegawaiId,
                             _token: '{{ csrf_token() }}'
                         },
@@ -1576,5 +1665,4 @@
         });
     });
 </script>
-
 @endsection
