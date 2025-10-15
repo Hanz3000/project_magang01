@@ -484,7 +484,7 @@
 </head>
 
 <body class="min-h-screen"
-    x-data="{ sidebarOpen: window.matchMedia('(min-width: 768px)').matches, showWelcome: {{ session('show_welcome', false) ? 'true' : 'false' }} }"
+    x-data="{ sidebarOpen: window.matchMedia('(min-width: 1024px)').matches, mobileSidebarOpen: false, showWelcome: {{ session('show_welcome', false) ? 'true' : 'false' }} }"
     x-init="if(showWelcome){ setTimeout(() => showWelcome = false, 3000); }">
     <!-- Welcome Animation -->
     <div x-show="showWelcome" x-transition:leave="transition ease-in duration-300"
@@ -511,11 +511,16 @@
     {{ session()->forget('show_welcome') }}
     @endif
 
+    <!-- Mobile Overlay -->
+    <div x-show="mobileSidebarOpen" 
+         @click="mobileSidebarOpen = false" 
+         class="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"></div>
+
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside
-            class="sidebar-gradient text-white shadow-2xl transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] relative flex flex-col overflow-hidden"
-            :class="sidebarOpen ? 'w-64 px-4' : 'w-20 px-2 sidebar-small'">
+            class="sidebar-gradient text-white shadow-2xl flex flex-col overflow-hidden fixed lg:static inset-y-0 left-0 z-50 w-64 transform -translate-x-full lg:translate-x-0 lg:transform-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] px-4"
+            :class="[mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full', sidebarOpen ? 'w-64' : 'w-20 sidebar-small px-2']">
 
             <!-- Header Logo -->
             <div class="flex items-center p-4 border-b border-white/20">
@@ -633,8 +638,14 @@
             <header class="header-glass px-6 py-4 shadow-lg sticky top-0 z-40">
                 <div class="flex justify-between items-center">
                     <div class="flex items-center gap-4">
+                        <!-- Mobile Menu Button (Titik Tiga) -->
+                        <button @click="mobileSidebarOpen = !mobileSidebarOpen"
+                            class="lg:hidden p-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors">
+                            <i class="fas fa-ellipsis-v text-xl"></i>
+                        </button>
+                        <!-- Desktop Toggle Button -->
                         <button @click="sidebarOpen = !sidebarOpen"
-                            class="toggle-btn p-3 rounded-xl shadow-md relative z-10">
+                            class="hidden lg:block toggle-btn p-3 rounded-xl shadow-md relative z-10">
                             <svg class="w-6 h-6 text-slate-600 relative z-10" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -798,26 +809,22 @@
                 // Handle notifications
                 @if(session('created'))
                 console.log("Found created notification");
-                showActionNotification('create', '{{ session('
-                    created ') }}');
+                showActionNotification('create', '{{ session('created') }}');
                 @endif
 
                 @if(session('updated'))
                 console.log("Found updated notification");
-                showActionNotification('update', '{{ session('
-                    updated ') }}');
+                showActionNotification('update', '{{ session('updated') }}');
                 @endif
 
                 @if(session('deleted'))
                 console.log("Found deleted notification");
-                showActionNotification('delete', '{{ session('
-                    deleted ') }}');
+                showActionNotification('delete', '{{ session('deleted') }}');
                 @endif
 
                 @if(session('error'))
                 console.log("Found error notification");
-                showActionNotification('error', '{{ session('
-                    error ') }}');
+                showActionNotification('error', '{{ session('error') }}');
                 @endif
 
             } catch (error) {
@@ -848,9 +855,9 @@
         }
 
         // Otomatisasi sidebar berdasarkan lebar layar
-        const mediaQuery = window.matchMedia('(min-width: 768px)');
+        const mediaQuery = window.matchMedia('(min-width: 1024px)');
         function handleSidebarChange(e) {
-            $nextTick(() => {
+            Alpine.nextTick(() => {
                 sidebarOpen = e.matches;
             });
         }
