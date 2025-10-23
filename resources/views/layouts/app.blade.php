@@ -33,6 +33,7 @@
             background: #e3f2fd;
             background-attachment: fixed;
             position: relative;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
 
         .sidebar-gradient {
@@ -182,18 +183,25 @@
             border-bottom: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        .logo-container {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .logo-container, .user-avatar {
+            background: var(--primary-gradient);
             box-shadow:
-                0 0 20px rgba(102, 126, 234, 0.4),
+                0 2px 10px var(--glow-primary),
                 0 4px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 9999px; /* Full circle */
+            overflow: hidden;
         }
 
-        .logo-container:hover {
+        .logo-container:hover, .user-avatar:hover {
             transform: scale(1.05) rotate(2deg);
             box-shadow:
-                0 0 30px rgba(102, 126, 234, 0.6),
+                0 4px 15px var(--glow-primary),
                 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
@@ -262,10 +270,11 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 100vh;
             pointer-events: none;
             z-index: -1;
+            overflow: hidden;
         }
 
         .particle {
@@ -377,16 +386,6 @@
             text-shadow: 0 0 8px currentColor;
         }
 
-        .user-avatar {
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
-        }
-
-        .user-avatar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
         .dropdown-menu {
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(10px);
@@ -403,7 +402,6 @@
             padding-left: 1.25rem;
         }
 
-        /* Animasi untuk teks sidebar */
         .sidebar-text-enter {
             opacity: 0;
             transform: translateX(-10px);
@@ -426,7 +424,6 @@
             transition: all 200ms ease-in;
         }
 
-        /* Optimasi untuk sidebar kecil */
         .sidebar-small .menu-item {
             padding: 0.75rem 0;
             justify-content: center;
@@ -520,12 +517,12 @@
         <!-- Sidebar -->
         <aside
             class="sidebar-gradient text-white shadow-2xl flex flex-col overflow-hidden fixed lg:static inset-y-0 left-0 z-50 w-64 transform -translate-x-full lg:translate-x-0 lg:transform-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] px-4"
-            :class="[mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full', sidebarOpen ? 'w-64' : 'w-20 sidebar-small px-2']">
+            :class="[mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full', sidebarOpen ? 'w-64' : 'w-20 sidebar-small px-2', showWelcome ? 'hidden' : '']">
 
             <!-- Header Logo -->
             <div class="flex items-center p-4 border-b border-white/20">
                 <div class="flex items-center gap-4 w-full" :class="sidebarOpen ? 'justify-start' : 'justify-center'">
-                    <div class="logo-container p-2 rounded-xl hover:rotate-6 transition-transform duration-300">
+                    <div class="logo-container p-2">
                         <svg class="w-6 h-6 text-white icon-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -640,12 +637,14 @@
                     <div class="flex items-center gap-4">
                         <!-- Mobile Menu Button (Titik Tiga) -->
                         <button @click="mobileSidebarOpen = !mobileSidebarOpen"
-                            class="lg:hidden p-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors">
+                            class="lg:hidden p-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
+                            :class="showWelcome ? 'hidden' : ''">
                             <i class="fas fa-ellipsis-v text-xl"></i>
                         </button>
                         <!-- Desktop Toggle Button -->
                         <button @click="sidebarOpen = !sidebarOpen"
-                            class="hidden lg:block toggle-btn p-3 rounded-xl shadow-md relative z-10">
+                            class="hidden lg:block toggle-btn p-3 rounded-xl shadow-md relative z-10"
+                            :class="showWelcome ? 'hidden' : ''">
                             <svg class="w-6 h-6 text-slate-600 relative z-10" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -662,8 +661,8 @@
                         <!-- User Profile Dropdown -->
                         <div x-data="{ open: false }" class="relative">
                             <button @click="open = !open" class="flex items-center gap-3 focus:outline-none group">
-                                <div class="relative">
-                                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all">
+                                <div class="relative user-avatar">
+                                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all overflow-hidden">
                                         {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                     </div>
                                     <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>

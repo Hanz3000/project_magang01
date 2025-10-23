@@ -22,10 +22,10 @@
 
         <div class="mb-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div class="mb-6">
-                    <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
-                    <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
-                </div>
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">Manajemen Struk</h1>
+                <p class="text-gray-600">Kelola dan atur semua struk pemasukan</p>
+            </div>
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto items-center">
                     @php
                     $isPemasukan = request()->routeIs('struks.index');
@@ -82,7 +82,7 @@
 
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 hover:shadow-md">
             <div class="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-white">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <div class="p-2 bg-indigo-100 rounded-lg">
                             <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -94,7 +94,7 @@
                             <p class="text-sm text-gray-500">{{ $struks->total() }} struk ditemukan</p>
                         </div>
                     </div>
-                    <div class="relative w-full sm:w-64">
+                    <div class="relative w-64">
                         <input type="text" name="search" id="searchInput"
                             class="pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-200 focus:border-green-400 w-full transition-all bg-transparent text-sm text-gray-800"
                             value="{{ request('search') }}" autocomplete="off">
@@ -132,106 +132,129 @@
                 </div>
             </div>
 
-            <div class="p-4">
-                @forelse ($struks as $index => $struk)
-                @php
-                $items = is_string($struk->items) ? json_decode($struk->items, true) : $struk->items;
-                if (!is_array($items)) $items = [];
-                $totalHarga = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
-                @endphp
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider w-10">
+                                <input type="checkbox" id="selectAll" class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            </th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No.</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Nama Toko</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">No. Struk</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Masuk</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Barang</th>
+                            <th class="px-6 py-3 text-left font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+                            <th class="px-6 py-3 text-right font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Foto Struk</th>
+                            <th class="px-6 py-3 text-center font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
+                        </tr>
+                    </thead>
 
-                <div class="border border-gray-200 rounded-lg mb-4 p-4 bg-white hover:bg-gray-50 transition-colors animate-fadeIn">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <input type="checkbox" name="selected_ids[]" value="{{ $struk->id }}" class="row-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                            <span class="font-medium text-gray-900">{{ $struks->firstItem() + $index }}</span>
-                        </div>
-                        <div class="flex space-x-2">
-                            <a href="{{ route('struks.show', $struk->id) }}" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors" title="Lihat Detail">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                                </svg>
-                            </a>
-                            <button type="button" onclick="openEditModal({{ $struk->id }})" class="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 px-3 py-1 rounded-md transition-colors" title="Edit">
-                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                                </svg>
-                            </button>
-                            <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="button" onclick="openDeleteModal('{{ route('struks.destroy', $struk->id) }}')" class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors" title="Hapus">
-                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                    </svg>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 gap-2 text-sm">
-                        <div>
-                            <span class="font-medium text-gray-700">Nama Toko:</span>
-                            <span class="text-gray-900">{{ $struk->nama_toko }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium text-gray-700">No. Struk:</span>
-                            <span class="text-gray-500">{{ $struk->nomor_struk }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium text-gray-700">Tanggal:</span>
-                            <span class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium text-gray-700">Barang:</span>
-                            <div class="space-y-2">
-                                @foreach ($items as $item)
-                                <div class="flex items-start">
-                                    <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
-                                    <span class="text-gray-700">
-                                        {{ $item['nama_barang'] ?? $barangList[$item['nama']]?->nama_barang ?? $item['nama'] }}
-                                        (x{{ $item['jumlah'] ?? '-' }})
-                                    </span>
+                    <tbody class="divide-y divide-gray-200">
+                        @forelse ($struks as $index => $struk)
+                        @php
+                        $items = is_string($struk->items) ? json_decode($struk->items, true) : $struk->items;
+                        if (!is_array($items)) $items = [];
+                        $totalHarga = collect($items)->sum(fn($item) => ($item['jumlah'] ?? 0) * ($item['harga'] ?? 0));
+                        @endphp
+
+                        <tr class="hover:bg-gray-50 transition-colors animate-fadeIn">
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <input type="checkbox" name="selected_ids[]" value="{{ $struk->id }}" class="row-checkbox rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-900">{{ $struks->firstItem() + $index }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="font-medium text-gray-900">{{ $struk->nama_toko }}</div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-gray-500">
+                                {{ $struk->nomor_struk }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <div class="text-gray-900">{{ date('d M Y', strtotime($struk->tanggal_struk)) }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="space-y-2 overflow-x-auto">
+                                    @foreach ($items as $item)
+                                    <div class="flex items-start whitespace-nowrap">
+                                        <span class="inline-block w-2 h-2 rounded-full bg-gray-400 mt-2 mr-2 flex-shrink-0"></span>
+                                        <span class="text-gray-700">
+                                            {{ $item['nama_barang'] ?? $barangList[$item['nama']]?->nama_barang ?? $item['nama'] }}
+                                        </span>
+                                    </div>
+                                    @endforeach
                                 </div>
-                                @endforeach
-                            </div>
-                        </div>
-                        <div>
-                            <span class="font-medium text-gray-700">Total:</span>
-                            <span class="font-medium text-indigo-600">Rp{{ number_format($totalHarga, 0, ',', '.') }}</span>
-                        </div>
-                        <div>
-                            <span class="font-medium text-gray-700">Status:</span>
-                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $struk->status == 'progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
-                                {{ ucfirst($struk->status) }}
-                            </span>
-                        </div>
-                        <div>
-                            <span class="font-medium text-gray-700">Foto Struk:</span>
-                            @if ($struk->foto_struk)
-                            <button onclick="openModal('{{ asset('storage/struk_foto/' . $struk->foto_struk) }}')" class="text-indigo-600 hover:text-indigo-900 flex items-center gap-1">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="text-xs">Lihat</span>
-                            </button>
-                            @else
-                            <span class="text-gray-400 italic text-xs">Tidak ada gambar</span>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                @empty
-                <div class="p-4 text-center text-gray-500">Tidak ada struk ditemukan.</div>
-                @endforelse
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="max-w-xs space-y-2">
+                                    @foreach ($items as $item)
+                                    <div class="text-gray-500 text-sm">
+                                        <span class="whitespace-nowrap">x{{ $item['jumlah'] ?? '-' }}</span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right font-medium text-indigo-600">
+                                Rp{{ number_format($totalHarga, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <span class="px-2 py-1 text-xs font-medium rounded-full {{ $struk->status == 'progress' ? 'bg-yellow-100 text-yellow-800' : 'bg-blue-100 text-blue-800' }}">
+                                    {{ ucfirst($struk->status) }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                @if ($struk->foto_struk)
+                                <button onclick="openModal('{{ asset('storage/struk_foto/' . $struk->foto_struk) }}')" class="text-indigo-600 hover:text-indigo-900">
+                                    <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    <span class="text-xs text-gray-500">Lihat</span>
+                                </button>
+                                @else
+                                <span class="text-gray-400 italic text-xs">Tidak ada gambar</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-center">
+                                <div class="flex justify-center space-x-2">
+                                    <a href="{{ route('struks.show', $struk->id) }}" class="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100 transition-colors" title="Lihat Detail">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                    </a>
+                                    <button type="button" onclick="openEditModal({{ $struk->id }})" class="text-indigo-600 hover:text-indigo-900 hover:bg-indigo-50 px-3 py-1 rounded-md transition-colors" title="Edit">
+                                        <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        </svg>
+                                    </button>
+                                    <form action="{{ route('struks.destroy', $struk->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus struk ini?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="button" onclick="openDeleteModal('{{ route('struks.destroy', $struk->id) }}')" class="text-gray-400 hover:text-red-600 p-1 rounded-full hover:bg-red-50 transition-colors" title="Hapus">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr class="animate-fadeIn">
+                            <td colspan="11" class="px-6 py-4 text-center text-gray-500">Tidak ada struk ditemukan.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
 
             @if ($struks->hasPages())
-            <div class="px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
                 <div class="text-sm text-gray-600">
                     Menampilkan {{ $struks->firstItem() }} sampai {{ $struks->lastItem() }} dari {{ $struks->total() }} hasil
                 </div>
-                <div class="flex flex-wrap gap-2">
+                <div class="flex space-x-1">
                     @if ($struks->onFirstPage())
                     <span class="px-3 py-1 rounded-lg border border-gray-200 text-gray-400 cursor-not-allowed">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -313,7 +336,7 @@
                 <form method="POST" action="" id="editForm">
                     @csrf
                     @method('PUT')
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Nama Toko</label>
                             <input type="text" name="nama_toko" id="editNamaToko" class="w-full border border-gray-300 rounded-lg px-3 py-2 mt-1 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400">
@@ -334,18 +357,23 @@
                             </select>
                         </div>
                     </div>
-                    
-                    <div class="mb-4">
-                        <div class="grid grid-cols-12 gap-2 pb-3 mb-2 border-b border-gray-200 text-sm font-medium text-gray-700">
-                            <div class="col-span-5 sm:col-span-5">Nama Barang</div>
-                            <div class="col-span-3 sm:col-span-2 text-center">Jumlah</div>
-                            <div class="col-span-3 sm:col-span-3 text-right">Harga Satuan</div>
-                            <div class="col-span-1 sm:col-span-2 text-center">Aksi</div>
+                    <div class="grid grid-cols-12 gap-4 pb-3 mb-4 border-b border-gray-200">
+                        <div class="col-span-5">
+                            <label class="block text-sm font-medium text-gray-700 text-center">Nama Barang</label>
                         </div>
-                        <div id="modalItemsContainer" class="space-y-3"></div>
-                        <div class="flex justify-end text-gray-700 font-medium mt-4">
-                            <span id="modalTotalPrice">Total: Rp0</span>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 text-center">Jumlah</label>
                         </div>
+                        <div class="col-span-3">
+                            <label class="block text-sm font-medium text-gray-700 text-right">Harga Satuan</label>
+                        </div>
+                        <div class="col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 text-center">Aksi</label>
+                        </div>
+                    </div>
+                    <div id="modalItemsContainer" class="space-y-3 mb-6"></div>
+                    <div class="flex justify-end text-gray-700 font-medium mb-4">
+                        <span id="modalTotalPrice">Total: Rp0</span>
                     </div>
 
                     <div class="border-2 border-dashed border-indigo-300 rounded-lg p-4 bg-indigo-50 mb-4">
@@ -355,8 +383,8 @@
                             </svg>
                             <span class="text-sm font-medium text-indigo-700">Tambah Item Baru</span>
                         </div>
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
-                            <div class="sm:col-span-5 relative">
+                        <div class="grid grid-cols-12 gap-4 items-end">
+                            <div class="col-span-5 relative">
                                 <input type="text" class="item-search w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 bg-white" id="modalNewItemNama" placeholder="Cari barang atau pilih dari daftar..." autocomplete="off" readonly onclick="toggleBarangDropdown()">
                                 <div class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto hidden" id="barangDropdown">
                                     <div class="sticky top-0 bg-white p-2 border-b">
@@ -377,27 +405,27 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="sm:col-span-2">
+                            <div class="col-span-2">
                                 <input type="number" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" id="modalNewItemJumlah" min="1">
                             </div>
-                            <div class="sm:col-span-3">
+                            <div class="col-span-3">
                                 <div class="relative">
                                     <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
                                     <input type="number" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="0" id="modalNewItemHarga" min="0">
                                 </div>
                             </div>
-                            <div class="sm:col-span-2 flex justify-center">
-                                <button type="button" id="addItemBtn" class="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center justify-center gap-2 shadow-sm" onclick="addNewItemToModal()">
+                            <div class="col-span-2 flex justify-center">
+                                <button type="button" id="addItemBtn" class="px-4 py-2.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors text-sm font-medium flex items-center gap-2 shadow-sm" onclick="addNewItemToModal()">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                                     </svg>
-                                    <span class="hidden sm:inline">Tambah</span>
+                                    Tambah
                                 </button>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col sm:flex-row justify-end space-y-3 sm:space-y-0 sm:space-x-3">
+                    <div class="flex justify-end space-x-3">
                         <button type="button" onclick="closeEditModal()" class="px-6 py-2.5 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors font-medium">
                             Batal
                         </button>
@@ -524,13 +552,13 @@
                 .then(html => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
-                    const newContent = doc.querySelector('.p-4');
-                    if (newContent) {
-                        document.querySelector('.p-4').innerHTML = newContent.innerHTML;
+                    const newTableBody = doc.querySelector('tbody');
+                    if (newTableBody) {
+                        document.querySelector('tbody').innerHTML = newTableBody.innerHTML;
                     }
-                    const newPagination = doc.querySelector('.flex.gap-2');
+                    const newPagination = doc.querySelector('.flex.space-x-1');
                     if (newPagination) {
-                        document.querySelector('.flex.gap-2').innerHTML = newPagination.innerHTML;
+                        document.querySelector('.flex.space-x-1').innerHTML = newPagination.innerHTML;
                     }
                     const newResultsInfo = doc.querySelector('.text-sm.text-gray-600');
                     if (newResultsInfo) {
@@ -549,7 +577,7 @@
         }
 
         function animateRows() {
-            document.querySelectorAll('.p-4 > div').forEach((row, index) => {
+            document.querySelectorAll('tbody tr').forEach((row, index) => {
                 row.style.opacity = '0';
                 row.style.transform = 'translateY(10px)';
                 row.style.transition = 'all 0.3s ease-out';
@@ -605,7 +633,7 @@
             }, 50);
         }
 
-        document.querySelectorAll('.p-4 > div').forEach((row, index) => {
+        document.querySelectorAll('tbody tr').forEach((row, index) => {
             row.style.opacity = '0';
             row.style.transform = 'translateY(10px)';
             row.style.transition = 'all 0.3s ease-out';
@@ -672,13 +700,13 @@
         document.getElementById('editForm').action = `/struks/${strukId}`;
         modal.scrollTop = 0;
 
-        // Ambil data dari div
-        const div = document.querySelector(`input.row-checkbox[value="${strukId}"]`).closest('.border.rounded-lg');
-        document.getElementById('editNamaToko').value = div.querySelector('.text-gray-900').textContent.trim();
-        document.getElementById('editNomorStruk').value = div.querySelector('.text-gray-500').textContent.trim();
+        // Ambil data dari baris tabel
+        const row = document.querySelector(`input.row-checkbox[value="${strukId}"]`).closest('tr');
+        document.getElementById('editNamaToko').value = row.querySelector('td:nth-child(3) .font-medium').textContent.trim();
+        document.getElementById('editNomorStruk').value = row.querySelector('td:nth-child(4)').textContent.trim();
 
         // Format tanggal dari "26 Aug 2025" ke "2025-08-26"
-        const tanggalText = div.querySelector('span.text-gray-900:not(.font-medium)').textContent.trim();
+        const tanggalText = row.querySelector('td:nth-child(5) .text-gray-900').textContent.trim();
         const bulanMap = {
             Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
             Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
@@ -690,25 +718,25 @@
         }
         document.getElementById('editTanggalStruk').value = tanggalFormatted;
 
-        document.getElementById('editStatus').value = div.querySelector('.rounded-full').textContent.trim().toLowerCase();
+        document.getElementById('editStatus').value = row.querySelector('td:nth-child(9) span').textContent.trim().toLowerCase();
 
-        // Ambil item barang dari data asli struk
+        // Ambil item barang dari data asli struk (window.strukItemsData)
         let items = [];
         if (window.strukItemsData && window.strukItemsData[strukId]) {
             items = window.strukItemsData[strukId];
         } else {
-            const barangDivs = div.querySelectorAll('.flex.items-start');
-            barangDivs.forEach(barangDiv => {
-                const text = barangDiv.querySelector('.text-gray-700').textContent.trim();
-                const match = text.match(/(.*)\s*\(x(\d+)\)/);
-                if (match) {
-                    items.push({
-                        nama_barang: match[1].trim(),
-                        nama: match[1].trim(),
-                        jumlah: match[2],
-                        harga: ''
-                    });
-                }
+            // fallback: ambil dari tampilan (tanpa harga satuan)
+            const barangCells = row.querySelectorAll('td:nth-child(6) .flex.items-start');
+            const jumlahCells = row.querySelectorAll('td:nth-child(7) .text-gray-500');
+            barangCells.forEach((barangDiv, i) => {
+                const namaBarang = barangDiv.querySelector('.text-gray-700').textContent.trim();
+                const jumlah = jumlahCells[i]?.textContent.replace('x', '').trim() || '';
+                items.push({
+                    nama_barang: namaBarang,
+                    nama: namaBarang,
+                    jumlah: jumlah,
+                    harga: ''
+                });
             });
         }
 
@@ -719,8 +747,8 @@
             addItemRowToModal(item, index);
         });
 
-        // Ambil total harga
-        const totalText = div.querySelector('.text-indigo-600').textContent.replace(/[^\d]/g, '');
+        // Ambil total harga dari kolom tabel
+        const totalText = row.querySelector('td:nth-child(8)').textContent.replace(/[^\d]/g, '');
         const totalHarga = parseInt(totalText) || 0;
         document.getElementById('modalTotalPrice').textContent = `Total: Rp${totalHarga.toLocaleString('id-ID')}`;
         let totalHargaInput = document.getElementById('editTotalHarga');
@@ -739,6 +767,7 @@
         }, 100);
     }
 
+    // Tambahkan di bawah <script> agar window.strukItemsData tersedia
     window.strukItemsData = {
         @foreach($struks as $struk)
             {{ $struk->id }}: {!! json_encode(is_string($struk->items) ? json_decode($struk->items, true) : $struk->items) !!},
@@ -825,22 +854,22 @@
         const disableDelete = willBeOnlyItem;
 
         const itemRow = document.createElement('div');
-        itemRow.className = 'grid grid-cols-12 gap-2 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
+        itemRow.className = 'grid grid-cols-12 gap-4 items-center item-row p-3 bg-gray-50 rounded-lg border border-gray-200';
         itemRow.innerHTML = `
-            <div class="col-span-5 sm:col-span-5 flex flex-col">
-                <input type="text" value="${item.nama_barang || item.nama || '-'}" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-sm sm:text-base" readonly>
+            <div class="col-span-5 flex flex-col">
+                <input type="text" value="${item.nama_barang || item.nama || '-'}" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 bg-gray-100 font-semibold text-base" readonly>
                 <input type="text" name="nama[]" value="${item.nama || item.kode || ''}" class="w-fit border border-indigo-200 rounded px-2 py-1 mt-1 bg-indigo-50 text-xs font-mono text-indigo-700" readonly>
             </div>
-            <div class="col-span-3 sm:col-span-2">
+            <div class="col-span-2">
                 <input name="jumlah[]" type="number" value="${item.jumlah || ''}" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-center focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="Jumlah" min="1">
             </div>
-            <div class="col-span-3 sm:col-span-3">
+            <div class="col-span-3">
                 <div class="relative">
                     <span class="absolute left-3 top-2.5 text-gray-500 text-sm">Rp</span>
                     <input name="harga[]" type="number" value="${item.harga || ''}" class="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2.5 text-right focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400" placeholder="0" min="0">
                 </div>
             </div>
-            <div class="col-span-1 sm:col-span-2 flex justify-center">
+            <div class="col-span-2 flex justify-center">
                 <button type="button" onclick="removeItemFromModal(this)" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-colors ${disableDelete ? 'opacity-50 cursor-not-allowed' : ''}" title="Hapus Item" ${disableDelete ? 'disabled' : ''}>
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -1179,27 +1208,27 @@
         background-color: #4338ca;
     }
     @keyframes slideIn {
-        from { opacity: 0; transform: translateY(-20px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    .animate-slideIn {
-        animation: slideIn 0.3s ease-out forwards;
-    }
-    .animate-fadeIn {
-        animation: fadeIn 0.3s ease-out forwards;
-    }
-    .toggle-dot {
-        transition: all 0.3s ease-in-out;
-    }
-    .autocomplete-results {
-        z-index: 1000;
-        max-height: 300px;
-        overflow-y: auto;
-    }
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        .toggle-dot {
+            transition: all 0.3s ease-in-out;
+        }
+        .autocomplete-results {
+            z-index: 1000;
+            max-height: 300px;
+            overflow-y: auto;
+        }
     .autocomplete-results div {
         padding: 10px 12px;
         cursor: pointer;
