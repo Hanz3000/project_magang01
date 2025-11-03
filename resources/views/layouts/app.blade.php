@@ -1,828 +1,326 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {{-- PERUBAHAN: Meta theme-color untuk browser chrome di mobile --}}
+    <meta name="theme-color" content="#030712"> 
+    
     <title>Gudang Inventaris Barang</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <!-- CSS Select2 -->
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- JS Select2 -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
-        * {
-            font-family: 'Inter', sans-serif;
+        
+        /* PERUBAHAN: Menghilangkan "white flash" dan menambah "fade-in" */
+        html, body {
+            background-color: #030712; /* Tailwind 'bg-gray-950' */
         }
-
-        :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --sidebar-gradient: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            --glow-primary: rgba(102, 126, 234, 0.4);
-            --glow-secondary: rgba(118, 75, 162, 0.3);
-        }
-
-        body {
-            background: #e3f2fd;
-            background-attachment: fixed;
-            position: relative;
-            overflow-x: hidden; /* Prevent horizontal scrolling */
-        }
-
-        .sidebar-gradient {
-            background: var(--sidebar-gradient);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar-gradient::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg,
-                    transparent 30%,
-                    rgba(255, 255, 255, 0.05) 50%,
-                    transparent 70%);
-            transform: translateX(-100%);
-            animation: shimmer 3s infinite;
-        }
-
-        @keyframes shimmer {
-            0% {
-                transform: translateX(-100%);
-            }
-
-            100% {
-                transform: translateX(100%);
-            }
-        }
-
-        .hover-glow {
-            position: relative;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-        }
-
-        .hover-glow::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-        }
-
-        .hover-glow:hover::before {
-            transform: translateX(100%);
-        }
-
-        .hover-glow:hover {
-            box-shadow:
-                0 0 30px var(--glow-primary),
-                0 10px 25px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            transform: translateY(-2px) scale(1.02);
-        }
-
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow:
-                0 8px 32px rgba(0, 0, 0, 0.1),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .menu-item {
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .menu-item::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent,
-                    rgba(255, 255, 255, 0.2),
-                    transparent);
-            transition: left 0.5s ease;
-        }
-
-        .menu-item:hover::after {
-            left: 100%;
-        }
-
-        .menu-item:hover {
-            transform: translateX(5px);
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .icon-glow {
-            filter: drop-shadow(0 0 8px currentColor);
-            transition: all 0.3s ease;
-        }
-
-        .menu-item:hover .icon-glow {
-            filter: drop-shadow(0 0 12px currentColor) brightness(1.2);
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        .slide-in-right {
-            animation: slideInRight 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%) scale(0.9);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0) scale(1);
-                opacity: 1;
-            }
-        }
-
         .fade-in {
-            animation: fadeIn 0.5s ease-out;
+            animation: fadeInAnimation 0.3s ease-out;
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        @keyframes fadeInAnimation {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
+        /* --- Selesai Perubahan --- */
 
-        .header-glass {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .logo-container, .user-avatar {
-            background: var(--primary-gradient);
-            box-shadow:
-                0 2px 10px var(--glow-primary),
-                0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 9999px; /* Full circle */
-            overflow: hidden;
-        }
-
-        .logo-container:hover, .user-avatar:hover {
-            transform: scale(1.05) rotate(2deg);
-            box-shadow:
-                0 4px 15px var(--glow-primary),
-                0 8px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        .toggle-btn {
-            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .toggle-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, transparent 70%);
-            transition: all 0.3s ease;
-            transform: translate(-50%, -50%);
-        }
-
-        .toggle-btn:hover::before {
-            width: 100px;
-            height: 100px;
-        }
-
-        .toggle-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        .submenu-item {
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .submenu-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            width: 3px;
-            height: 0;
-            background: linear-gradient(to bottom, #667eea, #764ba2);
-            transition: height 0.3s ease;
-            transform: translateY(-50%);
-        }
-
-        .submenu-item:hover::before {
-            height: 100%;
-        }
-
-        .submenu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-            padding-left: 1rem;
-            transform: translateX(5px);
-        }
-
-        .main-content {
-            background: transparent;
-            backdrop-filter: none;
-        }
-
-        .floating-particles {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 50%;
-            animation: float 6s infinite linear;
-        }
-
-        .particle:nth-child(odd) {
-            animation-delay: -3s;
-            background: rgba(102, 126, 234, 0.4);
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) rotate(0deg);
-                opacity: 0;
-            }
-
-            10% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                transform: translateY(-100px) rotate(360deg);
-                opacity: 0;
-            }
-        }
-
-        @keyframes spin-reverse {
-            from {
-                transform: rotate(360deg);
-            }
-
-            to {
-                transform: rotate(0deg);
-            }
-        }
-
-        @keyframes progress {
-            0% {
-                width: 0%;
-            }
-
-            100% {
-                width: 100%;
-            }
-        }
-
-        .animate-spin-reverse {
-            animation: spin-reverse 1s linear infinite;
-        }
-
-        .animate-progress {
-            animation: progress 3s ease-in-out infinite;
-        }
-
-        .content-area {
-            background: #fff;
-            backdrop-filter: none;
-            border-radius: 20px;
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.08),
-                0 0 0 1px rgba(33, 150, 243, 0.08);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .content-area::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.5), transparent);
-        }
-
-        .auth-button {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .auth-button:hover::before {
-            left: 100%;
-        }
-
-        .auth-button:hover {
-            transform: translateY(-1px);
-            text-shadow: 0 0 8px currentColor;
-        }
-
-        .dropdown-menu {
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1),
-                0 0 0 1px rgba(255, 255, 255, 0.2);
-        }
-
-        .dropdown-item {
-            transition: all 0.2s ease;
-        }
-
-        .dropdown-item:hover {
-            background: linear-gradient(90deg, rgba(102, 126, 234, 0.1), transparent);
-            padding-left: 1.25rem;
-        }
-
-        .sidebar-text-enter {
-            opacity: 0;
-            transform: translateX(-10px);
-        }
-
-        .sidebar-text-enter-active {
-            opacity: 1;
-            transform: translateX(0);
-            transition: all 300ms ease-out;
-        }
-
-        .sidebar-text-exit {
-            opacity: 1;
-            transform: translateX(0);
-        }
-
-        .sidebar-text-exit-active {
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: all 200ms ease-in;
-        }
-
-        .sidebar-small .menu-item {
-            padding: 0.75rem 0;
-            justify-content: center;
-        }
-
-        .sidebar-small .menu-icon {
-            margin: 0 auto;
-        }
-
+        body, * { font-family: 'Inter', sans-serif; }
+        
+        /* Style SweetAlert untuk Dark Mode */
         .swal2-toast {
             animation: slideInRight 0.5s ease-out, fadeOut 0.5s ease-out 2.5s forwards !important;
             border-left: 4px solid;
             border-radius: 0.375rem !important;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+            background: #1F2937 !important; /* bg-gray-800 */
+            color: #F9FAFB !important; /* text-gray-100 */
         }
-
-        .swal2-toast.swal2-success {
-            border-left-color: #10B981 !important;
+        .swal2-popup {
+            background: #1F2937 !important; /* bg-gray-800 */
+            color: #F9FAFB !important; /* text-gray-100 */
         }
-
-        .swal2-toast.swal2-info {
-            border-left-color: #3B82F6 !important;
+        .swal2-title {
+            color: #F9FAFB !important; /* text-gray-100 */
         }
-
-        .swal2-toast.swal2-warning {
-            border-left-color: #EF4444 !important;
+        .swal2-html-container {
+            color: #D1D5DB !important; /* text-gray-300 */
         }
+        /* --- */
 
-        .swal2-toast.swal2-error {
-            border-left-color: #DC2626 !important;
-        }
+        .swal2-toast.swal2-success { border-left-color: #10B981 !important; }
+        .swal2-toast.swal2-info { border-left-color: #3B82F6 !important; }
+        .swal2-toast.swal2-warning { border-left-color: #EF4444 !important; }
+        .swal2-toast.swal2-error { border-left-color: #DC2626 !important; }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        .sidebar-nav::-webkit-scrollbar { display: none; }
+        .sidebar-nav { -ms-overflow-style: none; scrollbar-width: none; }
 
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        @keyframes fadeOut {
-            from {
-                opacity: 1;
-            }
-
-            to {
-                opacity: 0;
-            }
-        }
+        /* Mencegah FOUC (Flash of Unstyled Content) saat Alpine memuat */
+        [x-cloak] { display: none !important; }
     </style>
+    @stack('styles')
 </head>
 
-<body class="min-h-screen"
-    x-data="{ sidebarOpen: window.matchMedia('(min-width: 1024px)').matches, mobileSidebarOpen: false, showWelcome: {{ session('show_welcome', false) ? 'true' : 'false' }} }"
-    x-init="if(showWelcome){ setTimeout(() => showWelcome = false, 3000); }">
-    <!-- Welcome Animation -->
-    <div x-show="showWelcome" x-transition:leave="transition ease-in duration-300"
-        class="fixed inset-0 z-50 flex items-center justify-center bg-[#e3f2fd]">
-        <div class="text-center space-y-6">
-            <div
-                class="mx-auto w-24 h-24 border-4 border-blue-200 border-t-transparent rounded-full animate-spin flex items-center justify-center">
-                <div class="w-16 h-16 border-4 border-blue-300 border-b-transparent rounded-full animate-spin-reverse">
-                </div>
-            </div>
-            <div class="space-y-2">
-                <h2 class="text-3xl font-bold tracking-tight text-blue-800">Selamat Datang</h2>
-                <p class="text-blue-500 font-medium">Sistem Inventaris Barang</p>
-            </div>
-            <div class="pt-4">
-                <div class="h-1.5 w-40 mx-auto bg-blue-100 rounded-full overflow-hidden">
-                    <div class="h-full bg-blue-400 rounded-full animate-progress"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-    {{-- Hapus session setelah welcome tampil --}}
-    @if(session('show_welcome'))
-    {{ session()->forget('show_welcome') }}
-    @endif
+{{-- PERUBAHAN: Ditambahkan class 'fade-in' --}}
+<body class="min-h-screen bg-gray-950 fade-in" 
+    x-data="{ 
+        isDesktop: window.innerWidth >= 1024,
+        sidebarOpen: window.innerWidth >= 1024, 
+        mobileSidebarOpen: false,
+        handleResize() {
+            this.isDesktop = window.innerWidth >= 1024;
+            if (this.isDesktop) {
+                this.mobileSidebarOpen = false;
+            } else {
+                this.sidebarOpen = true; // Di mobile, sidebar selalu 'expanded' (full width)
+            }
+        }
+    }"
+    @resize.window.debounce.150ms="handleResize"
+    x-init="handleResize">
 
-    <!-- Mobile Overlay -->
+    {{-- Overlay Mobile --}}
     <div x-show="mobileSidebarOpen" 
          @click="mobileSidebarOpen = false" 
-         class="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"></div>
+         x-transition:enter="transition-opacity ease-linear duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition-opacity ease-linear duration-300"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 bg-black/60 z-40 lg:hidden" x-cloak></div>
 
     <div class="flex min-h-screen">
-        <!-- Sidebar -->
+        
+        {{-- Sidebar --}}
         <aside
-            class="sidebar-gradient text-white shadow-2xl flex flex-col overflow-hidden fixed lg:static inset-y-0 left-0 z-50 w-64 transform -translate-x-full lg:translate-x-0 lg:transform-none transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] px-4"
-            :class="[mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full', sidebarOpen ? 'w-64' : 'w-20 sidebar-small px-2', showWelcome ? 'hidden' : '']">
-
-            <!-- Header Logo -->
-            <div class="flex items-center p-4 border-b border-white/20">
-                <div class="flex items-center gap-4 w-full" :class="sidebarOpen ? 'justify-start' : 'justify-center'">
-                    <div class="logo-container p-2">
-                        <svg class="w-6 h-6 text-white icon-glow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                        </svg>
-                    </div>
-                    <div x-show="sidebarOpen" x-transition:enter="transition ease-out duration-300 transform"
-                        x-transition:enter-start="opacity-0 -translate-x-4"
-                        x-transition:enter-end="opacity-100 translate-x-0"
-                        x-transition:leave="transition ease-in duration-200 transform"
-                        x-transition:leave-start="opacity-100 translate-x-0"
-                        x-transition:leave-end="opacity-0 -translate-x-4" class="overflow-hidden">
-                        <h1
-                            class="text-xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                            <span class="block">Inventaris</span>
-                            <span class="block text-sm font-medium text-white/80">Sistem Manajemen</span>
-                        </h1>
-                    </div>
+            class="bg-gray-900 text-gray-300 flex flex-col h-screen overflow-hidden fixed lg:sticky inset-y-0 left-0 z-50 transform lg:translate-x-0 transition-all duration-300 ease-in-out"
+            :class="{
+                'w-64': true,
+                'lg:w-20': !sidebarOpen && isDesktop,
+                'translate-x-0': mobileSidebarOpen,
+                '-translate-x-full': !mobileSidebarOpen && !isDesktop
+            }">
+            
+            <div class="flex flex-col flex-1 overflow-y-auto sidebar-nav">
+                
+                {{-- Header Sidebar --}}
+                <div class="flex items-center justify-between h-16 border-b border-gray-700" :class="sidebarOpen ? 'px-4' : 'px-3'">
+                    
+                    <a href="{{ url('/dashboard') }}" class="flex items-center gap-3" x-show="sidebarOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-cloak>
+                        <div class="flex-shrink-0 p-2 bg-gray-800 rounded-lg">
+                            <i class="fa-solid fa-boxes-stacked w-6 h-6 text-white text-center leading-6"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <h1 class="text-xl font-bold text-white">
+                                <span class="block">Inventaris</span>
+                                <span class="block text-sm font-medium text-gray-400">Manajemen</span>
+                            </h1>
+                        </div>
+                    </a>
+                    
+                    {{-- Tombol Toggle Desktop --}}
+                    <button @click="sidebarOpen = !sidebarOpen" 
+                            class="hidden lg:block p-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+                            :class="!sidebarOpen ? 'w-full' : ''">
+                        <i class="fa-solid w-5 h-5 text-center" :class="sidebarOpen ? 'fa-angles-left' : 'fa-angles-right'"></i>
+                    </button>
                 </div>
+
+                {{-- Navigasi Menu --}}
+                <nav class="py-4" :class="sidebarOpen ? 'px-4' : 'px-2'">
+                    <ul class="space-y-2 text-sm">
+                        <li>
+                            <a href="{{ url('/dashboard') }}"
+                               class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors duration-150 {{ request()->is('dashboard') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}"
+                               :class="sidebarOpen ? '' : 'justify-center'">
+                                <i class="fa-solid fa-house-chimney w-5 h-5 flex-shrink-0 text-center"></i>
+                                <div class="nav-text whitespace-nowrap overflow-hidden" x-show="sidebarOpen" x-cloak>
+                                    <span class="font-medium block text-sm">Dashboard</span>
+                                    <p class="text-xs {{ request()->is('dashboard') ? 'text-blue-200' : 'text-gray-500' }}">Beranda sistem</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('struks.index') }}"
+                               class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors duration-150 {{ request()->is('struks*') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}"
+                               :class="sidebarOpen ? '' : 'justify-center'">
+                                <i class="fa-solid fa-box-open w-5 h-5 flex-shrink-0 text-center"></i>
+                                <div class="nav-text whitespace-nowrap overflow-hidden" x-show="sidebarOpen" x-cloak>
+                                    <span class="font-medium block text-sm">Pemasukan</span>
+                                    <p class="text-xs {{ request()->is('struks*') ? 'text-blue-200' : 'text-gray-500' }}">Data barang masuk</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('pengeluarans.index') }}"
+                               class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors duration-150 {{ request()->is('pengeluarans*') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}"
+                               :class="sidebarOpen ? '' : 'justify-center'">
+                                <i class="fa-solid fa-boxes-packing w-5 h-5 flex-shrink-0 text-center"></i>
+                                <div class="nav-text whitespace-nowrap overflow-hidden" x-show="sidebarOpen" x-cloak>
+                                    <span class="font-medium block text-sm">Pengeluaran</span>
+                                    <p class="text-xs {{ request()->is('pengeluarans*') ? 'text-blue-200' : 'text-gray-500' }}">Data barang keluar</p>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('transaksi.create') }}"
+                               class="flex items-center gap-3 px-3 py-3 rounded-lg transition-colors duration-150 {{ request()->is('transaksi/create') ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}"
+                               :class="sidebarOpen ? '' : 'justify-center'">
+                                <i class="fa-solid fa-plus w-5 h-5 flex-shrink-0 text-center"></i>
+                                <div class="nav-text whitespace-nowrap overflow-hidden" x-show="sidebarOpen" x-cloak>
+                                    <span class="font-medium block text-sm">Tambah Transaksi</span>
+                                    <p class="text-xs {{ request()->is('transaksi/create') ? 'text-blue-200' : 'text-gray-500' }}">Buat transaksi baru</p>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-            <!-- Sidebar Menu -->
-            <nav class="py-4 px-1 flex-1 overflow-y-auto">
-                <ul class="space-y-2 text-sm">
-                    <!-- Dashboard -->
-                    <li>
-                        <a href="{{ url('/dashboard') }}"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-blue-600/30 hover:to-purple-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            </div>
-                            <template x-if="sidebarOpen">
-                                <div class="whitespace-nowrap text-left">
-                                    <span class="font-medium block">Dashboard</span>
-                                    <p class="text-xs text-slate-300">Beranda sistem</p>
+            
+            {{-- User/Profil Section --}}
+            <div class="flex-shrink-0" :class="sidebarOpen ? 'p-4' : 'p-2'">
+                <div class="border-t border-gray-700">
+                    @auth
+                    <div x-data="{ open: false }" class="relative">
+                        <button @click="open = !open" 
+                                class="flex items-center w-full gap-3 p-2 rounded-lg hover:bg-gray-800 transition-colors focus:outline-none"
+                                :class="!sidebarOpen ? 'justify-center' : ''">
+                            <div class="relative flex-shrink-0">
+                                <div class="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-white font-semibold text-lg">
+                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                                 </div>
-                            </template>
-                        </a>
-                    </li>
-
-                    <!-- Pemasukan -->
-                    <li>
-                        <a href="{{ route('struks.index') }}"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-green-600/30 hover:to-emerald-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                                <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-gray-900 shadow-sm"></div>
                             </div>
-                            <template x-if="sidebarOpen">
-                                <div class="whitespace-nowrap text-left">
-                                    <span class="font-medium block">Pemasukan</span>
-                                    <p class="text-xs text-slate-300">Data pemasukan</p>
-                                </div>
-                            </template>
-                        </a>
-                    </li>
-
-                    <!-- Pengeluaran -->
-                    <li>
-                        <a href="{{ route('pengeluarans.index') }}"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-red-600/30 hover:to-pink-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-red-500 to-red-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                            <div class="nav-text text-left overflow-hidden" x-show="sidebarOpen" x-cloak>
+                                <span class="font-medium text-white text-sm block whitespace-nowrap">{{ Auth::user()->name }}</span>
+                                <span class="text-xs text-gray-400 whitespace-nowrap">Lihat Opsi</span>
                             </div>
-                            <template x-if="sidebarOpen">
-                                <div class="whitespace-nowrap text-left">
-                                    <span class="font-medium block">Pengeluaran</span>
-                                    <p class="text-xs text-slate-300">Data pengeluaran</p>
-                                </div>
-                            </template>
-                        </a>
-                    </li>
-
-                    <!-- Tambah Transaksi -->
-                    <li>
-                        <a href="{{ route('transaksi.create') }}"
-                            class="group flex items-center gap-3 px-2 py-3 text-white rounded-lg hover-glow transition-all duration-200 hover:bg-gradient-to-r hover:from-amber-600/30 hover:to-orange-600/30">
-                            <div
-                                class="p-2 bg-gradient-to-br from-amber-500 to-amber-600 rounded-md group-hover:scale-105 transition-transform duration-200">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                            </div>
-                            <template x-if="sidebarOpen">
-                                <div class="whitespace-nowrap text-left">
-                                    <span class="font-medium block">Tambah Transaksi</span>
-                                    <p class="text-xs text-slate-300">Buat transaksi baru</p>
-                                </div>
-                            </template>
-                        </a>
-                    </li>
-
-                </ul>
-            </nav>
-
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 h-screen overflow-y-auto main-content">
-            <header class="header-glass px-6 py-4 shadow-lg sticky top-0 z-40">
-                <div class="flex justify-between items-center">
-                    <div class="flex items-center gap-4">
-                        <!-- Mobile Menu Button (Titik Tiga) -->
-                        <button @click="mobileSidebarOpen = !mobileSidebarOpen"
-                            class="lg:hidden p-2 rounded-xl bg-gray-200 text-gray-800 hover:bg-gray-300 transition-colors"
-                            :class="showWelcome ? 'hidden' : ''">
-                            <i class="fas fa-ellipsis-v text-xl"></i>
+                            <i class="nav-text fa-solid fa-chevron-up w-4 h-4 text-gray-400 ml-auto transition-transform" x-show="sidebarOpen" x-cloak :class="open ? 'rotate-0' : 'rotate-180'"></i>
                         </button>
-                        <!-- Desktop Toggle Button -->
-                        <button @click="sidebarOpen = !sidebarOpen"
-                            class="hidden lg:block toggle-btn p-3 rounded-xl shadow-md relative z-10"
-                            :class="showWelcome ? 'hidden' : ''">
-                            <svg class="w-6 h-6 text-slate-600 relative z-10" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 6h16M4 12h16M4 18h7" />
-                            </svg>
-                        </button>
-                        <h2
-                            class="text-2xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                            Inventaris Barang
-                        </h2>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        @auth
-                        <!-- User Profile Dropdown -->
-                        <div x-data="{ open: false }" class="relative">
-                            <button @click="open = !open" class="flex items-center gap-3 focus:outline-none group">
-                                <div class="relative user-avatar">
-                                    <div class="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-md group-hover:shadow-lg transition-all overflow-hidden">
-                                        {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
-                                    </div>
-                                    <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-400 rounded-full border-2 border-white shadow-sm"></div>
-                                </div>
-                                <div class="hidden md:inline-block text-left">
-                                    <div class="flex items-center gap-1.5">
-                                        <span class="font-medium text-slate-800 text-sm leading-tight">{{ Auth::user()->name }}</span>
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    @if(Auth::user()->pegawai && Auth::user()->pegawai->nip)
-                                    <div class="flex items-center gap-1 mt-0.5">
-                                        <span class="text-xs font-mono bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full">NIP: {{ Auth::user()->pegawai->nip }}</span>
-                                    </div>
-                                    @endif
-                                </div>
-                                <svg :class="{ 'rotate-180': open }" class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </button>
 
-                            <!-- Dropdown Menu -->
-                            <div x-show="open" @click.away="open = false"
-                                x-transition:enter="transition ease-out duration-200"
-                                x-transition:enter-start="opacity-0 scale-95"
-                                x-transition:enter-end="opacity-100 scale-100"
-                                x-transition:leave="transition ease-in duration-75"
-                                x-transition:leave-start="opacity-100 scale-100"
-                                x-transition:leave-end="opacity-0 scale-95"
-                                class="absolute right-0 mt-2 w-48 origin-top-right rounded-xl shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden">
-                                <div class="py-1">
+                        <div x-show="open" @click.away="open = false"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95"
+                             x-transition:enter-end="opacity-100 scale-100"
+                             x-transition:leave="transition ease-in duration-75"
+                             x-transition:leave-start="opacity-100 scale-100"
+                             x-transition:leave-end="opacity-0 scale-95"
+                             class="absolute bottom-full left-0 mb-2 w-56 origin-bottom-left rounded-md shadow-lg bg-gray-800 border border-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                             :class="!sidebarOpen ? 'left-1/2 -translate-x-1/2 w-48' : 'w-56'" x-cloak>
+                            
+                            <div class="px-4 py-3 border-b border-gray-700">
+                                <span class="block text-sm font-medium text-white">{{ Auth::user()->name }}</span>
+                                @if(Auth::user()->pegawai && Auth::user()->pegawai->nip)
+                                <span class="block text-xs font-mono bg-blue-900 text-blue-300 px-2 py-0.5 rounded-full mt-1">NIP: {{ Auth::user()->pegawai->nip }}</span>
+                                @endif
+                            </div>
 
-                                    <a href="{{ route('profile.edit') }}"
-                                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors">
-                                        Profil Saya
-                                    </a>
-
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit"
-                                            class="w-full text-left block px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                                            Keluar
-                                        </button>
-                                    </form>
-                                </div>
-
+                            <div class="py-1">
+                                <a href="{{ route('profile.edit') }}"
+                                   class="flex items-center gap-2 px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 transition-colors">
+                                    <i class="fa-solid fa-user-edit w-4 h-4 text-gray-400"></i>
+                                    Profil Saya
+                                </a>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                            class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-gray-700 transition-colors">
+                                        <i class="fa-solid fa-right-from-bracket w-4 h-4 text-red-400"></i>
+                                        Keluar
+                                    </button>
+                                </form>
                             </div>
                         </div>
-                        @else
-                        <a href="{{ route('login') }}"
-                            class="auth-button px-6 py-2 text-blue-600 hover:text-blue-700 font-semibold rounded-lg">
-                            Login
-                        </a>
-                        @endauth
                     </div>
+                    @else
+                    <a href="{{ route('login') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg transition-colors duration-150 text-gray-400 hover:bg-gray-800 hover:text-white"
+                        :class="!sidebarOpen ? 'justify-center' : ''">
+                        <i class="fa-solid fa-right-to-bracket w-5 h-5 text-center"></i>
+                        <span class="nav-text font-medium text-sm whitespace-nowrap" x-show="sidebarOpen" x-cloak>Login</span>
+                    </a>
+                    @endauth
+                </div>
+            </div>
+        </aside>
+
+        {{-- Content Area --}}
+        <div class="flex-1 flex flex-col min-w-0">
+            
+            {{-- Mobile Header --}}
+            <header class="lg:hidden bg-gray-900 px-4 py-3 shadow-sm border-b border-gray-700 sticky top-0 z-30">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-lg font-bold text-white">Inventaris</h2>
+                    <button @click="mobileSidebarOpen = true" class="p-2 rounded-lg text-gray-400 hover:bg-gray-800 transition-colors">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
                 </div>
             </header>
 
-            <!-- Content Area -->
-            <div class="p-6 min-h-full">
-                <div class="content-area p-6 fade-in">
-                    <!-- Main Content -->
+            {{-- Main Content --}}
+            <main class="flex-1 bg-gray-950">
+                <div class="max-w-7xl mx-auto p-4 md:p-6">
                     @yield('content')
                 </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    <!-- Floating Particles Background -->
-    <div class="floating-particles">
-        @for ($i = 0; $i < 20; $i++) <div class="particle" style="
-                left: {{ rand(0, 100) }}%;
-                animation-duration: {{ rand(5, 15) }}s;
-                animation-delay: {{ rand(0, 5) }}s;
-                width: {{ rand(2, 6) }}px;
-                height: {{ rand(2, 6) }}px;
-            ">
-    </div>
-    @endfor
-    </div>
-
-    <!-- Scripts -->
     @stack('scripts')
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // --- Script untuk Notifikasi (SweetAlert) ---
             try {
                 // Fungsi untuk notifikasi
                 function showActionNotification(action, message) {
                     const settings = {
-                        create: {
-                            icon: 'success',
-                            title: 'Data Berhasil Ditambahkan',
-                            color: '#10B981'
-                        },
-                        update: {
-                            icon: 'info',
-                            title: 'Data Berhasil Diperbarui',
-                            color: '#3B82F6'
-                        },
-                        delete: {
-                            icon: 'warning',
-                            title: 'Data Berhasil Dihapus',
-                            color: '#EF4444'
-                        },
-                        error: {
-                            icon: 'error',
-                            title: 'Terjadi Kesalahan',
-                            color: '#DC2626'
-                        }
+                        create: { icon: 'success', title: 'Data Berhasil Ditambahkan', color: '#10B981' },
+                        update: { icon: 'info', title: 'Data Berhasil Diperbarui', color: '#3B82F6' },
+                        delete: { icon: 'warning', title: 'Data Berhasil Dihapus', color: '#EF4444' },
+                        error: { icon: 'error', title: 'Terjadi Kesalahan', color: '#DC2626' }
                     };
-
-                    const config = settings[action] || {
-                        icon: 'info',
-                        title: 'Notifikasi'
-                    };
-
+                    const config = settings[action] || { icon: 'info', title: 'Notifikasi' };
+                    
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'top-end',
                         showConfirmButton: false,
                         timer: 3000,
                         timerProgressBar: true,
-                        background: 'white',
+                        background: '#1F2937', // bg-gray-800
                         iconColor: config.color,
-                        color: '#1F2937',
+                        color: '#F9FAFB', // text-gray-100
                         didOpen: (toast) => {
                             toast.addEventListener('mouseenter', Swal.stopTimer);
                             toast.addEventListener('mouseleave', Swal.resumeTimer);
                         }
                     });
-
-                    Toast.fire({
-                        icon: config.icon,
-                        title: config.title,
-                        text: message
-                    });
+                    Toast.fire({ icon: config.icon, title: config.title, text: message });
                 }
 
-                // Debug session
-                console.log("Checking for notifications...");
-
-                // Handle notifications
+                // Handle notifications dari session
                 @if(session('created'))
-                console.log("Found created notification");
                 showActionNotification('create', '{{ session('created') }}');
                 @endif
-
                 @if(session('updated'))
-                console.log("Found updated notification");
                 showActionNotification('update', '{{ session('updated') }}');
                 @endif
-
                 @if(session('deleted'))
-                console.log("Found deleted notification");
                 showActionNotification('delete', '{{ session('deleted') }}');
                 @endif
-
                 @if(session('error'))
-                console.log("Found error notification");
                 showActionNotification('error', '{{ session('error') }}');
                 @endif
 
@@ -831,11 +329,10 @@
             }
         });
 
-        // Fungsi konfirmasi delete
+        // Fungsi konfirmasi delete (Global)
         function confirmDelete(event, itemName = 'data') {
             event.preventDefault();
             const form = event.target.closest('form');
-
             Swal.fire({
                 title: `Hapus ${itemName}?`,
                 text: "Data yang dihapus tidak dapat dikembalikan!",
@@ -845,24 +342,14 @@
                 cancelButtonColor: '#6B7280',
                 confirmButtonText: 'Ya, Hapus!',
                 cancelButtonText: 'Batal',
-                background: 'white'
+                background: '#1F2937', // bg-gray-800
+                color: '#F9FAFB' // text-gray-100
             }).then((result) => {
                 if (result.isConfirmed) {
                     form.submit();
                 }
             });
         }
-
-        // Otomatisasi sidebar berdasarkan lebar layar
-        const mediaQuery = window.matchMedia('(min-width: 1024px)');
-        function handleSidebarChange(e) {
-            Alpine.nextTick(() => {
-                sidebarOpen = e.matches;
-            });
-        }
-        mediaQuery.addEventListener('change', handleSidebarChange);
-        handleSidebarChange(mediaQuery); // Panggil langsung saat halaman dimuat
     </script>
 </body>
-
 </html>

@@ -11,17 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('struks', function (Blueprint $table) {
-    $table->id();
-    $table->string('nama_toko');
-    $table->string('nomor_struk')->unique();
-    $table->date('tanggal');
-    $table->json('items'); // deskripsi barang, jumlah, harga
-    $table->decimal('total_harga', 15, 2);
-    $table->enum('status', ['progress', 'selesai'])->default('progress');
-    $table->timestamps();
-});
-
+        Schema::create('struks', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_toko');
+            $table->string('nomor_struk');
+            $table->date('tanggal_struk');
+            $table->json('items');
+            $table->integer('total_harga');
+            $table->string('foto_struk')->nullable();
+            
+            // INI YANG PALING PENTING:
+            $table->string('status')->default('pending'); 
+            
+            $table->boolean('is_used')->default(false);
+            $table->date('tanggal_keluar')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**

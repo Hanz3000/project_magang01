@@ -2,266 +2,273 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8">
-    <title>Masuk - Inventaris Barang</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Masuk - Inventaris Barang PDAM Surabaya</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- TailwindCSS via CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            200: '#bae6fd',
-                            300: '#7dd3fc',
-                            400: '#38bdf8',
-                            500: '#0ea5e9',
-                            600: '#0284c7',
-                            700: '#0369a1',
-                            800: '#075985',
-                            900: '#0c4a6e',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Font & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+body {
+font-family: 'Inter', sans-serif;
+background-color: #111827;
+color: #E5E7EB;
+overflow: hidden; /* Mencegah scroll di body */
+}
 
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%);
-        }
+:root {
+--dark-bg-main: #111827;
+--dark-bg-container: #1F2937;
+--dark-bg-card-left: #374151;
+--dark-bg-card-right: #1F2937;
+--dark-bg-input: #374151;
+--text-light: #F9FAFB;
+--text-medium: #D1D5DB;
+--text-dark: #9CA3AF;
+--border-gray: #4B5563;
+--accent-gray-light: #9CA3AF;
+--accent-gray-hover: #6B7280;
+--focus-ring-gray: rgba(156, 163, 175, 0.4);
+--highlight-gray: #E5E7EB;
+--error-bg-dark: rgba(220, 38, 38, 0.2);
+--error-text-dark: #f87171;
+}
 
-        @keyframes float {
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
+.bg-main { background-color: var(--dark-bg-main); }
+.bg-container-dark { background-color: var(--dark-bg-container); }
+.bg-card-left { background-color: var(--dark-bg-card-left); }
+.bg-card-right { background-color: var(--dark-bg-card-right); }
+.bg-input-dark { background-color: var(--dark-bg-input); }
+.text-light { color: var(--text-light); }
+.text-medium { color: var(--text-medium); }
+.text-dark { color: var(--text-dark); }
+.border-gray { border-color: var(--border-gray); }
+.bg-accent-light { background-color: var(--accent-gray-light); }
+.hover\:bg-accent-hover:hover { background-color: var(--accent-gray-hover); }
+.text-accent-light { color: var(--accent-gray-light); }
+.hover\:text-light:hover { color: var(--text-light); }
+.focus\:ring-gray:focus {
+--tw-ring-color: var(--focus-ring-gray);
+border-color: var(--accent-gray-light);
+}
+.text-highlight-gray { color: var(--highlight-gray); }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+@keyframes fadeInSlideUp {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scaleIn {
+from { transform: scale(0.98); opacity: 0; }
+to { transform: scale(1); opacity: 1; }
+}
+@keyframes subtleBgShift {
+0% { background-color: #374151; }
+50% { background-color: #404a5a; }
+100% { background-color: #374151; }
+}
+@keyframes slowRotate {
+from { transform: rotate(-10deg); }
+to { transform: rotate(10deg); }
+}
 
-        @keyframes scaleIn {
-            from {
-                transform: scale(0.95);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
+.animate-fadeInSlideUp { animation: fadeInSlideUp 0.6s ease-out forwards; }
+.animate-scaleIn { animation: scaleIn 0.5s ease-out forwards; }
 
-        @keyframes gradientBG {
-            0% {
-                background-position: 0% 50%;
-            }
-            50% {
-                background-position: 100% 50%;
-            }
-            100% {
-                background-position: 0% 50%;
-            }
-        }
+.input-field {
+background-color: var(--dark-bg-input);
+color: var(--text-light);
+border: 1px solid var(--border-gray);
+transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.input-field::placeholder { color: var(--text-dark); }
+.input-field:focus {
+border-color: var(--accent-gray-light);
+box-shadow: 0 0 0 2px var(--focus-ring-gray);
+background-color: #4B5563;
+outline: none;
+}
 
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
+.left-col-bg {
+animation: subtleBgShift 15s ease infinite alternate;
+}
 
-        .animate-fadeIn {
-            animation: fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1);
-        }
+.floating-watermark {
+position: absolute;
+bottom: -50px;
+right: -50px;
+opacity: 0.03;
+font-size: 18rem;
+color: var(--text-dark);
+z-index: 0;
+animation: slowRotate 25s linear infinite alternate;
+}
 
-        .animate-scaleIn {
-            animation: scaleIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+/* Container yang fit dengan viewport */
+.login-container {
+height: 100vh;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: 1rem;
+}
 
-        .gradient-bg {
-            background: linear-gradient(-45deg, #f0f9ff, #e0f2fe, #bae6fd, #7dd3fc);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
-        }
+/* Responsive height adjustments */
+.login-card {
+max-height: 95vh;
+height: auto;
+}
 
-        .input-field {
-            transition: all 0.3s ease;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-        }
+/* Compact spacing untuk mobile */
+@media (max-height: 700px) {
+.login-card {
+max-height: 98vh;
+}
+.compact-spacing {
+padding: 1rem !important;
+}
+.compact-title {
+font-size: 1.5rem !important;
+margin-bottom: 0.5rem !important;
+}
+.compact-form {
+margin-top: 1rem !important;
+margin-bottom: 1rem !important;
+}
+}
 
-        .input-field:focus {
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
-        }
-
-        .btn-primary {
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px -1px rgba(14, 165, 233, 0.3), 0 2px 4px -1px rgba(14, 165, 233, 0.1);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(14, 165, 233, 0.3), 0 4px 6px -2px rgba(14, 165, 233, 0.1);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .floating-shapes {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
-        }
-
-        .shape {
-            position: absolute;
-            opacity: 0.2;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #0ea5e9, #7dd3fc);
-            filter: blur(40px);
-        }
-    </style>
+[x-cloak] { display: none !important; }
+</style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center px-4 py-12 gradient-bg">
-    <!-- Floating background shapes -->
-    <div class="floating-shapes">
-        <div class="shape w-64 h-64 top-10 left-10 animate-float" style="animation-delay: 0s;"></div>
-        <div class="shape w-80 h-80 bottom-20 right-20 animate-float" style="animation-delay: 2s;"></div>
-        <div class="shape w-96 h-96 top-1/3 right-1/4 animate-float" style="animation-delay: 4s;"></div>
-    </div>
+<body class="bg-main">
 
-    <div class="w-full max-w-md bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl p-8 animate-scaleIn">
-        <div class="text-center mb-8 animate-fadeIn" style="animation-delay: 0.2s;">
-            <div
-                class="w-20 h-20 bg-primary-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-inner">
-                <i class="fas fa-box-open text-primary-600 text-3xl"></i>
-            </div>
-            <h2 class="text-3xl font-bold text-slate-800 mb-2">Selamat Datang</h2>
-            <p class="text-slate-500">Masuk dengan NIP Anda</p>
-        </div>
+    <div class="login-container">
+        <div class="relative w-full max-w-5xl bg-container-dark rounded-xl shadow-2xl overflow-hidden flex flex-col lg:flex-row login-card animate-scaleIn">
 
-        @if ($errors->any())
-            <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-6 text-sm animate-fadeIn"
-                style="animation-delay: 0.3s;">
-                <div class="flex items-center">
-                    <i class="fas fa-exclamation-circle mr-2"></i>
-                    <div>
-                        @foreach ($errors->all() as $error)
-                            <p>{{ $error }}</p>
-                        @endforeach
+            <i class="fas fa-box floating-watermark hidden lg:block"></i>
+            
+            <div class="relative lg:w-1/2 p-6 lg:p-10 compact-spacing flex flex-col justify-center text-light bg-card-left overflow-hidden left-col-bg">
+                <div class="relative z-10">
+                    <div class="flex items-center mb-4 animate-fadeInSlideUp" style="animation-delay: 0.1s;">
+                        <div class="w-10 h-10 bg-gray-700 rounded-lg flex items-center justify-center mr-3">
+                             <i class="fas fa-box text-gray-300 text-xl"></i>
+                        </div>
+                        <span class="text-xl font-bold text-light">Inventaris Barang</span>
                     </div>
-                </div>
-            </div>
-        @endif
-
-        <form method="POST" action="{{ route('login') }}" class="space-y-5">
-            @csrf
-
-            <div class="animate-fadeIn" style="animation-delay: 0.4s;">
-                <label for="nip" class="block text-sm font-medium text-slate-700 mb-2">NIP</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-id-card text-slate-400"></i>
-                    </div>
-                    <input type="text" id="nip" name="nip"
-                        class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl input-field focus:border-primary-500 focus:ring-primary-500"
-                        placeholder="Masukkan NIP (8 digit)" value="{{ old('nip') }}" required autofocus pattern="\d{8}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold leading-tight mb-3 tracking-tight animate-fadeInSlideUp compact-title" style="animation-delay: 0.2s;">
+                        Manajemen Aset <span class="text-highlight-gray">Efisien</span>
+                    </h1>
+                    <p class="text-base text-medium animate-fadeInSlideUp" style="animation-delay: 0.3s;">
+                        Masuk untuk mengelola stok dan aset pergudangan PDAM Surabaya dengan mudah dan akurat.
+                    </p>
                 </div>
             </div>
 
-            <div class="animate-fadeIn" style="animation-delay: 0.5s;">
-                <label for="password" class="block text-sm font-medium text-slate-700 mb-2">Kata Sandi</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <i class="fas fa-lock text-slate-400"></i>
+            <div class="lg:w-1/2 p-6 lg:p-10 compact-spacing flex flex-col justify-center bg-card-right relative z-10">
+                <div class="text-center mb-6 compact-form animate-fadeInSlideUp" style="animation-delay: 0.4s;">
+                    <h2 class="text-2xl font-bold text-light mb-2">Selamat Datang Kembali</h2>
+                    <p class="text-medium text-sm">Masuk dengan NIP Anda</p>
+                </div>
+
+                {{-- PERBAIKAN: Menampilkan error Laravel jika ada --}}
+                @if ($errors->any())
+                <div class="bg-opacity-20 bg-red-500 border border-red-500 text-error-text-dark p-3 rounded mb-4 text-sm animate-fadeInSlideUp" style="animation-delay: 0.5s;">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle mr-3"></i>
+                        <div>
+                            @foreach ($errors->all() as $error)
+                                <p>{{ $error }}</p>
+                            @endforeach
+                        </div>
                     </div>
-                    <input type="password" id="password" name="password"
-                        class="w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl input-field focus:border-primary-500 focus:ring-primary-500"
-                        placeholder="••••••••" required>
-                    <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center"
-                        id="togglePassword">
-                        <i class="fas fa-eye text-slate-400 hover:text-primary-500 cursor-pointer"></i>
+                </div>
+                @endif
+
+                {{-- PERBAIKAN: action diubah ke route('login') dan @csrf ditambahkan --}}
+                <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                    @csrf
+
+                    <div class="animate-fadeInSlideUp" style="animation-delay: 0.6s;">
+                        <label for="nip" class="block text-sm font-medium text-medium mb-1.5">NIP</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-id-card text-dark"></i>
+                            </div>
+                            <input type="text" id="nip" name="nip"
+                                class="w-full pl-10 pr-4 py-2.5 rounded-lg input-field focus:ring-gray"
+                                placeholder="Masukkan NIP Anda (8 digit)" value="{{ old('nip') }}" required autofocus
+                                pattern="\d{8}" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 8)">
+                        </div>
+                    </div>
+
+                    <div class="animate-fadeInSlideUp" style="animation-delay: 0.7s;">
+                        <label for="password" class="block text-sm font-medium text-medium mb-1.5">Kata Sandi</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                                <i class="fas fa-lock text-dark"></i>
+                            </div>
+                            <input type="password" id="password" name="password"
+                                class="w-full pl-10 pr-10 py-2.5 rounded-lg input-field focus:ring-gray"
+                                placeholder="••••••••" required>
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-dark hover:text-medium transition-colors duration-150"
+                                id="togglePassword">
+                                <i class="fas fa-eye" id="toggleIcon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between text-sm animate-fadeInSlideUp" style="animation-delay: 0.8s;">
+                        <label class="inline-flex items-center">
+                            <input type="checkbox" name="remember"
+                                class="h-4 w-4 text-accent-light border-gray rounded focus:ring-gray bg-card focus:ring-opacity-50 focus:ring-offset-0">
+                            <span class="ml-2 text-medium">Ingat saya</span>
+                        </label>
+                        {{-- PERBAIKAN: href diubah ke route('password.request') --}}
+                        <a href="{{ route('password.request') }}"
+                            class="text-accent-light hover:text-light font-medium transition-colors duration-150">Lupa kata sandi?</a>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full bg-accent-light text-light py-2.5 px-4 rounded-lg font-semibold hover:bg-accent-hover transition-all duration-200 shadow hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-light focus:ring-offset-gray-800 animate-fadeInSlideUp"
+                        style="animation-delay: 0.9s;">
+                        Masuk
+                        <i class="fas fa-arrow-right ml-1.5 text-xs"></i>
                     </button>
+                </form>
+
+                <div class="text-center text-xs text-dark mt-6 animate-fadeInSlideUp" style="animation-delay: 1s;">
+                    <p>NIP & Kata Sandi diberikan oleh Admin. Hubungi Kepegawaian jika ada kendala.</p>
+                    <p class="mt-2">&copy; {{ date('Y') }} PDAM Surya Sembada Kota Surabaya</p>
                 </div>
             </div>
-
-            <div class="flex items-center justify-between text-sm animate-fadeIn" style="animation-delay: 0.6s;">
-                <label class="inline-flex items-center">
-                    <input type="checkbox" name="remember"
-                        class="h-4 w-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500">
-                    <span class="ml-2 text-slate-600">Ingat saya</span>
-                </label>
-                <a href="{{ route('password.request') }}"
-                    class="text-primary-600 hover:text-primary-800 hover:underline">Lupa kata sandi?</a>
-            </div>
-
-            <button type="submit"
-                class="w-full bg-primary-600 text-white py-3 px-4 rounded-xl btn-primary font-semibold animate-fadeIn"
-                style="animation-delay: 0.7s;">
-                Masuk
-                <i class="fas fa-arrow-right ml-2"></i>
-            </button>
-        </form>
-
-        <div class="text-center text-sm mt-6 animate-fadeIn" style="animation-delay: 1s;">
-            <p class="text-sm text-gray-600">NIP dan kata sandi diberikan oleh admin Master Data. Hubungi bagian kepegawaian jika ada masalah.</p>
         </div>
     </div>
 
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script>
         // Toggle password visibility
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
+        const passwordInput = document.querySelector('#password');
+        const toggleButton = document.querySelector('#togglePassword');
+        const toggleIcon = document.querySelector('#toggleIcon');
 
-        togglePassword.addEventListener('click', function(e) {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            this.querySelector('i').classList.toggle('fa-eye');
-            this.querySelector('i').classList.toggle('fa-eye-slash');
-        });
-
-        // Add ripple effect to buttons
-        document.querySelectorAll('.btn-primary').forEach(button => {
-            button.addEventListener('click', function(e) {
-                const x = e.clientX - e.target.getBoundingClientRect().left;
-                const y = e.clientY - e.target.getBoundingClientRect().top;
-
-                const ripple = document.createElement('span');
-                ripple.className = 'ripple-effect';
-                ripple.style.left = `${x}px`;
-                ripple.style.top = `${y}px`;
-
-                this.appendChild(ripple);
-
-                setTimeout(() => {
-                    ripple.remove();
-                }, 1000);
+        if (passwordInput && toggleButton) {
+            toggleButton.addEventListener('click', () => {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                
+                // Toggle icon
+                if (type === 'text') {
+                    toggleIcon.classList.remove('fa-eye');
+                    toggleIcon.classList.add('fa-eye-slash');
+                } else {
+                    toggleIcon.classList.remove('fa-eye-slash');
+                    toggleIcon.classList.add('fa-eye');
+                }
             });
-        });
+        }
     </script>
 </body>
 

@@ -1,5 +1,5 @@
 <?php
-// File: 2025_07_01_160049_add_from_income_to_pengeluarans_table.php
+// File: 2025_10_28_142324_add_struk_id_to_pengeluarans_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -13,9 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('pengeluarans', function (Blueprint $table) {
-            // File ini SEKARANG HANYA menambahkan 'from_income'
-            // Kita sudah menghapus kode 'struk_id' dari sini
-            $table->boolean('from_income')->default(false);
+            // Kode 'struk_id' kita pindahkan ke file BARU ini
+            // Ini aman karena file ini berjalan SETELAH tabel 'struks' dibuat
+            $table->foreignId('struk_id')->nullable()->constrained('struks');
         });
     }
 
@@ -25,7 +25,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('pengeluarans', function (Blueprint $table) {
-            $table->dropColumn('from_income');
+            $table->dropForeign(['struk_id']);
+            $table->dropColumn('struk_id');
         });
     }
 };

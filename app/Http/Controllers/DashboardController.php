@@ -16,9 +16,12 @@ final class DashboardController extends Controller
         $timePeriod = $request->input('time_period', 'all');
         $bulan = $request->input('bulan', now()->month);
         $tahun = $request->input('tahun', now()->year);
+        $startDate = $request->input('start_date'); // BARU: Ambil start_date
+        $endDate = $request->input('end_date');     // BARU: Ambil end_date
 
-        $totalStrukPemasukan = $this->getFilteredCount(Struk::query(), $timePeriod, $bulan, $tahun);
-        $totalStrukPengeluaran = $this->getFilteredCount(Pengeluaran::query(), $timePeriod, $bulan, $tahun);
+        // BARU: Kirim $startDate dan $endDate ke fungsi
+        $totalStrukPemasukan = $this->getFilteredCount(Struk::query(), $timePeriod, $bulan, $tahun, $startDate, $endDate);
+        $totalStrukPengeluaran = $this->getFilteredCount(Pengeluaran::query(), $timePeriod, $bulan, $tahun, $startDate, $endDate);
         $totalStruk = $totalStrukPemasukan + $totalStrukPengeluaran;
 
         $latestStruk = Struk::latest()->first();
@@ -33,8 +36,9 @@ final class DashboardController extends Controller
             $latestPengeluaranStruk->processed_items = $this->parseItems($latestPengeluaranStruk->daftar_barang);
         }
 
-        $totalBarangMasuk = $this->calculateTotalBarangFiltered(Struk::class, 'items', $timePeriod, $bulan, $tahun);
-        $totalBarangKeluar = $this->calculateTotalBarangFiltered(Pengeluaran::class, 'daftar_barang', $timePeriod, $bulan, $tahun);
+        // BARU: Kirim $startDate dan $endDate ke fungsi
+        $totalBarangMasuk = $this->calculateTotalBarangFiltered(Struk::class, 'items', $timePeriod, $bulan, $tahun, $startDate, $endDate);
+        $totalBarangKeluar = $this->calculateTotalBarangFiltered(Pengeluaran::class, 'daftar_barang', $timePeriod, $bulan, $tahun, $startDate, $endDate);
 
         $strukQuery = Struk::query();
         $pengeluaranQuery = Pengeluaran::query();
@@ -51,6 +55,13 @@ final class DashboardController extends Controller
             case 'monthly':
                 $strukQuery->whereMonth('tanggal_struk', $bulan)->whereYear('tanggal_struk', $tahun);
                 $pengeluaranQuery->whereMonth('tanggal', $bulan)->whereYear('tanggal', $tahun);
+                break;
+            // BARU: Tambahkan case untuk 'range'
+            case 'range':
+                if ($startDate && $endDate) {
+                    $strukQuery->whereBetween('tanggal_struk', [$startDate, $endDate . ' 23:59:59']);
+                    $pengeluaranQuery->whereBetween('tanggal', [$startDate, $endDate . ' 23:59:59']);
+                }
                 break;
         }
 
@@ -108,10 +119,18 @@ final class DashboardController extends Controller
         });
 
         // Kirimkan SEMUA Struk unik (baik progress maupun completed) ke view
-$pemasukans = $pemasukanList->map(function ($item) {
-    return $item['struk'];
-})->unique('id')->values();
-$pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
+        $pemasukans = $pemasukanList->map(function ($item) {
+            return $item['struk'];
+        })->unique('id')->values();
+        
+        // BARU: Filter server-side untuk status pemasukan
+        if ($request->filled('status_pemasukan')) {
+            $pemasukans = $pemasukans->filter(function ($struk) use ($request) {
+                return $struk->status === $request->input('status_pemasukan');
+            });
+        }
+        
+        $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
 
         // Filter for Completed
         $completedPemasukans = $pemasukanList->filter(function ($item) {
@@ -122,9 +141,14 @@ $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
 
         $completedPemasukans = $this->paginateCollection($completedPemasukans, 10, 'page_pemasukan_completed');
 
-        // Fetch SEMUA Pengeluaran (Progress dan Completed)
-        $pengeluarans = Pengeluaran::with('pegawai')
-            ->latest()
+        // BARU: Terapkan filter status server-side untuk pengeluaran
+        $pengeluaranQueryForList = Pengeluaran::with('pegawai')->latest();
+        
+        if ($request->filled('status_pengeluaran')) {
+            $pengeluaranQueryForList->where('status', $request->input('status_pengeluaran'));
+        }
+
+        $pengeluarans = $pengeluaranQueryForList
             ->paginate(10, ['*'], 'page_pengeluaran')
             ->appends($request->query());
 
@@ -153,7 +177,8 @@ $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
         ]);
     }
 
-    private function getFilteredCount($query, $timePeriod, $bulan = null, $tahun = null)
+    // BARU: Tambahkan parameter $startDate dan $endDate
+    private function getFilteredCount($query, $timePeriod, $bulan = null, $tahun = null, $startDate = null, $endDate = null)
     {
         $query = clone $query;
         $model = $query->getModel();
@@ -169,12 +194,19 @@ $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
             case 'monthly':
                 $query->whereMonth($dateColumn, $bulan)->whereYear($dateColumn, $tahun);
                 break;
+            // BARU: Tambahkan case untuk 'range'
+            case 'range':
+                if ($startDate && $endDate) {
+                    $query->whereBetween($dateColumn, [$startDate, $endDate . ' 23:59:59']);
+                }
+                break;
         }
 
         return $query->count();
     }
 
-    private function calculateTotalBarangFiltered(string $model, string $itemsField, string $timePeriod, $bulan = null, $tahun = null): int
+    // BARU: Tambahkan parameter $startDate dan $endDate dan hapus type hint string dari $timePeriod
+    private function calculateTotalBarangFiltered(string $model, string $itemsField, $timePeriod, $bulan = null, $tahun = null, $startDate = null, $endDate = null): int
     {
         $query = $model::query();
         $dateColumn = $model === \App\Models\Struk::class ? 'tanggal_struk' : 'tanggal';
@@ -188,6 +220,12 @@ $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
                 break;
             case 'monthly':
                 $query->whereMonth($dateColumn, $bulan)->whereYear($dateColumn, $tahun);
+                break;
+            // BARU: Tambahkan case untuk 'range'
+            case 'range':
+                if ($startDate && $endDate) {
+                    $query->whereBetween($dateColumn, [$startDate, $endDate . ' 23:59:59']);
+                }
                 break;
         }
 
@@ -283,21 +321,25 @@ $pemasukans = $this->paginateCollection($pemasukans, 10, 'page_pemasukan');
     {
         // Logika untuk menentukan status progres
         // Jika ada tanggal keluar, status completed
+        
+        // BARU: Menggunakan $struk->status (dari database) sebagai sumber kebenaran
+        if ($struk->status === 'completed') {
+            return 'completed';
+        }
+        if ($struk->status === 'progress') {
+             return 'progress';
+        }
+
+        // Fallback ke logika lama jika status tidak ada
         if ($struk->tanggal_keluar) {
             return 'completed';
         }
         
-        // Jika barang memiliki tanggal struk yang sudah lewat lebih dari 7 hari
         if ($struk->tanggal_struk && now()->diffInDays($struk->tanggal_struk) > 7) {
-            return 'in_progress';
+            return 'progress'; // Mengganti 'in_progress' menjadi 'progress' agar konsisten
         }
         
-        // Jika jumlah barang lebih dari 10, anggap sedang diproses
-        if ($item['jumlah'] > 10) {
-            return 'in_progress';
-        }
-        
-        return 'pending';
+        return 'progress'; // Default ke 'progress' (bukan 'pending')
     }
 
     private function processAndPaginatePengeluaranList($query, array $filters = [], string $pageName = 'page', $barangMaster = [])
